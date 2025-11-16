@@ -1,522 +1,1071 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SL Farmer | Premium Pineapples & Ginger</title>
 
-    <link rel="icon" type="image/svg+xml" href="images/sl-farmer-logo.svg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="images/sl-farmer-logo.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        farm: {
-                            50: '#f2fbf2',
-                            100: '#dff3df',
-                            200: '#b7e2b7',
-                            300: '#8dce8d',
-                            400: '#5fb25f',
-                            500: '#3f8a3f',
-                            600: '#2f6c2f',
-                            700: '#215021',
-                            800: '#153515',
-                            900: '#0b1d0b'
-                        }
-                    }
-                }
-            }
-        };
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              farm: {
+                50: "#f2fbf2",
+                100: "#dff3df",
+                200: "#b7e2b7",
+                300: "#8dce8d",
+                400: "#5fb25f",
+                500: "#3f8a3f",
+                600: "#2f6c2f",
+                700: "#215021",
+                800: "#153515",
+                900: "#0b1d0b",
+              },
+            },
+          },
+        },
+      };
     </script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900">
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80">
-        <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
-            <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
-                <a href="#" class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100">
-                    <img src="images/sl-farmer-logo.svg" alt="SL Farmer Logo" class="h-20 w-26 object-contain">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500">SL Farmer</p>
-                        <p class="text-2xl font-extrabold text-farm-800 dark:text-farm-100">Farm Fresh Goodness</p>
-                    </div>
-                </a>
-                <nav class="order-3 w-full md:order-2 md:flex-1">
-                    <ul class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0">
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#products">Products</a></li>
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#farm">Our Farm</a></li>
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#about">About</a></li>
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#story">Our Story</a></li>
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#testimonials">Testimonials</a></li>
-                        <li><a class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200" href="#contact">Contact</a></li>
-                        <li class="md:hidden"><a href="https://wa.me/94751519573" target="_blank" class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow">Chat on WhatsApp</a></li>
-                    </ul>
-                </nav>
-                <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
-                    <button id="themeToggle" class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900" aria-label="Toggle dark mode">
-                        <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
-                    </button>
-                    <a href="https://wa.me/94751519573" target="_blank" class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex">
-                        <i class="fab fa-whatsapp text-base leading-none"></i><span class="tracking-wide">WhatsApp</span>
-                    </a>
-                    <button class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50" aria-label="Toggle navigation" aria-expanded="false">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900"
+  >
+    <header
+      class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80"
+    >
+      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
+        <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
+          <a
+            href="#"
+            class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100"
+          >
+            <img
+              src="images/sl-farmer-logo.svg"
+              alt="SL Farmer Logo"
+              class="h-20 w-26 object-contain"
+            />
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500"
+              >
+                SL Farmer
+              </p>
+              <p
+                class="text-2xl font-extrabold text-farm-800 dark:text-farm-100"
+              >
+                Farm Fresh Goodness
+              </p>
             </div>
+          </a>
+          <nav class="order-3 w-full md:order-2 md:flex-1">
+            <ul
+              class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0"
+            >
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#products"
+                  >Products</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#farm"
+                  >Our Farm</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#about"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#story"
+                  >Our Story</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#testimonials"
+                  >Testimonials</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#contact"
+                  >Contact</a
+                >
+              </li>
+              <li class="md:hidden">
+                <a
+                  href="https://wa.me/94751519573"
+                  target="_blank"
+                  class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow"
+                  >Chat on WhatsApp</a
+                >
+              </li>
+            </ul>
+          </nav>
+          <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
+            <button
+              id="themeToggle"
+              class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
+              aria-label="Toggle dark mode"
+            >
+              <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+            </button>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex"
+            >
+              <i class="fab fa-whatsapp text-base leading-none"></i
+              ><span class="tracking-wide">WhatsApp</span>
+            </a>
+            <button
+              class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
         </div>
+      </div>
     </header>
 
     <main class="pt-36">
-        <section class="hero bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6">
-            <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
-                <div class="hero-content space-y-6">
-                    <p class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200">Natural Sri Lankan Harvest</p>
-                    <h1 class="text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">Premium Pineapples &amp; Ginger, Naturally Grown</h1>
-                    <p class="text-lg text-slate-600 dark:text-slate-200">Founded by our passionate team, SL Farmer brings you the finest quality produce from our family farm to your table using sustainable farming methods.</p>
-                    <div class="hero-btns flex flex-wrap gap-4">
-                        <a href="#products" class="inline-flex items-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5">View Products</a>
-                        <a href="#contact" class="inline-flex items-center rounded-full border border-farm-300 px-7 py-3 text-base font-semibold text-farm-700 transition hover:bg-white dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-900">Get in Touch</a>
-                    </div>
-                    <dl class="grid grid-cols-2 gap-6 pt-4 text-sm sm:grid-cols-3">
-                        <div>
-                            <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Acres cultivated</dt>
-                            <dd class="text-3xl font-bold text-farm-700 dark:text-amber-200">25+</dd>
-                        </div>
-                        <div>
-                            <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Chemical free</dt>
-                            <dd class="text-3xl font-bold text-farm-700 dark:text-amber-200">100%</dd>
-                        </div>
-                        <div>
-                            <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Happy clients</dt>
-                            <dd class="text-3xl font-bold text-farm-700 dark:text-amber-200">500+</dd>
-                        </div>
-                    </dl>
-                </div>
-                <div class="hero-image relative h-[28rem] w-full sm:h-[32rem]">
-                    <div class="slideshow-container h-full w-full overflow-hidden rounded-[2rem] border border-emerald-100/70 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-emerald-100/50 dark:border-emerald-900/40 dark:bg-slate-900 dark:shadow-black/40 dark:ring-emerald-900/50">
-                        <div class="slideshow">
-                            <div class="slide active">
-                                <img src="images/1.jpeg" alt="Fresh Pineapples">
-                                <div class="slide-overlay">
-                                    <span>Fresh Pineapples</span>
-                                </div>
-                            </div>
-                            <div class="slide">
-                                <img src="images/2.jpg" alt="Organic Ginger">
-                                <div class="slide-overlay">
-                                    <span>Organic Ginger</span>
-                                </div>
-                            </div>
-                            <div class="slide">
-                                <img src="images/3.jpg" alt="Farm Fresh">
-                                <div class="slide-overlay">
-                                    <span>Farm Fresh</span>
-                                </div>
-                            </div>
-                            <div class="slide">
-                                <img src="images/4.jpg" alt="Natural Farming">
-                                <div class="slide-overlay">
-                                    <span>Natural Farming</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="slideshow-nav">
-                            <button class="nav-btn prev-btn" aria-label="Previous slide">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div class="slide-dots">
-                                <span class="dot active" data-slide="0"></span>
-                                <span class="dot" data-slide="1"></span>
-                                <span class="dot" data-slide="2"></span>
-                                <span class="dot" data-slide="3"></span>
-                            </div>
-                            <button class="nav-btn next-btn" aria-label="Next slide">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+      <section
+        class="hero bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6"
+      >
+        <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+          <div class="hero-content space-y-6">
+            <p
+              class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200"
+            >
+              Natural Sri Lankan Harvest
+            </p>
+            <h1
+              class="text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white"
+            >
+              Premium Pineapples &amp; Ginger, Naturally Grown
+            </h1>
+            <p class="text-lg text-slate-600 dark:text-slate-200">
+              Founded by our passionate team, SL Farmer brings you the finest
+              quality produce from our family farm to your table using
+              sustainable farming methods.
+            </p>
+            <div class="hero-btns flex flex-wrap gap-4">
+              <a
+                href="#products"
+                class="inline-flex items-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5"
+                >View Products</a
+              >
+              <a
+                href="#contact"
+                class="inline-flex items-center rounded-full border border-farm-300 px-7 py-3 text-base font-semibold text-farm-700 transition hover:bg-white dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-900"
+                >Get in Touch</a
+              >
             </div>
-        </section>
-
-        <section class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.5em] text-farm-500">Why Choose Us</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Nourished by Sri Lankan Soil</h2>
-                    <p class="mt-4 text-base text-slate-600 dark:text-slate-300">We blend modern agricultural science with traditional wisdom to deliver produce that tastes vibrant and feels authentic.</p>
+            <dl class="grid grid-cols-2 gap-6 pt-4 text-sm sm:grid-cols-3">
+              <div>
+                <dt
+                  class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Acres cultivated
+                </dt>
+                <dd
+                  class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                >
+                  25+
+                </dd>
+              </div>
+              <div>
+                <dt
+                  class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Chemical free
+                </dt>
+                <dd
+                  class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                >
+                  100%
+                </dd>
+              </div>
+              <div>
+                <dt
+                  class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Happy clients
+                </dt>
+                <dd
+                  class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                >
+                  500+
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div class="hero-image relative h-[28rem] w-full sm:h-[32rem]">
+            <div
+              class="slideshow-container h-full w-full overflow-hidden rounded-[2rem] border border-emerald-100/70 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-emerald-100/50 dark:border-emerald-900/40 dark:bg-slate-900 dark:shadow-black/40 dark:ring-emerald-900/50"
+            >
+              <div class="slideshow">
+                <div class="slide active">
+                  <img src="images/1.jpeg" alt="Fresh Pineapples" />
+                  <div class="slide-overlay">
+                    <span>Fresh Pineapples</span>
+                  </div>
                 </div>
-                <div class="features mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <article class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70">
-                        <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200">
-                            <i class="fas fa-seedling"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">100% Natural</h3>
-                        <p class="mt-2 text-slate-600 dark:text-slate-300">Grown without synthetic chemicals or pesticides for the purest fruit experience.</p>
-                    </article>
-                    <article class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70">
-                        <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200">
-                            <i class="fas fa-award"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Premium Quality</h3>
-                        <p class="mt-2 text-slate-600 dark:text-slate-300">Hand-picked at peak ripeness for sweetness, aroma, and longer shelf life.</p>
-                    </article>
-                    <article class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70">
-                        <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Fresh Delivery</h3>
-                        <p class="mt-2 text-slate-600 dark:text-slate-300">Direct from our farm to you with cold-chain packaging that preserves freshness.</p>
-                    </article>
+                <div class="slide">
+                  <img src="images/2.jpg" alt="Organic Ginger" />
+                  <div class="slide-overlay">
+                    <span>Organic Ginger</span>
+                  </div>
                 </div>
+                <div class="slide">
+                  <img src="images/3.jpg" alt="Farm Fresh" />
+                  <div class="slide-overlay">
+                    <span>Farm Fresh</span>
+                  </div>
+                </div>
+                <div class="slide">
+                  <img src="images/4.jpg" alt="Natural Farming" />
+                  <div class="slide-overlay">
+                    <span>Natural Farming</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slideshow-nav">
+                <button class="nav-btn prev-btn" aria-label="Previous slide">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slide-dots">
+                  <span class="dot active" data-slide="0"></span>
+                  <span class="dot" data-slide="1"></span>
+                  <span class="dot" data-slide="2"></span>
+                  <span class="dot" data-slide="3"></span>
+                </div>
+                <button class="nav-btn next-btn" aria-label="Next slide">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
             </div>
-        </section>
-
-        <section id="products" class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="section-title text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">Our Harvest</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Our Premium Products</h2>
-                    <p class="mt-4 text-base text-slate-600 dark:text-slate-300">Discover naturally grown pineapples and ginger nurtured in rich Sri Lankan soil.</p>
-                </div>
-                <div class="products-grid mt-12 grid gap-8 lg:grid-cols-2">
-                    <article class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
-                        <span class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
-                        <img src="images/1.jpeg" alt="Golden Pineapples" class="mt-4 h-64 w-full rounded-2xl object-cover">
-                        <div class="product-content mt-6 space-y-4">
-                            <div>
-                                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">Golden Pineapple</h3>
-                                <p class="mt-2 text-slate-600 dark:text-slate-300">Sweet, juicy pineapples harvested at peak ripeness. Perfect for fresh eating, smoothies, or cooking.</p>
-                            </div>
-                            <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
-                                <span>$12.99</span>
-                                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per kg</span>
-                            </div>
-                            <a href="#contact" class="inline-flex items-center justify-center rounded-full border border-farm-300 px-6 py-3 text-sm font-semibold text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-800">Pre-order Now</a>
-                        </div>
-                    </article>
-                    <article class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
-                        <span class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
-                        <img src="images/2.jpg" alt="Fresh ginger roots" class="mt-4 h-64 w-full rounded-2xl object-cover">
-                        <div class="product-content mt-6 space-y-4">
-                            <div>
-                                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">Premium Ginger</h3>
-                                <p class="mt-2 text-slate-600 dark:text-slate-300">Hearty ginger with intense aroma for cooking, herbal teas, and natural remedies.</p>
-                            </div>
-                            <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
-                                <span>$8.99</span>
-                                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per kg</span>
-                            </div>
-                            <a href="#contact" class="inline-flex items-center justify-center rounded-full border border-farm-300 px-6 py-3 text-sm font-semibold text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-800">Pre-order Now</a>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section id="farm" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="section-title text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">Our Farm</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Our Farming Process</h2>
-                    <p class="mt-4 text-base text-slate-600 dark:text-slate-300">Traditional methods meet modern sustainable practices.</p>
-                </div>
-                <div class="farm-content mt-12 grid gap-12 lg:grid-cols-2">
-                    <div class="farm-text space-y-5">
-                        <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">Natural &amp; Sustainable</h3>
-                        <p class="text-slate-600 dark:text-slate-300">Explore the finest fruits grown with care and dedication, ensuring quality and freshness in every harvest.</p>
-                        <p class="text-slate-600 dark:text-slate-300">Our commitment to sustainable farming means you get produce that's not only delicious but also environmentally responsible.</p>
-                        <div class="grid grid-cols-3 gap-4 rounded-3xl border border-farm-100 bg-farm-50/70 p-6 text-center dark:border-farm-800 dark:bg-slate-900">
-                            <div>
-                                <p class="text-3xl font-bold text-farm-700 dark:text-amber-200">100%</p>
-                                <p class="text-xs uppercase tracking-wide text-slate-500">Natural</p>
-                            </div>
-                            <div>
-                                <p class="text-3xl font-bold text-farm-700 dark:text-amber-200">0</p>
-                                <p class="text-xs uppercase tracking-wide text-slate-500">Chemicals</p>
-                            </div>
-                            <div>
-                                <p class="text-3xl font-bold text-farm-700 dark:text-amber-200">Fresh</p>
-                                <p class="text-xs uppercase tracking-wide text-slate-500">Daily</p>
-                            </div>
-                        </div>
-                        <ul class="space-y-3 text-slate-600 dark:text-slate-300">
-                            <li class="flex items-start gap-3"><i class="fas fa-leaf mt-1 text-farm-500"></i>Soil enriched with composted pineapple crowns.</li>
-                            <li class="flex items-start gap-3"><i class="fas fa-hand-holding-water mt-1 text-farm-500"></i>Rainwater harvesting and precision watering.</li>
-                            <li class="flex items-start gap-3"><i class="fas fa-sun mt-1 text-farm-500"></i>Shade management that keeps crops cool and sweet.</li>
-                        </ul>
-                    </div>
-                    <div class="farm-image">
-                        <div class="slideshow-container farm-slideshow h-[26rem] w-full overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-emerald-100 dark:border-emerald-900 dark:bg-slate-900 dark:ring-emerald-900">
-                            <div class="slideshow">
-                                <div class="slide active">
-                                    <img src="images/1.jpeg" alt="Natural Farming">
-                                    <div class="slide-overlay">
-                                        <span>Natural Farming</span>
-                                    </div>
-                                </div>
-                                <div class="slide">
-                                    <img src="images/2.jpg" alt="Organic Growth">
-                                    <div class="slide-overlay">
-                                        <span>Organic Growth</span>
-                                    </div>
-                                </div>
-                                <div class="slide">
-                                    <img src="images/3.jpg" alt="Harvest Time">
-                                    <div class="slide-overlay">
-                                        <span>Harvest Time</span>
-                                    </div>
-                                </div>
-                                <div class="slide">
-                                    <img src="images/4.jpg" alt="Quality Check">
-                                    <div class="slide-overlay">
-                                        <span>Quality Check</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="slideshow-nav">
-                                <button class="nav-btn prev-btn" aria-label="Previous slide">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="slide-dots">
-                                    <span class="dot active" data-slide="0"></span>
-                                    <span class="dot" data-slide="1"></span>
-                                    <span class="dot" data-slide="2"></span>
-                                    <span class="dot" data-slide="3"></span>
-                                </div>
-                                <button class="nav-btn next-btn" aria-label="Next slide">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="bg-farm-50/60 px-4 py-20 dark:bg-slate-900 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="section-title text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">About SL Farmer</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Our Commitment to Quality</h2>
-                </div>
-                <div class="about-content mt-10 grid gap-10 md:grid-cols-2">
-                    <div class="about-text space-y-5 text-slate-600 dark:text-slate-300">
-                        <p>SL Farmer is a family-owned farm dedicated to growing premium pineapples and ginger using natural farming practices. We believe in sustainable agriculture that respects the environment while delivering the highest quality products to our customers.</p>
-                        <div class="commitment-points space-y-3">
-                            <div class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80">
-                                <i class="fas fa-check-circle text-farm-500"></i>
-                                <span>100% natural farming methods</span>
-                            </div>
-                            <div class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80">
-                                <i class="fas fa-check-circle text-farm-500"></i>
-                                <span>Sustainable agricultural practices</span>
-                            </div>
-                            <div class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80">
-                                <i class="fas fa-check-circle text-farm-500"></i>
-                                <span>Fresh, locally grown produce</span>
-                            </div>
-                            <div class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80">
-                                <i class="fas fa-check-circle text-farm-500"></i>
-                                <span>Supporting our local community</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="rounded-[2rem] border border-farm-100 bg-gradient-to-br from-white to-farm-50 p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:from-slate-900 dark:to-slate-950">
-                        <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">Sustainability in Action</h3>
-                        <p class="mt-4 text-slate-600 dark:text-slate-300">Every harvest is traced, recorded, and audited for carbon footprint, water usage, and soil vitality.</p>
-                        <div class="mt-6 grid grid-cols-2 gap-6 text-center">
-                            <div class="rounded-2xl bg-white/80 p-4 shadow-sm dark:bg-slate-800/80">
-                                <p class="text-4xl font-bold text-farm-700 dark:text-amber-200">15+</p>
-                                <p class="text-xs uppercase tracking-wide text-slate-500">Years Experience</p>
-                            </div>
-                            <div class="rounded-2xl bg-white/80 p-4 shadow-sm dark:bg-slate-800/80">
-                                <p class="text-4xl font-bold text-farm-700 dark:text-amber-200">4</p>
-                                <p class="text-xs uppercase tracking-wide text-slate-500">Generations</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="story" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="section-title text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">Our Story</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Meet Our Founder</h2>
-                    <p class="mt-4 text-base text-slate-600 dark:text-slate-300">The passion behind SL Farmer</p>
-                </div>
-                <div class="story-content mt-12 grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-                    <div class="owner-info rounded-[2rem] border border-farm-100 bg-white/80 p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
-                        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">Rashmi Perera</h3>
-                        <p class="owner-title mt-2 text-sm uppercase tracking-[0.4em] text-farm-500">Founder &amp; Head Farmer</p>
-                        <div class="owner-bio mt-6 space-y-4 text-slate-600 dark:text-slate-300">
-                            <p>With over 15 years of experience in sustainable agriculture, Rashmi founded SL Farmer with a vision to provide premium, naturally grown produce while preserving traditional farming methods.</p>
-                            <p>Her dedication to organic farming and commitment to quality has made SL Farmer a trusted name in premium pineapples and ginger. Coming from a family of farmers, she combines traditional wisdom with modern sustainable practices.</p>
-                        </div>
-                        <blockquote class="owner-quote mt-6 rounded-3xl bg-farm-50/70 p-6 text-lg font-medium text-farm-700 dark:bg-slate-800 dark:text-amber-100">
-                            "Our mission is simple: grow the finest pineapples and ginger using methods that respect both nature and our customers' health. Every fruit we harvest carries the love and care of our farming heritage."
-                        </blockquote>
-                        <div class="owner-achievements mt-6 grid gap-4 md:grid-cols-3">
-                            <div class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800">
-                                <i class="fas fa-graduation-cap text-2xl text-farm-500"></i>
-                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Degree in Agricultural Science</p>
-                            </div>
-                            <div class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800">
-                                <i class="fas fa-hand-holding-heart text-2xl text-farm-500"></i>
-                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">15+ Years Farming Experience</p>
-                            </div>
-                            <div class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800">
-                                <i class="fas fa-users text-2xl text-farm-500"></i>
-                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Local Community Leader</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="owner-image">
-                        <div class="image-placeholder owner flex h-full min-h-[24rem] flex-col items-center justify-center rounded-[2rem] border border-dashed border-farm-200 bg-gradient-to-br from-farm-50 to-white p-10 text-center text-farm-700 dark:border-farm-800 dark:from-slate-900 dark:to-slate-950">
-                            <i class="fas fa-user-tie text-6xl"></i>
-                            <span class="mt-4 text-lg font-semibold">Founder &amp; Owner</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="testimonials" class="bg-farm-50/70 px-4 py-20 dark:bg-slate-900 sm:px-6">
-            <div class="mx-auto max-w-6xl">
-                <div class="section-title text-center">
-                    <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">Testimonials</p>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">What Our Customers Say</h2>
-                </div>
-                <div class="testimonial-grid mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <article class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100">
-                        <p class="testimonial-text text-lg">"The pineapples from SL Farmer are the sweetest I've ever tasted! You can really tell they're grown naturally."
-                        </p>
-                        <div class="testimonial-author mt-6 text-sm font-semibold">
-                            <p class="author-name text-farm-600 dark:text-amber-200">Priya S.</p>
-                            <p class="author-location text-slate-500">Colombo</p>
-                        </div>
-                    </article>
-                    <article class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100">
-                        <p class="testimonial-text text-lg">"I've been using their ginger for my teas and remedies for months now. The quality is consistently excellent."
-                        </p>
-                        <div class="testimonial-author mt-6 text-sm font-semibold">
-                            <p class="author-name text-farm-600 dark:text-amber-200">Rajesh K.</p>
-                            <p class="author-location text-slate-500">Kandy</p>
-                        </div>
-                    </article>
-                    <article class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100">
-                        <p class="testimonial-text text-lg">"Knowing that my produce comes from a farm that cares about sustainable practices makes me feel good about my purchase."</p>
-                        <div class="testimonial-author mt-6 text-sm font-semibold">
-                            <p class="author-name text-farm-600 dark:text-amber-200">Anjali M.</p>
-                            <p class="author-location text-slate-500">Galle</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-    <section id="contact" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-        <div class="mx-auto max-w-6xl">
-            <div class="section-title text-center">
-                <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">Contact</p>
-                <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">Get in Touch</h2>
-                <p class="mt-4 text-base text-slate-600 dark:text-slate-300">Ready to experience our premium products? Contact us today!</p>
-            </div>
-            <div class="contact-container mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-                <div class="contact-info space-y-6 rounded-[2rem] border border-farm-100 bg-farm-50/70 p-8 shadow-xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
-                    <div class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80">
-                        <span class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"><i class="fas fa-phone"></i></span>
-                        <div class="contact-text">
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Phone</h3>
-                            <p>+94 75 151 9573</p>
-                        </div>
-                    </div>
-                    <div class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80">
-                        <span class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"><i class="fas fa-envelope"></i></span>
-                        <div class="contact-text">
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Email</h3>
-                            <p>info@slfarmer.com</p>
-                        </div>
-                    </div>
-                    <div class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80">
-                        <span class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"><i class="fas fa-map-marker-alt"></i></span>
-                        <div class="contact-text">
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Location</h3>
-                            <p>85/1 Pokunuwita Kulupana</p>
-                        </div>
-                    </div>
-                    <a href="https://wa.me/94751519573" target="_blank" class="whatsapp-contact-btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5">
-                        <i class="fab fa-whatsapp mr-2"></i> Chat on WhatsApp
-                    </a>
-                </div>
-                <div class="contact-form rounded-[2rem] border border-farm-100 bg-white p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
-                    <form id="contactForm" class="space-y-5">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100" placeholder="Your full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100" placeholder="Your email address" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone</label>
-                            <input type="tel" id="phone" class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100" placeholder="Your phone number">
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" rows="4" class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100" placeholder="How can we help you?" required></textarea>
-                        </div>
-                        <button type="submit" class="btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-xl shadow-emerald-900/30 transition hover:-translate-y-0.5" id="submitBtn">
-                            <i class="fas fa-paper-plane mr-2"></i> Send Message
-                        </button>
-                    </form>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
+      <section class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.5em] text-farm-500"
+            >
+              Why Choose Us
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Nourished by Sri Lankan Soil
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              We blend modern agricultural science with traditional wisdom to
+              deliver produce that tastes vibrant and feels authentic.
+            </p>
+          </div>
+          <div class="features mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <article
+              class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70"
+            >
+              <div
+                class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+              >
+                <i class="fas fa-seedling"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white">
+                100% Natural
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                Grown without synthetic chemicals or pesticides for the purest
+                fruit experience.
+              </p>
+            </article>
+            <article
+              class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70"
+            >
+              <div
+                class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+              >
+                <i class="fas fa-award"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white">
+                Premium Quality
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                Hand-picked at peak ripeness for sweetness, aroma, and longer
+                shelf life.
+              </p>
+            </article>
+            <article
+              class="feature-card rounded-3xl border border-farm-100 bg-white/70 p-6 shadow-lg shadow-emerald-900/5 transition hover:-translate-y-1 hover:shadow-emerald-900/20 dark:border-farm-800 dark:bg-slate-900/70"
+            >
+              <div
+                class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+              >
+                <i class="fas fa-truck"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white">
+                Fresh Delivery
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                Direct from our farm to you with cold-chain packaging that
+                preserves freshness.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="products"
+        class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6"
+      >
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Our Harvest
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Premium Products
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Discover naturally grown pineapples and ginger nurtured in rich
+              Sri Lankan soil.
+            </p>
+          </div>
+          <div class="products-grid mt-12 grid gap-8 lg:grid-cols-2">
+            <article
+              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <span
+                class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
+                >Premium</span
+              >
+              <img
+                src="images/1.jpeg"
+                alt="Golden Pineapples"
+                class="mt-4 h-64 w-full rounded-2xl object-cover"
+              />
+              <div class="product-content mt-6 space-y-4">
+                <div>
+                  <h3
+                    class="text-2xl font-semibold text-slate-900 dark:text-white"
+                  >
+                    Golden Pineapple
+                  </h3>
+                  <p class="mt-2 text-slate-600 dark:text-slate-300">
+                    Sweet, juicy pineapples harvested at peak ripeness. Perfect
+                    for fresh eating, smoothies, or cooking.
+                  </p>
+                </div>
+                <div
+                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
+                >
+                  <span>$12.99</span>
+                  <span
+                    class="text-base font-medium text-slate-500 dark:text-slate-400"
+                    >per kg</span
+                  >
+                </div>
+                <a
+                  href="#contact"
+                  class="inline-flex items-center justify-center rounded-full border border-farm-300 px-6 py-3 text-sm font-semibold text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-800"
+                  >Pre-order Now</a
+                >
+              </div>
+            </article>
+            <article
+              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <span
+                class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
+                >Premium</span
+              >
+              <img
+                src="images/2.jpg"
+                alt="Fresh ginger roots"
+                class="mt-4 h-64 w-full rounded-2xl object-cover"
+              />
+              <div class="product-content mt-6 space-y-4">
+                <div>
+                  <h3
+                    class="text-2xl font-semibold text-slate-900 dark:text-white"
+                  >
+                    Premium Ginger
+                  </h3>
+                  <p class="mt-2 text-slate-600 dark:text-slate-300">
+                    Hearty ginger with intense aroma for cooking, herbal teas,
+                    and natural remedies.
+                  </p>
+                </div>
+                <div
+                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
+                >
+                  <span>$8.99</span>
+                  <span
+                    class="text-base font-medium text-slate-500 dark:text-slate-400"
+                    >per kg</span
+                  >
+                </div>
+                <a
+                  href="#contact"
+                  class="inline-flex items-center justify-center rounded-full border border-farm-300 px-6 py-3 text-sm font-semibold text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-800"
+                  >Pre-order Now</a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="farm" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Our Farm
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Farming Process
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Traditional methods meet modern sustainable practices.
+            </p>
+          </div>
+          <div class="farm-content mt-12 grid gap-12 lg:grid-cols-2">
+            <div class="farm-text space-y-5">
+              <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                Natural &amp; Sustainable
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300">
+                Explore the finest fruits grown with care and dedication,
+                ensuring quality and freshness in every harvest.
+              </p>
+              <p class="text-slate-600 dark:text-slate-300">
+                Our commitment to sustainable farming means you get produce
+                that's not only delicious but also environmentally responsible.
+              </p>
+              <div
+                class="grid grid-cols-3 gap-4 rounded-3xl border border-farm-100 bg-farm-50/70 p-6 text-center dark:border-farm-800 dark:bg-slate-900"
+              >
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    100%
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Natural
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    0
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Chemicals
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    Fresh
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Daily
+                  </p>
+                </div>
+              </div>
+              <ul class="space-y-3 text-slate-600 dark:text-slate-300">
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-leaf mt-1 text-farm-500"></i>Soil enriched
+                  with composted pineapple crowns.
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-hand-holding-water mt-1 text-farm-500"></i
+                  >Rainwater harvesting and precision watering.
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-sun mt-1 text-farm-500"></i>Shade management
+                  that keeps crops cool and sweet.
+                </li>
+              </ul>
+            </div>
+            <div class="farm-image">
+              <div
+                class="slideshow-container farm-slideshow h-[26rem] w-full overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-emerald-100 dark:border-emerald-900 dark:bg-slate-900 dark:ring-emerald-900"
+              >
+                <div class="slideshow">
+                  <div class="slide active">
+                    <img src="images/1.jpeg" alt="Natural Farming" />
+                    <div class="slide-overlay">
+                      <span>Natural Farming</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/2.jpg" alt="Organic Growth" />
+                    <div class="slide-overlay">
+                      <span>Organic Growth</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/3.jpg" alt="Harvest Time" />
+                    <div class="slide-overlay">
+                      <span>Harvest Time</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/4.jpg" alt="Quality Check" />
+                    <div class="slide-overlay">
+                      <span>Quality Check</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slideshow-nav">
+                  <button class="nav-btn prev-btn" aria-label="Previous slide">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <div class="slide-dots">
+                    <span class="dot active" data-slide="0"></span>
+                    <span class="dot" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                  </div>
+                  <button class="nav-btn next-btn" aria-label="Next slide">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="about"
+        class="bg-farm-50/60 px-4 py-20 dark:bg-slate-900 sm:px-6"
+      >
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              About SL Farmer
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Commitment to Quality
+            </h2>
+          </div>
+          <div class="about-content mt-10 grid gap-10 md:grid-cols-2">
+            <div
+              class="about-text space-y-5 text-slate-600 dark:text-slate-300"
+            >
+              <p>
+                SL Farmer is a family-owned farm dedicated to growing premium
+                pineapples and ginger using natural farming practices. We
+                believe in sustainable agriculture that respects the environment
+                while delivering the highest quality products to our customers.
+              </p>
+              <div class="commitment-points space-y-3">
+                <div
+                  class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80"
+                >
+                  <i class="fas fa-check-circle text-farm-500"></i>
+                  <span>100% natural farming methods</span>
+                </div>
+                <div
+                  class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80"
+                >
+                  <i class="fas fa-check-circle text-farm-500"></i>
+                  <span>Sustainable agricultural practices</span>
+                </div>
+                <div
+                  class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80"
+                >
+                  <i class="fas fa-check-circle text-farm-500"></i>
+                  <span>Fresh, locally grown produce</span>
+                </div>
+                <div
+                  class="point flex items-center gap-3 rounded-2xl bg-white/80 p-3 shadow-sm dark:bg-slate-800/80"
+                >
+                  <i class="fas fa-check-circle text-farm-500"></i>
+                  <span>Supporting our local community</span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="rounded-[2rem] border border-farm-100 bg-gradient-to-br from-white to-farm-50 p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:from-slate-900 dark:to-slate-950"
+            >
+              <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                Sustainability in Action
+              </h3>
+              <p class="mt-4 text-slate-600 dark:text-slate-300">
+                Every harvest is traced, recorded, and audited for carbon
+                footprint, water usage, and soil vitality.
+              </p>
+              <div class="mt-6 grid grid-cols-2 gap-6 text-center">
+                <div
+                  class="rounded-2xl bg-white/80 p-4 shadow-sm dark:bg-slate-800/80"
+                >
+                  <p
+                    class="text-4xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    15+
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Years Experience
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl bg-white/80 p-4 shadow-sm dark:bg-slate-800/80"
+                >
+                  <p
+                    class="text-4xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    4
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Generations
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="story" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Our Story
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Meet Our Founder
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              The passion behind SL Farmer
+            </p>
+          </div>
+          <div
+            class="story-content mt-12 grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]"
+          >
+            <div
+              class="owner-info rounded-[2rem] border border-farm-100 bg-white/80 p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <h3 class="text-3xl font-bold text-slate-900 dark:text-white">
+                Rashmi Perera
+              </h3>
+              <p
+                class="owner-title mt-2 text-sm uppercase tracking-[0.4em] text-farm-500"
+              >
+                Founder &amp; Head Farmer
+              </p>
+              <div
+                class="owner-bio mt-6 space-y-4 text-slate-600 dark:text-slate-300"
+              >
+                <p>
+                  With over 15 years of experience in sustainable agriculture,
+                  Rashmi founded SL Farmer with a vision to provide premium,
+                  naturally grown produce while preserving traditional farming
+                  methods.
+                </p>
+                <p>
+                  Her dedication to organic farming and commitment to quality
+                  has made SL Farmer a trusted name in premium pineapples and
+                  ginger. Coming from a family of farmers, she combines
+                  traditional wisdom with modern sustainable practices.
+                </p>
+              </div>
+              <blockquote
+                class="owner-quote mt-6 rounded-3xl bg-farm-50/70 p-6 text-lg font-medium text-farm-700 dark:bg-slate-800 dark:text-amber-100"
+              >
+                "Our mission is simple: grow the finest pineapples and ginger
+                using methods that respect both nature and our customers'
+                health. Every fruit we harvest carries the love and care of our
+                farming heritage."
+              </blockquote>
+              <div class="owner-achievements mt-6 grid gap-4 md:grid-cols-3">
+                <div
+                  class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800"
+                >
+                  <i class="fas fa-graduation-cap text-2xl text-farm-500"></i>
+                  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    Degree in Agricultural Science
+                  </p>
+                </div>
+                <div
+                  class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800"
+                >
+                  <i
+                    class="fas fa-hand-holding-heart text-2xl text-farm-500"
+                  ></i>
+                  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    15+ Years Farming Experience
+                  </p>
+                </div>
+                <div
+                  class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800"
+                >
+                  <i class="fas fa-users text-2xl text-farm-500"></i>
+                  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    Local Community Leader
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="owner-image">
+              <div
+                class="image-placeholder owner flex h-full min-h-[24rem] flex-col items-center justify-center rounded-[2rem] border border-dashed border-farm-200 bg-gradient-to-br from-farm-50 to-white p-10 text-center text-farm-700 dark:border-farm-800 dark:from-slate-900 dark:to-slate-950"
+              >
+                <i class="fas fa-user-tie text-6xl"></i>
+                <span class="mt-4 text-lg font-semibold"
+                  >Founder &amp; Owner</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="testimonials"
+        class="bg-farm-50/70 px-4 py-20 dark:bg-slate-900 sm:px-6"
+      >
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Testimonials
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              What Our Customers Say
+            </h2>
+          </div>
+          <div
+            class="testimonial-grid mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <article
+              class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <p class="testimonial-text text-lg">
+                "The pineapples from SL Farmer are the sweetest I've ever
+                tasted! You can really tell they're grown naturally."
+              </p>
+              <div class="testimonial-author mt-6 text-sm font-semibold">
+                <p class="author-name text-farm-600 dark:text-amber-200">
+                  Priya S.
+                </p>
+                <p class="author-location text-slate-500">Colombo</p>
+              </div>
+            </article>
+            <article
+              class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <p class="testimonial-text text-lg">
+                "I've been using their ginger for my teas and remedies for
+                months now. The quality is consistently excellent."
+              </p>
+              <div class="testimonial-author mt-6 text-sm font-semibold">
+                <p class="author-name text-farm-600 dark:text-amber-200">
+                  Rajesh K.
+                </p>
+                <p class="author-location text-slate-500">Kandy</p>
+              </div>
+            </article>
+            <article
+              class="testimonial-card rounded-[2rem] border border-farm-100 bg-white p-6 text-slate-700 shadow-lg shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <p class="testimonial-text text-lg">
+                "Knowing that my produce comes from a farm that cares about
+                sustainable practices makes me feel good about my purchase."
+              </p>
+              <div class="testimonial-author mt-6 text-sm font-semibold">
+                <p class="author-name text-farm-600 dark:text-amber-200">
+                  Anjali M.
+                </p>
+                <p class="author-location text-slate-500">Galle</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section
+        id="contact"
+        class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6"
+      >
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Contact
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Get in Touch
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Ready to experience our premium products? Contact us today!
+            </p>
+          </div>
+          <div
+            class="contact-container mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr]"
+          >
+            <div
+              class="contact-info space-y-6 rounded-[2rem] border border-farm-100 bg-farm-50/70 p-8 shadow-xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-phone"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Phone
+                  </h3>
+                  <p>+94 75 151 9573</p>
+                </div>
+              </div>
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-envelope"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Email
+                  </h3>
+                  <p>info@slfarmer.com</p>
+                </div>
+              </div>
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-map-marker-alt"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Location
+                  </h3>
+                  <p>85/1 Pokunuwita Kulupana</p>
+                </div>
+              </div>
+              <a
+                href="https://wa.me/94751519573"
+                target="_blank"
+                class="whatsapp-contact-btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5"
+              >
+                <i class="fab fa-whatsapp mr-2"></i> Chat on WhatsApp
+              </a>
+            </div>
+            <div
+              class="contact-form rounded-[2rem] border border-farm-100 bg-white p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <form id="contactForm" class="space-y-5">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your full name"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your email address"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your phone number"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="message">Message</label>
+                  <textarea
+                    id="message"
+                    rows="4"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="How can we help you?"
+                    required
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-xl shadow-emerald-900/30 transition hover:-translate-y-0.5"
+                  id="submitBtn"
+                >
+                  <i class="fas fa-paper-plane mr-2"></i> Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="border-t border-farm-100 bg-farm-50/70 px-4 py-10 text-slate-600 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-300 sm:px-6">
-        <div class="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:justify-between">
-            <div>
-                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">SL Farmer</h3>
-                <p class="mt-3 max-w-xs">Founded by Rashmi Perera. Premium pineapples and ginger, naturally grown on our family farm in Sri Lanka.</p>
-                <div class="mt-4 flex gap-3 text-xl text-farm-600 dark:text-amber-200">
-                    <a href="#" class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://wa.me/94751519573" target="_blank" class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Quick Links</h3>
-                <ul class="mt-3 space-y-2">
-                    <li><a href="#products" class="hover:text-farm-600 dark:hover:text-amber-200">Products</a></li>
-                    <li><a href="#farm" class="hover:text-farm-600 dark:hover:text-amber-200">Our Farm</a></li>
-                    <li><a href="#about" class="hover:text-farm-600 dark:hover:text-amber-200">About Us</a></li>
-                    <li><a href="#story" class="hover:text-farm-600 dark:hover:text-amber-200">Our Story</a></li>
-                    <li><a href="#testimonials" class="hover:text-farm-600 dark:hover:text-amber-200">Testimonials</a></li>
-                    <li><a href="#contact" class="hover:text-farm-600 dark:hover:text-amber-200">Contact</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Contact Info</h3>
-                <ul class="mt-3 space-y-2">
-                    <li><i class="fas fa-phone mr-2"></i> +94 75 151 9573</li>
-                    <li><i class="fas fa-envelope mr-2"></i> info@slfarmer.com</li>
-                    <li><i class="fas fa-map-marker-alt mr-2"></i> 85/1 Pokunuwita Kulupana</li>
-                </ul>
-            </div>
+    <footer
+      class="border-t border-farm-100 bg-farm-50/70 px-4 py-10 text-slate-600 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-300 sm:px-6"
+    >
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:justify-between"
+      >
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
+            SL Farmer
+          </h3>
+          <p class="mt-3 max-w-xs">
+            Founded by Rashmi Perera. Premium pineapples and ginger, naturally
+            grown on our family farm in Sri Lanka.
+          </p>
+          <div
+            class="mt-4 flex gap-3 text-xl text-farm-600 dark:text-amber-200"
+          >
+            <a
+              href="#"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Facebook"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="#"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="WhatsApp"
+              ><i class="fab fa-whatsapp"></i
+            ></a>
+          </div>
         </div>
-        <p class="mt-8 text-center text-sm">&copy; 2023 SL Farmer. All Rights Reserved.</p>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Quick Links
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li>
+              <a
+                href="#products"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Products</a
+              >
+            </li>
+            <li>
+              <a
+                href="#farm"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Our Farm</a
+              >
+            </li>
+            <li>
+              <a
+                href="#about"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="#story"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Our Story</a
+              >
+            </li>
+            <li>
+              <a
+                href="#testimonials"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Testimonials</a
+              >
+            </li>
+            <li>
+              <a
+                href="#contact"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Contact</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Contact Info
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li><i class="fas fa-phone mr-2"></i> +94 75 151 9573</li>
+            <li><i class="fas fa-envelope mr-2"></i> info@slfarmer.com</li>
+            <li>
+              <i class="fas fa-map-marker-alt mr-2"></i> 85/1 Pokunuwita
+              Kulupana
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p class="mt-8 text-center text-sm">
+        &copy; 2023 SL Farmer. All Rights Reserved.
+      </p>
     </footer>
 
     <script src="style.js"></script>
-</body>
+  </body>
 </html>

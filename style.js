@@ -100,12 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('themeToggle');
     const themeToggleIcon = document.getElementById('themeToggleIcon');
     const storedTheme = localStorage.getItem('slfarmer-theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+    if (storedTheme === 'dark') {
         html.classList.add('dark');
     } else {
         html.classList.remove('dark');
+        if (!storedTheme) {
+            localStorage.setItem('slfarmer-theme', 'light');
+        }
     }
 
     function updateThemeToggleIcon() {
