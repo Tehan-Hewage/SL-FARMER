@@ -1,0 +1,225 @@
+:root {
+    --font-sans: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: #f2fbf2;
+    min-height: 100vh;
+}
+
+.nav-menu {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hero-content,
+.hero-image {
+    opacity: 0;
+    transform: translateY(35px);
+}
+
+.hero-content.fade-in-up,
+.hero-image.fade-in-up {
+    animation: fadeInUp 0.9s ease forwards;
+}
+
+.slideshow-container {
+    position: relative;
+    height: 100%;
+}
+
+.slideshow {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide.active {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 1;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10, 40, 26, 0) 0%, rgba(11, 29, 11, 0.8) 100%);
+    color: #fff;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.slideshow-nav {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    box-shadow: 0 20px 35px rgba(15, 118, 110, 0.18);
+    backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4fa34f, #215021);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(33, 80, 33, 0.35);
+}
+
+.slide-dots {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(33, 80, 33, 0.3);
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.dot.active {
+    background: #4fa34f;
+    transform: scale(1.1);
+}
+
+.farm-slideshow {
+    min-height: 22rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: color 0.3s ease;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #1f2937;
+    transition: color 0.3s ease;
+}
+
+.dark .form-group label {
+    color: #e2e8f0;
+}
+
+.form-group.focused label {
+    color: #2f6c2f;
+}
+
+.dark .form-group.focused label {
+    color: #facc15;
+}
+
+.form-control {
+    transition: box-shadow 0.25s ease, transform 0.2s ease, background-color 0.2s ease;
+    outline: none;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 2px rgba(79, 163, 79, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn {
+    border: none;
+    cursor: pointer;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.submit-success {
+    background: linear-gradient(135deg, #215021, #0b1d0b) !important;
+    box-shadow: 0 15px 30px rgba(11, 29, 11, 0.45) !important;
+}
+
+.feature-card,
+.product-card,
+.testimonial-card,
+.contact-item,
+.owner-info,
+.owner-image,
+.contact-form {
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.feature-card:hover,
+.product-card:hover,
+.testimonial-card:hover,
+.contact-item:hover,
+.owner-info:hover,
+.owner-image:hover,
+.contact-form:hover {
+    transform: translateY(-6px);
+}
+
+@media (max-width: 768px) {
+    .slideshow-nav {
+        bottom: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .nav-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
