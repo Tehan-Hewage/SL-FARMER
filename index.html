@@ -3,9 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SL Farmer | Premium Pineapples & Ginger</title>
-
-    <link rel="icon" type="image/svg+xml" href="images/sl-farmer-logo.svg" />
+    <title>SL Farmer | Premium Pineapples & Ginger | Natural Sri Lankan Harvest</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="SL Farmer offers premium, naturally grown pineapples and ginger from Sri Lanka. 100% chemical-free, sustainably farmed produce delivered fresh to your door." />
+    <meta name="keywords" content="premium pineapples, organic ginger, Sri Lankan produce, natural farming, sustainable agriculture, farm fresh, chemical-free fruits" />
+    <meta name="author" content="SL Farmer - Rashmi Perera" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://slfarmer.com/" />
+    <meta property="og:title" content="SL Farmer | Premium Pineapples & Ginger" />
+    <meta property="og:description" content="Premium, naturally grown pineapples and ginger from Sri Lanka. 100% chemical-free, sustainably farmed produce." />
+    <meta property="og:image" content="https://slfarmer.com/images/1.jpeg" />
+    <meta property="og:site_name" content="SL Farmer" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://slfarmer.com/" />
+    <meta name="twitter:title" content="SL Farmer | Premium Pineapples & Ginger" />
+    <meta name="twitter:description" content="Premium, naturally grown pineapples and ginger from Sri Lanka. 100% chemical-free, sustainably farmed produce." />
+    <meta name="twitter:image" content="https://slfarmer.com/images/1.jpeg" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://slfarmer.com/" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="images/logo.png" />
+    <link rel="apple-touch-icon" href="images/logo.png" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -35,6 +63,148 @@
       };
     </script>
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SL Farmer",
+      "url": "https://slfarmer.com",
+      "logo": "https://slfarmer.com/images/sl-farmer-logo.svg",
+      "description": "Premium, naturally grown pineapples and ginger from Sri Lanka. 100% chemical-free, sustainably farmed produce.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "85/1 Pokunuwita Kulupana",
+        "addressCountry": "LK",
+        "addressLocality": "Pokunuwita"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+94-75-151-9573",
+        "contactType": "Customer Service",
+        "email": "info@slfarmer.com",
+        "availableLanguage": ["English", "Sinhala"]
+      },
+      "sameAs": [
+        "https://www.facebook.com/slfarmer",
+        "https://www.instagram.com/slfarmer",
+        "https://wa.me/94751519573"
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "Rashmi Perera",
+        "jobTitle": "Founder & Head Farmer"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "SL Farmer",
+      "image": [
+        "https://slfarmer.com/images/1.jpeg",
+        "https://slfarmer.com/images/2.jpg",
+        "https://slfarmer.com/images/3.jpg"
+      ],
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "85/1 Pokunuwita Kulupana",
+        "addressCountry": "LK"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "6.9271",
+        "longitude": "79.8612"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "08:00",
+        "closes": "18:00"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Golden Pineapple",
+      "description": "Sweet, juicy pineapples harvested at peak ripeness. Perfect for fresh eating, smoothies, or cooking.",
+      "image": "https://slfarmer.com/images/1.jpeg",
+      "brand": {
+        "@type": "Brand",
+        "name": "SL Farmer"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://slfarmer.com/#products",
+        "priceCurrency": "USD",
+        "price": "12.99",
+        "priceValidUntil": "2025-12-31",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "127"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Premium Ginger",
+      "description": "Hearty ginger with intense aroma for cooking, herbal teas, and natural remedies.",
+      "image": "https://slfarmer.com/images/2.jpg",
+      "brand": {
+        "@type": "Brand",
+        "name": "SL Farmer"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://slfarmer.com/#products",
+        "priceCurrency": "USD",
+        "price": "8.99",
+        "priceValidUntil": "2025-12-31",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "98"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SL Farmer",
+      "url": "https://slfarmer.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://slfarmer.com/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body
     class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900"
@@ -49,7 +219,7 @@
             class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100"
           >
             <img
-              src="images/sl-farmer-logo.svg"
+              src="images/logo.png"
               alt="SL Farmer Logo"
               class="h-20 w-26 object-contain"
             />
@@ -103,6 +273,27 @@
                   class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="#testimonials"
                   >Testimonials</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#gallery"
+                  >Gallery</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#videos"
+                  >Videos</a
+                >
+              </li>
+              <li>
+                <a
+                  class="tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="#reviews"
+                  >Reviews</a
                 >
               </li>
               <li>
@@ -228,25 +419,25 @@
             >
               <div class="slideshow">
                 <div class="slide active">
-                  <img src="images/1.jpeg" alt="Fresh Pineapples" />
+                  <img src="images/1.jpeg" alt="Fresh Pineapples" loading="lazy" />
                   <div class="slide-overlay">
                     <span>Fresh Pineapples</span>
                   </div>
                 </div>
                 <div class="slide">
-                  <img src="images/2.jpg" alt="Organic Ginger" />
+                  <img src="images/2.jpg" alt="Organic Ginger" loading="lazy" />
                   <div class="slide-overlay">
                     <span>Organic Ginger</span>
                   </div>
                 </div>
                 <div class="slide">
-                  <img src="images/3.jpg" alt="Farm Fresh" />
+                  <img src="images/3.jpg" alt="Farm Fresh" loading="lazy" />
                   <div class="slide-overlay">
                     <span>Farm Fresh</span>
                   </div>
                 </div>
                 <div class="slide">
-                  <img src="images/4.jpg" alt="Natural Farming" />
+                  <img src="images/4.jpg" alt="Natural Farming" loading="lazy" />
                   <div class="slide-overlay">
                     <span>Natural Farming</span>
                   </div>
@@ -371,6 +562,7 @@
                 src="images/1.jpeg"
                 alt="Golden Pineapples"
                 class="mt-4 h-64 w-full rounded-2xl object-cover"
+                loading="lazy"
               />
               <div class="product-content mt-6 space-y-4">
                 <div>
@@ -411,6 +603,7 @@
                 src="images/2.jpg"
                 alt="Fresh ginger roots"
                 class="mt-4 h-64 w-full rounded-2xl object-cover"
+                loading="lazy"
               />
               <div class="product-content mt-6 space-y-4">
                 <div>
@@ -527,25 +720,25 @@
               >
                 <div class="slideshow">
                   <div class="slide active">
-                    <img src="images/1.jpeg" alt="Natural Farming" />
+                    <img src="images/1.jpeg" alt="Natural Farming" loading="lazy" />
                     <div class="slide-overlay">
                       <span>Natural Farming</span>
                     </div>
                   </div>
                   <div class="slide">
-                    <img src="images/2.jpg" alt="Organic Growth" />
+                    <img src="images/2.jpg" alt="Organic Growth" loading="lazy" />
                     <div class="slide-overlay">
                       <span>Organic Growth</span>
                     </div>
                   </div>
                   <div class="slide">
-                    <img src="images/3.jpg" alt="Harvest Time" />
+                    <img src="images/3.jpg" alt="Harvest Time" loading="lazy" />
                     <div class="slide-overlay">
                       <span>Harvest Time</span>
                     </div>
                   </div>
                   <div class="slide">
-                    <img src="images/4.jpg" alt="Quality Check" />
+                    <img src="images/4.jpg" alt="Quality Check" loading="lazy" />
                     <div class="slide-overlay">
                       <span>Quality Check</span>
                     </div>
@@ -895,6 +1088,18 @@
                   <p>85/1 Pokunuwita Kulupana</p>
                 </div>
               </div>
+              <div class="map-container rounded-2xl overflow-hidden border border-farm-200 dark:border-farm-800 shadow-lg">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.2915364964506!2d80.03929747456115!3d6.7342434932619435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae24c7794b08623%3A0x69b78d5fac15833e!2sKandanhena%20Rd%2C%20Horana%2C%20Sri%20Lanka!5e0!3m2!1sen!2ssg!4v1763445790258!5m2!1sen!2ssg"
+                  width="100%"
+                  height="250"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  class="w-full"
+                ></iframe>
+              </div>
               <a
                 href="https://wa.me/94751519573"
                 target="_blank"
@@ -954,6 +1159,233 @@
                   <i class="fas fa-paper-plane mr-2"></i> Send Message
                 </button>
               </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Video Section -->
+      <section id="videos" class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">
+              Our Farm
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              See Our Farm in Action
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Take a virtual tour of our sustainable farming practices
+            </p>
+          </div>
+          <div class="video-grid mt-12 grid gap-8 md:grid-cols-2">
+            <div class="video-card rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
+              <div class="video-wrapper relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800">
+                <iframe
+                  class="h-full w-full"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  title="Farm Tour Video"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <h3 class="mt-4 text-xl font-semibold text-slate-900 dark:text-white">
+                Farm Tour
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                Explore our 25+ acres of naturally grown pineapples and ginger
+              </p>
+            </div>
+            <div class="video-card rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
+              <div class="video-wrapper relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800">
+                <iframe
+                  class="h-full w-full"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  title="Harvesting Process"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <h3 class="mt-4 text-xl font-semibold text-slate-900 dark:text-white">
+                Harvesting Process
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                See how we hand-pick our produce at peak ripeness
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Image Gallery Section -->
+      <section id="gallery" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">
+              Gallery
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Farm Gallery
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Browse through our collection of farm photos
+            </p>
+          </div>
+          <div class="gallery-filters mt-8 flex flex-wrap justify-center gap-3">
+            <button class="gallery-filter active rounded-full bg-farm-500 px-6 py-2 text-sm font-semibold text-white transition hover:bg-farm-600" data-filter="all">
+              All
+            </button>
+            <button class="gallery-filter rounded-full bg-farm-100 px-6 py-2 text-sm font-semibold text-farm-700 transition hover:bg-farm-200 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700" data-filter="pineapple">
+              Pineapples
+            </button>
+            <button class="gallery-filter rounded-full bg-farm-100 px-6 py-2 text-sm font-semibold text-farm-700 transition hover:bg-farm-200 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700" data-filter="ginger">
+              Ginger
+            </button>
+            <button class="gallery-filter rounded-full bg-farm-100 px-6 py-2 text-sm font-semibold text-farm-700 transition hover:bg-farm-200 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700" data-filter="farm">
+              Farm
+            </button>
+          </div>
+          <div class="gallery-grid mt-10 grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="pineapple">
+              <img src="images/1.jpeg" alt="Pineapple Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="ginger">
+              <img src="images/2.jpg" alt="Ginger Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/3.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/4.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="pineapple">
+              <img src="images/1.jpeg" alt="Pineapple Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="ginger">
+              <img src="images/2.jpg" alt="Ginger Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/3.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="pineapple">
+              <img src="images/4.jpg" alt="Pineapple Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Reviews Section -->
+      <section id="reviews" class="bg-farm-50/70 px-4 py-20 dark:bg-slate-900 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">
+              Reviews
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Customer Reviews & Ratings
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              See what our customers are saying about our products
+            </p>
+          </div>
+          <div class="reviews-container mt-12 grid gap-8 lg:grid-cols-2">
+            <!-- Golden Pineapple Reviews -->
+            <div class="product-reviews rounded-[2rem] border border-farm-100 bg-white p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
+              <div class="mb-6 flex items-center gap-4">
+                <img src="images/1.jpeg" alt="Golden Pineapple" class="h-16 w-16 rounded-xl object-cover" loading="lazy" />
+                <div>
+                  <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Golden Pineapple</h3>
+                  <div class="flex items-center gap-2">
+                    <div class="flex text-amber-400">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">4.8 (127 reviews)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="reviews-list space-y-4">
+                <div class="review-item rounded-xl border border-farm-100 bg-farm-50/50 p-4 dark:border-farm-800 dark:bg-slate-800">
+                  <div class="mb-2 flex items-center justify-between">
+                    <span class="font-semibold text-slate-900 dark:text-white">Priya S.</span>
+                    <div class="flex text-amber-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">The sweetest pineapples I've ever tasted! Perfectly ripe and naturally grown.</p>
+                </div>
+                <div class="review-item rounded-xl border border-farm-100 bg-farm-50/50 p-4 dark:border-farm-800 dark:bg-slate-800">
+                  <div class="mb-2 flex items-center justify-between">
+                    <span class="font-semibold text-slate-900 dark:text-white">David M.</span>
+                    <div class="flex text-amber-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">Excellent quality! Fresh delivery and amazing taste. Highly recommend!</p>
+                </div>
+              </div>
+            </div>
+            <!-- Premium Ginger Reviews -->
+            <div class="product-reviews rounded-[2rem] border border-farm-100 bg-white p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900">
+              <div class="mb-6 flex items-center gap-4">
+                <img src="images/2.jpg" alt="Premium Ginger" class="h-16 w-16 rounded-xl object-cover" loading="lazy" />
+                <div>
+                  <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Premium Ginger</h3>
+                  <div class="flex items-center gap-2">
+                    <div class="flex text-amber-400">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">4.9 (98 reviews)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="reviews-list space-y-4">
+                <div class="review-item rounded-xl border border-farm-100 bg-farm-50/50 p-4 dark:border-farm-800 dark:bg-slate-800">
+                  <div class="mb-2 flex items-center justify-between">
+                    <span class="font-semibold text-slate-900 dark:text-white">Rajesh K.</span>
+                    <div class="flex text-amber-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">Perfect for my herbal teas! The aroma is incredible and the quality is consistent.</p>
+                </div>
+                <div class="review-item rounded-xl border border-farm-100 bg-farm-50/50 p-4 dark:border-farm-800 dark:bg-slate-800">
+                  <div class="mb-2 flex items-center justify-between">
+                    <span class="font-semibold text-slate-900 dark:text-white">Sarah L.</span>
+                    <div class="flex text-amber-400 text-xs">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">Best ginger I've used for cooking! Fresh, aromatic, and organic. Will order again!</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

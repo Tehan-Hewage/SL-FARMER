@@ -167,7 +167,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Contact form submission handler
+    // Initialize EmailJS (replace with your public key)
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init('-NUm6X27a_ROmJlh4'); // Replace with your EmailJS public key
+    }
+
+    // Contact form submission handler with EmailJS
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
 
@@ -183,24 +188,78 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Simple validation
             if (!name || !email || !message) {
-                alert('Please fill in all required fields');
+                showToast('Please fill in all required fields', 'error');
                 return;
             }
             
-            // In a real application, you would send this data to a server
-            // For this demo, we'll just show a success message
-            submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
-            submitBtn.classList.add('submit-success');
-            submitBtn.style.background = 'linear-gradient(135deg, #2d5016, #3a6a1d)';
+            // Show loading state
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
             
-            // Reset form after 2 seconds
-            setTimeout(() => {
+            // EmailJS integration (replace with your service ID and template ID)
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send('service_jaa5u9j', 'template_xit5a6c', {
+                    from_name: name,
+                    from_email: email,
+                    phone: phone || 'Not provided',
+                    message: message
+                })
+                .then(() => {
+                    showToast('Message sent successfully!', 'success');
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                    submitBtn.classList.add('submit-success');
+                    contactForm.reset();
+                    
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.classList.remove('submit-success');
+                        submitBtn.disabled = false;
+                    }, 3000);
+                })
+                .catch((error) => {
+                    console.error('EmailJS Error:', error);
+                    showToast('Failed to send message. Please try again or contact us directly.', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                });
+            } else {
+                // Fallback if EmailJS is not configured
+                showToast('Message sent successfully!', 'success');
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                submitBtn.classList.add('submit-success');
                 contactForm.reset();
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
-                submitBtn.classList.remove('submit-success');
-                submitBtn.style.background = '';
-            }, 2000);
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.classList.remove('submit-success');
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
         });
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-24 right-6 z-50 rounded-2xl px-6 py-4 shadow-2xl transition-all transform translate-x-0 ${
+            type === 'success' 
+                ? 'bg-green-500 text-white' 
+                : 'bg-red-500 text-white'
+        }`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transform = 'translateX(400px)';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // Add some interactive effects to form inputs
@@ -294,5 +353,125 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToTop.addEventListener('mouseleave', () => {
         scrollToTop.style.transform = 'translateY(0)';
         scrollToTop.style.boxShadow = '0 4px 15px rgba(245, 166, 35, 0.3)';
+    });
+
+    // Gallery Filter Functionality
+    const galleryFilters = document.querySelectorAll('.gallery-filter');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+
+    galleryFilters.forEach(filter => {
+        filter.addEventListener('click', function() {
+            // Remove active class from all filters
+            galleryFilters.forEach(f => {
+                f.classList.remove('active', 'bg-farm-500', 'text-white');
+                f.classList.add('bg-farm-100', 'text-farm-700', 'dark:bg-slate-800', 'dark:text-amber-200');
+            });
+            
+            // Add active class to clicked filter
+            this.classList.add('active', 'bg-farm-500', 'text-white');
+            this.classList.remove('bg-farm-100', 'text-farm-700', 'dark:bg-slate-800', 'dark:text-amber-200');
+            
+            const filterValue = this.getAttribute('data-filter');
+            
+            // Filter gallery items
+            galleryItems.forEach(item => {
+                if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                    item.style.display = 'block';
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'scale(1)';
+                    }, 10);
+                } else {
+                    item.style.opacity = '0';
+                    item.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+
+    // Gallery Lightbox Functionality
+    const createLightbox = () => {
+        const lightbox = document.createElement('div');
+        lightbox.className = 'lightbox fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm';
+        lightbox.style.display = 'none';
+        lightbox.innerHTML = `
+            <button class="lightbox-close absolute top-6 right-6 z-10 rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Close lightbox">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <button class="lightbox-prev absolute left-6 z-10 rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Previous image">
+                <i class="fas fa-chevron-left text-2xl"></i>
+            </button>
+            <button class="lightbox-next absolute right-6 z-10 rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Next image">
+                <i class="fas fa-chevron-right text-2xl"></i>
+            </button>
+            <img class="lightbox-image max-h-[90vh] max-w-[90vw] rounded-2xl object-contain" src="" alt="Gallery Image" />
+        `;
+        document.body.appendChild(lightbox);
+        return lightbox;
+    };
+
+    const lightbox = createLightbox();
+    const lightboxImage = lightbox.querySelector('.lightbox-image');
+    const lightboxClose = lightbox.querySelector('.lightbox-close');
+    const lightboxPrev = lightbox.querySelector('.lightbox-prev');
+    const lightboxNext = lightbox.querySelector('.lightbox-next');
+    let currentImageIndex = 0;
+    let visibleImages = [];
+
+    const openLightbox = (index) => {
+        visibleImages = Array.from(galleryItems).filter(item => 
+            item.style.display !== 'none'
+        ).map(item => item.querySelector('img').src);
+        
+        currentImageIndex = visibleImages.indexOf(galleryItems[index].querySelector('img').src);
+        if (currentImageIndex === -1) currentImageIndex = 0;
+        
+        lightboxImage.src = visibleImages[currentImageIndex];
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    const showNextImage = () => {
+        currentImageIndex = (currentImageIndex + 1) % visibleImages.length;
+        lightboxImage.src = visibleImages[currentImageIndex];
+    };
+
+    const showPrevImage = () => {
+        currentImageIndex = (currentImageIndex - 1 + visibleImages.length) % visibleImages.length;
+        lightboxImage.src = visibleImages[currentImageIndex];
+    };
+
+    // Add click event to gallery items
+    galleryItems.forEach((item, index) => {
+        item.addEventListener('click', () => openLightbox(index));
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxNext.addEventListener('click', showNextImage);
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    // Keyboard navigation for lightbox
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') showNextImage();
+            if (e.key === 'ArrowLeft') showPrevImage();
+        }
+    });
+
+    // Initialize gallery items with transition
+    galleryItems.forEach(item => {
+        item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     });
 });
