@@ -38,6 +38,15 @@
   <body
     class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex items-center justify-center"
   >
+    <!-- Theme Toggle Button -->
+    <button
+      id="themeToggle"
+      class="fixed top-4 right-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900 bg-white dark:bg-slate-800 shadow-lg"
+      aria-label="Toggle dark mode"
+    >
+      <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+    </button>
+
     <div class="w-full max-w-md mx-auto px-4">
       <div class="text-center mb-8">
         <img
@@ -114,6 +123,45 @@
 
     <script src="admin.js"></script>
     <script>
+      // Initialize theme toggle
+      function initThemeToggle() {
+        const html = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+        const themeToggleIcon = document.getElementById("themeToggleIcon");
+        const storedTheme = localStorage.getItem("slfarmer-theme");
+
+        // Apply stored theme or default to light
+        if (storedTheme === "dark") {
+          html.classList.add("dark");
+        } else {
+          html.classList.remove("dark");
+          if (!storedTheme) {
+            localStorage.setItem("slfarmer-theme", "light");
+          }
+        }
+
+        function updateThemeToggleIcon() {
+          if (!themeToggleIcon) return;
+          if (html.classList.contains("dark")) {
+            themeToggleIcon.classList.remove("fa-moon");
+            themeToggleIcon.classList.add("fa-sun");
+          } else {
+            themeToggleIcon.classList.remove("fa-sun");
+            themeToggleIcon.classList.add("fa-moon");
+          }
+        }
+
+        updateThemeToggleIcon();
+
+        if (themeToggle) {
+          themeToggle.addEventListener("click", () => {
+            const isDark = html.classList.toggle("dark");
+            localStorage.setItem("slfarmer-theme", isDark ? "dark" : "light");
+            updateThemeToggleIcon();
+          });
+        }
+      }
+
       // Initialize admin system (wait for it to be available)
       function initAdmin() {
         if (typeof AdminSystem !== 'undefined') {
@@ -126,8 +174,12 @@
       
       // Start initialization when DOM is ready
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAdmin);
+        document.addEventListener('DOMContentLoaded', () => {
+          initThemeToggle();
+          initAdmin();
+        });
       } else {
+        initThemeToggle();
         initAdmin();
       }
     </script>
