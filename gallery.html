@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallery | SL Farmer | Our Farm & Photos</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Explore our farm gallery and learn about our sustainable farming practices. View photos from SL Farmer's 25+ acres of naturally grown produce." />
+    <meta name="keywords" content="farm gallery, farming photos, sustainable agriculture, Sri Lankan farm, natural farming" />
+    <meta name="author" content="SL Farmer - Rashmi Perera" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="images/logo.png" />
+    <link rel="apple-touch-icon" href="images/logo.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              farm: {
+                50: "#f2fbf2",
+                100: "#dff3df",
+                200: "#b7e2b7",
+                300: "#8dce8d",
+                400: "#5fb25f",
+                500: "#3f8a3f",
+                600: "#2f6c2f",
+                700: "#215021",
+                800: "#153515",
+                900: "#0b1d0b",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  </head>
+  <body
+    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900"
+  >
+    <header
+      class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80"
+    >
+      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
+        <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
+          <a
+            href="index.html"
+            class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100"
+          >
+            <img
+              src="images/logo.png"
+              alt="SL Farmer Logo"
+              class="h-20 w-26 object-contain"
+            />
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500"
+              >
+                SL Farmer
+              </p>
+              <p
+                class="text-2xl font-extrabold text-farm-800 dark:text-farm-100"
+              >
+                Farm Fresh Goodness
+              </p>
+            </div>
+          </a>
+          <nav class="order-3 w-full md:order-2 md:flex-1">
+            <ul
+              class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0"
+            >
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="products.html"
+                  >Products</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="gallery.html"
+                  >Gallery</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html#about"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html#story"
+                  >Our Story</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="contact.html"
+                  >Contact</a
+                >
+              </li>
+              <li class="md:hidden">
+                <a
+                  href="https://wa.me/94751519573"
+                  target="_blank"
+                  class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow"
+                  >Chat on WhatsApp</a
+                >
+              </li>
+            </ul>
+          </nav>
+          <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
+            <button
+              id="themeToggle"
+              class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
+              aria-label="Toggle dark mode"
+            >
+              <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+            </button>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex"
+            >
+              <i class="fab fa-whatsapp text-base leading-none"></i
+              ><span class="tracking-wide">WhatsApp</span>
+            </a>
+            <button
+              class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="pt-36">
+      <!-- Our Farm Section -->
+      <section id="farm" class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Our Farm
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Farming Process
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Traditional methods meet modern sustainable practices.
+            </p>
+          </div>
+          <div class="farm-content mt-12 grid gap-12 lg:grid-cols-2">
+            <div class="farm-text space-y-5">
+              <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                Natural &amp; Sustainable
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300">
+                Explore the finest fruits grown with care and dedication,
+                ensuring quality and freshness in every harvest.
+              </p>
+              <p class="text-slate-600 dark:text-slate-300">
+                Our commitment to sustainable farming means you get produce
+                that's not only delicious but also environmentally responsible.
+              </p>
+              <div
+                class="grid grid-cols-3 gap-4 rounded-3xl border border-farm-100 bg-farm-50/70 p-6 text-center dark:border-farm-800 dark:bg-slate-900"
+              >
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    100%
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Natural
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    0
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Chemicals
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-3xl font-bold text-farm-700 dark:text-amber-200"
+                  >
+                    Fresh
+                  </p>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">
+                    Daily
+                  </p>
+                </div>
+              </div>
+              <ul class="space-y-3 text-slate-600 dark:text-slate-300">
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-leaf mt-1 text-farm-500"></i>Soil enriched
+                  with composted pineapple crowns.
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-hand-holding-water mt-1 text-farm-500"></i
+                  >Rainwater harvesting and precision watering.
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-sun mt-1 text-farm-500"></i>Shade management
+                  that keeps crops cool and sweet.
+                </li>
+              </ul>
+            </div>
+            <div class="farm-image">
+              <div
+                class="slideshow-container farm-slideshow h-[26rem] w-full overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-emerald-100 dark:border-emerald-900 dark:bg-slate-900 dark:ring-emerald-900"
+              >
+                <div class="slideshow">
+                  <div class="slide active">
+                    <img src="images/Farm/IMG_2913.jpg" alt="Organic Growth" loading="lazy" />
+                    <div class="slide-overlay">
+                      <span>Organic Growth</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/Farm/IMG_2922.jpg" alt="Harvest Time" loading="lazy" />
+                    <div class="slide-overlay">
+                      <span>Harvest Time</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/Farm/IMG_2923.jpg" alt="Quality Check" loading="lazy" />
+                    <div class="slide-overlay">
+                      <span>Quality Check</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/Farm/IMG_2924.jpg" alt="Farm Life" loading="lazy" />
+                    <div class="slide-overlay">
+                      <span>Farm Life</span>
+                    </div>
+                  </div>
+                  <div class="slide">
+                    <img src="images/Farm/IMG_2926 (1).jpg" alt="Sustainable Practices" loading="lazy" />
+                    <div class="slide-overlay">
+                      <span>Sustainable Practices</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slideshow-nav">
+                  <button class="nav-btn prev-btn" aria-label="Previous slide">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <div class="slide-dots">
+                    <span class="dot active" data-slide="0"></span>
+                    <span class="dot" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                    <span class="dot" data-slide="4"></span>
+                    <span class="dot" data-slide="5"></span>
+                  </div>
+                  <button class="nav-btn next-btn" aria-label="Next slide">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Image Gallery Section -->
+      <section id="gallery" class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500">
+              Gallery
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Our Farm Gallery
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Browse through our collection of farm photos
+            </p>
+          </div>
+          <div class="gallery-filters mt-8 flex flex-wrap justify-center gap-3">
+            <button class="gallery-filter active rounded-full bg-farm-500 px-6 py-2 text-sm font-semibold text-white transition hover:bg-farm-600" data-filter="all">
+              All
+            </button>
+            <button class="gallery-filter rounded-full bg-farm-100 px-6 py-2 text-sm font-semibold text-farm-700 transition hover:bg-farm-200 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700" data-filter="farm">
+              Farm
+            </button>
+          </div>
+          <div class="gallery-grid mt-10 grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/Farm/IMG_2913.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/Farm/IMG_2922.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/Farm/IMG_2923.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/Farm/IMG_2924.jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+            <div class="gallery-item cursor-pointer overflow-hidden rounded-2xl border border-farm-100 dark:border-farm-800" data-category="farm">
+              <img src="images/Farm/IMG_2926 (1).jpg" alt="Farm Gallery" class="h-full w-full object-cover transition-transform duration-300 hover:scale-110" loading="lazy" />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="border-t border-farm-100 bg-farm-50/70 px-4 py-10 text-slate-600 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-300 sm:px-6"
+    >
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:justify-between"
+      >
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
+            SL Farmer
+          </h3>
+          <p class="mt-3 max-w-xs">
+            Founded by Rashmi Perera. Premium pineapples and ginger, naturally
+            grown on our family farm in Sri Lanka.
+          </p>
+          <div
+            class="mt-4 flex gap-3 text-xl text-farm-600 dark:text-amber-200"
+          >
+            <a
+              href="https://www.facebook.com/profile.php?id=61583678220885"
+              target="_blank"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Facebook"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="#"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="WhatsApp"
+              ><i class="fab fa-whatsapp"></i
+            ></a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Quick Links
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li>
+              <a
+                href="products.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Products</a
+              >
+            </li>
+            <li>
+              <a
+                href="gallery.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Gallery</a
+              >
+            </li>
+            <li>
+              <a
+                href="index.html#about"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="index.html#story"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Our Story</a
+              >
+            </li>
+            <li>
+              <a
+                href="contact.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Contact</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Contact Info
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li><i class="fas fa-phone mr-2"></i> +94 75 151 9573</li>
+            <li><i class="fas fa-envelope mr-2"></i> SLfarmercompany@gmail.com</li>
+            <li>
+              <i class="fas fa-map-marker-alt mr-2"></i> 85/1 Pokunuwita
+              Kulupana
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p class="mt-8 text-center text-sm">
+        &copy; 2025 SL Farmer. All Rights Reserved.
+      </p>
+    </footer>
+
+    <script src="style.js"></script>
+  </body>
+</html>
+

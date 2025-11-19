@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | SL Farmer</title>
+    <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              farm: {
+                50: "#f2fbf2",
+                100: "#dff3df",
+                200: "#b7e2b7",
+                300: "#8dce8d",
+                400: "#5fb25f",
+                500: "#3f8a3f",
+                600: "#2f6c2f",
+                700: "#215021",
+                800: "#153515",
+                900: "#0b1d0b",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body
+    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen"
+  >
+    <!-- Header -->
+    <header
+      class="border-b border-farm-100 dark:border-farm-800 bg-white dark:bg-slate-900 shadow-sm"
+    >
+      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-center justify-between gap-4 py-4">
+          <div class="flex items-center gap-2 sm:gap-4">
+            <img
+              src="../images/logo.png"
+              alt="SL Farmer Logo"
+              class="h-10 w-12 sm:h-12 sm:w-16 object-contain"
+            />
+            <div>
+              <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+                Admin Dashboard
+              </h1>
+              <p class="hidden sm:block text-sm text-slate-600 dark:text-slate-300">
+                Manage Product Availability
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <button
+              id="themeToggle"
+              class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-800"
+              aria-label="Toggle dark mode"
+            >
+              <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+            </button>
+            <a
+              href="../products.html"
+              target="_blank"
+              class="inline-flex items-center gap-2 rounded-full border border-farm-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-800"
+            >
+              <i class="fas fa-external-link-alt"></i> <span class="hidden sm:inline">View Products</span>
+            </a>
+            <button
+              id="logoutBtn"
+              class="inline-flex items-center gap-2 rounded-full bg-red-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white transition hover:bg-red-600"
+            >
+              <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="py-8 px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-6xl">
+        <!-- Status Message -->
+        <div
+          id="statusMessage"
+          class="hidden mb-6 rounded-xl border px-4 py-3 text-sm"
+        ></div>
+
+        <!-- Products Management -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-farm-100 dark:border-farm-800 shadow-xl p-6 sm:p-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
+              Product Availability
+            </h2>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">
+              Toggle product availability status. Changes will reflect on the products page immediately.
+            </p>
+          </div>
+
+          <div id="productsList" class="space-y-4">
+            <!-- Products will be loaded here dynamically -->
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-4">
+            <button
+              id="saveAllBtn"
+              class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:-translate-y-0.5"
+            >
+              <i class="fas fa-save"></i> Save All Changes
+            </button>
+            <button
+              id="makeAllAvailableBtn"
+              class="inline-flex items-center gap-2 rounded-xl border border-green-300 px-6 py-3 text-base font-semibold text-green-700 transition hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900/20"
+            >
+              <i class="fas fa-check-circle"></i> Make All Available
+            </button>
+            <button
+              id="makeAllUnavailableBtn"
+              class="inline-flex items-center gap-2 rounded-xl border border-red-300 px-6 py-3 text-base font-semibold text-red-700 transition hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20"
+            >
+              <i class="fas fa-times-circle"></i> Make All Unavailable
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="admin.js"></script>
+    <script>
+      // Initialize admin system
+      if (typeof AdminSystem !== 'undefined') {
+        AdminSystem.initDashboard();
+      }
+    </script>
+  </body>
+</html>
+

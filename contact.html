@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us | SL Farmer | Get in Touch</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Contact SL Farmer today. Get in touch for inquiries about our premium pineapples, ginger, cinnamon, and other naturally grown produce from Sri Lanka." />
+    <meta name="keywords" content="contact SL Farmer, Sri Lankan produce, farm contact, order inquiries, WhatsApp" />
+    <meta name="author" content="SL Farmer - Rashmi Perera" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="images/logo.png" />
+    <link rel="apple-touch-icon" href="images/logo.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              farm: {
+                50: "#f2fbf2",
+                100: "#dff3df",
+                200: "#b7e2b7",
+                300: "#8dce8d",
+                400: "#5fb25f",
+                500: "#3f8a3f",
+                600: "#2f6c2f",
+                700: "#215021",
+                800: "#153515",
+                900: "#0b1d0b",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  </head>
+  <body
+    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900"
+  >
+    <header
+      class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80"
+    >
+      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
+        <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
+          <a
+            href="index.html"
+            class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100"
+          >
+            <img
+              src="images/logo.png"
+              alt="SL Farmer Logo"
+              class="h-20 w-26 object-contain"
+            />
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500"
+              >
+                SL Farmer
+              </p>
+              <p
+                class="text-2xl font-extrabold text-farm-800 dark:text-farm-100"
+              >
+                Farm Fresh Goodness
+              </p>
+            </div>
+          </a>
+          <nav class="order-3 w-full md:order-2 md:flex-1">
+            <ul
+              class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0"
+            >
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="products.html"
+                  >Products</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="gallery.html"
+                  >Gallery</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html#about"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="index.html#story"
+                  >Our Story</a
+                >
+              </li>
+              <li>
+                <a
+                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                  href="contact.html"
+                  >Contact</a
+                >
+              </li>
+              <li class="md:hidden">
+                <a
+                  href="https://wa.me/94751519573"
+                  target="_blank"
+                  class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow"
+                  >Chat on WhatsApp</a
+                >
+              </li>
+            </ul>
+          </nav>
+          <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
+            <button
+              id="themeToggle"
+              class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
+              aria-label="Toggle dark mode"
+            >
+              <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+            </button>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex"
+            >
+              <i class="fab fa-whatsapp text-base leading-none"></i
+              ><span class="tracking-wide">WhatsApp</span>
+            </a>
+            <button
+              class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="pt-36">
+      <!-- Contact Hero Section -->
+      <section class="bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6">
+        <div class="mx-auto max-w-6xl text-center">
+          <p class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200">
+            Contact Us
+          </p>
+          <h1 class="mt-6 text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
+            Get in Touch
+          </h1>
+          <p class="mt-4 text-lg text-slate-600 dark:text-slate-200 max-w-2xl mx-auto">
+            Ready to experience our premium products? Contact us today! We're here to answer your questions and help you with your orders.
+          </p>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section
+        id="contact"
+        class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6"
+      >
+        <div class="mx-auto max-w-6xl">
+          <div class="section-title text-center">
+            <p
+              class="text-sm font-semibold uppercase tracking-[0.45em] text-farm-500"
+            >
+              Contact
+            </p>
+            <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+              Get in Touch
+            </h2>
+            <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+              Ready to experience our premium products? Contact us today!
+            </p>
+          </div>
+          <div
+            class="contact-container mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr]"
+          >
+            <div
+              class="contact-info space-y-6 rounded-[2rem] border border-farm-100 bg-farm-50/70 p-8 shadow-xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-phone"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Phone
+                  </h3>
+                  <p>+94 75 151 9573</p>
+                </div>
+              </div>
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-envelope"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Email
+                  </h3>
+                  <p>SLfarmercompany@gmail.com</p>
+                </div>
+              </div>
+              <div
+                class="contact-item flex items-center gap-4 rounded-2xl bg-white/80 p-4 dark:bg-slate-800/80"
+              >
+                <span
+                  class="contact-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-farm-100 text-2xl text-farm-700 dark:bg-emerald-900/60 dark:text-amber-200"
+                  ><i class="fas fa-map-marker-alt"></i
+                ></span>
+                <div class="contact-text">
+                  <h3
+                    class="text-lg font-semibold text-slate-900 dark:text-white"
+                  >
+                    Location
+                  </h3>
+                  <p>85/1 Pokunuwita Kulupana</p>
+                </div>
+              </div>
+              <div class="map-container rounded-2xl overflow-hidden border border-farm-200 dark:border-farm-800 shadow-lg">
+                <iframe
+                  src="https://maps.google.com/maps?width=600&height=400&hl=en&q=6.734426%2C%2080.042117&t=&z=14&ie=UTF8&iwloc=B&output=embed"
+                  width="100%"
+                  height="250"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  class="w-full"
+                ></iframe>
+              </div>
+              <a
+                href="https://wa.me/94751519573"
+                target="_blank"
+                class="whatsapp-contact-btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5"
+              >
+                <i class="fab fa-whatsapp mr-2"></i> Chat on WhatsApp
+              </a>
+            </div>
+            <div
+              class="contact-form rounded-[2rem] border border-farm-100 bg-white p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            >
+              <form id="contactForm" class="space-y-5">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your full name"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your email address"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="Your phone number"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="message">Message</label>
+                  <textarea
+                    id="message"
+                    rows="4"
+                    class="form-control w-full rounded-2xl border-none bg-farm-50/80 px-4 py-3 text-slate-900 shadow-inner shadow-emerald-900/5 focus:bg-white dark:bg-slate-800 dark:text-slate-100"
+                    placeholder="How can we help you?"
+                    required
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="btn inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-lg font-semibold text-white shadow-xl shadow-emerald-900/30 transition hover:-translate-y-0.5"
+                  id="submitBtn"
+                >
+                  <i class="fas fa-paper-plane mr-2"></i> Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="border-t border-farm-100 bg-farm-50/70 px-4 py-10 text-slate-600 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-300 sm:px-6"
+    >
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:justify-between"
+      >
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
+            SL Farmer
+          </h3>
+          <p class="mt-3 max-w-xs">
+            Founded by Rashmi Perera. Premium pineapples and ginger, naturally
+            grown on our family farm in Sri Lanka.
+          </p>
+          <div
+            class="mt-4 flex gap-3 text-xl text-farm-600 dark:text-amber-200"
+          >
+            <a
+              href="https://www.facebook.com/profile.php?id=61583678220885"
+              target="_blank"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Facebook"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="#"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a
+              href="https://wa.me/94751519573"
+              target="_blank"
+              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
+              aria-label="WhatsApp"
+              ><i class="fab fa-whatsapp"></i
+            ></a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Quick Links
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li>
+              <a
+                href="products.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Products</a
+              >
+            </li>
+            <li>
+              <a
+                href="gallery.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Gallery</a
+              >
+            </li>
+            <li>
+              <a
+                href="index.html#about"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="index.html#story"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Our Story</a
+              >
+            </li>
+            <li>
+              <a
+                href="contact.html"
+                class="hover:text-farm-600 dark:hover:text-amber-200"
+                >Contact</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Contact Info
+          </h3>
+          <ul class="mt-3 space-y-2">
+            <li><i class="fas fa-phone mr-2"></i> +94 75 151 9573</li>
+            <li><i class="fas fa-envelope mr-2"></i> SLfarmercompany@gmail.com</li>
+            <li>
+              <i class="fas fa-map-marker-alt mr-2"></i> 85/1 Pokunuwita
+              Kulupana
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p class="mt-8 text-center text-sm">
+        &copy; 2025 SL Farmer. All Rights Reserved.
+      </p>
+    </footer>
+
+    <script src="style.js"></script>
+  </body>
+</html>
+

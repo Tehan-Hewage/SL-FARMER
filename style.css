@@ -12,6 +12,74 @@ body {
     transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
+/* Active Navigation Link Styles */
+.nav-link {
+    position: relative;
+    display: inline-block;
+    padding: 0.5rem 0;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #4fa34f, #215021);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.dark .nav-link::after {
+    background: linear-gradient(135deg, #facc15, #eab308);
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+.nav-link.active {
+    color: #4fa34f;
+    font-weight: 700;
+}
+
+.dark .nav-link.active {
+    color: #facc15;
+}
+
+.nav-link.active::after {
+    width: 100%;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Mobile active state */
+@media (max-width: 768px) {
+    .nav-link.active {
+        background: linear-gradient(135deg, rgba(79, 163, 79, 0.1), rgba(33, 80, 33, 0.1));
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .dark .nav-link.active {
+        background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(234, 179, 8, 0.1));
+    }
+    
+    .nav-link.active::after {
+        display: none;
+    }
+}
+
 .hero-content,
 .hero-image {
     opacity: 0;
@@ -185,6 +253,33 @@ body {
     transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
+.owner-image img {
+    object-position: top;
+}
+
+/* Desktop: Image fits container height */
+@media (min-width: 1024px) {
+    .owner-image {
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .owner-image > div {
+        width: 100%;
+        max-height: 600px;
+        display: flex;
+        overflow: hidden;
+    }
+    
+    .owner-image img {
+        width: 100%;
+        height: 100%;
+        max-height: 600px;
+        object-fit: cover;
+        object-position: top;
+    }
+}
+
 .feature-card:hover,
 .product-card:hover,
 .testimonial-card:hover,
@@ -209,6 +304,31 @@ body {
     .dot {
         width: 8px;
         height: 8px;
+    }
+    
+    /* Mobile: Meet Our Founder section - Image first */
+    .owner-image {
+        margin-bottom: 1rem;
+    }
+    
+    .owner-image img {
+        max-height: 400px;
+        width: 100%;
+        object-fit: cover;
+        object-position: top;
+    }
+    
+    .owner-info {
+        padding: 1.5rem;
+    }
+    
+    .owner-info h3 {
+        font-size: 1.75rem;
+    }
+    
+    .owner-achievements {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
     }
 }
 

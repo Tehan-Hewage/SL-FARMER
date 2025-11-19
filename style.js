@@ -142,6 +142,92 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Set active navigation link based on current page
+    function setActiveNavLink() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const currentHash = window.location.hash;
+        
+        // Remove active class from all links first
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Find and activate the correct link
+        navLinks.forEach(link => {
+            const linkHref = link.getAttribute('href');
+            if (!linkHref) return;
+            
+            let shouldBeActive = false;
+            
+            // Case 1: Direct page matches (products.html, gallery.html, contact.html)
+            if (linkHref === currentPage) {
+                shouldBeActive = true;
+            }
+            // Case 2: Home page (index.html) without hash
+            else if (linkHref === 'index.html' && (currentPage === 'index.html' || currentPage === '') && !currentHash) {
+                shouldBeActive = true;
+            }
+            // Case 3: Hash links on index.html (e.g., #about, #story)
+            else if (linkHref.startsWith('#') && (currentPage === 'index.html' || currentPage === '')) {
+                if (currentHash === linkHref) {
+                    shouldBeActive = true;
+                }
+            }
+            // Case 4: Links from other pages pointing to index.html with hash (e.g., index.html#about)
+            else if (linkHref.startsWith('index.html#')) {
+                const linkHash = '#' + linkHref.split('#')[1];
+                if ((currentPage === 'index.html' || currentPage === '') && currentHash === linkHash) {
+                    shouldBeActive = true;
+                }
+            }
+            // Case 5: Links from other pages pointing to index.html without hash
+            else if (linkHref === 'index.html' && (currentPage === 'index.html' || currentPage === '') && !currentHash) {
+                shouldBeActive = true;
+            }
+            
+            if (shouldBeActive) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    // Set active nav link on page load
+    setActiveNavLink();
+    
+    // Update active nav link when hash changes (for anchor links)
+    window.addEventListener('hashchange', setActiveNavLink);
+    
+    // Update active nav link on scroll for hash sections (for smooth UX)
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            if (window.location.pathname.split('/').pop() === 'index.html' || window.location.pathname.split('/').pop() === '') {
+                const aboutSection = document.getElementById('about');
+                const storySection = document.getElementById('story');
+                const scrollPos = window.scrollY + 150; // Offset for header
+                
+                if (aboutSection && scrollPos >= aboutSection.offsetTop && scrollPos < (storySection ? storySection.offsetTop : Infinity)) {
+                    if (window.location.hash !== '#about') {
+                        history.replaceState(null, '', '#about');
+                        setActiveNavLink();
+                    }
+                } else if (storySection && scrollPos >= storySection.offsetTop) {
+                    if (window.location.hash !== '#story') {
+                        history.replaceState(null, '', '#story');
+                        setActiveNavLink();
+                    }
+                } else if (scrollPos < (aboutSection ? aboutSection.offsetTop : Infinity)) {
+                    if (window.location.hash !== '') {
+                        history.replaceState(null, '', window.location.pathname);
+                        setActiveNavLink();
+                    }
+                }
+            }
+        }, 100);
+    });
+
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -156,6 +242,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     top: targetElement.offsetTop - 80,
                     behavior: 'smooth'
                 });
+                
+                // Update URL hash without jumping
+                history.pushState(null, '', targetId);
+                
+                // Update active nav link
+                setActiveNavLink();
                 
                 if (navMenu) {
                     navMenu.classList.remove('active');

@@ -1,0 +1,13 @@
+{
+  "products": [
+    { "id": "pineapple", "name": "Pineapple", "available": true },
+    { "id": "pineapple-plant", "name": "Pineapple Plant", "available": true },
+    { "id": "ginger", "name": "Ginger", "available": true },
+    { "id": "ginger-plant", "name": "Ginger Plant", "available": true },
+    { "id": "cinnamon", "name": "Cinnamon", "available": true },
+    { "id": "cinnamon-plant", "name": "Cinnamon Plant", "available": true },
+    { "id": "scotch-bonnet", "name": "Scotch Bonnet Pepper (Nai Miris)", "available": true }
+  ],
+  "lastUpdated": "2025-01-01T00:00:00.000Z"
+}
+
