@@ -1,662 +1,659 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Products | SL Farmer | Premium Sri Lankan Produce</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Browse our premium collection of naturally grown produce: Pineapples, Ginger, Cinnamon, and Scotch Bonnet Peppers from SL Farmer." />
-    <meta name="keywords" content="pineapple, ginger, cinnamon, scotch bonnet pepper, Sri Lankan produce, plants, natural farming" />
-    <meta name="author" content="SL Farmer - Rashmi Perera" />
-    <meta name="robots" content="index, follow" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="images/logo.png" />
-    <link rel="apple-touch-icon" href="images/logo.png" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              farm: {
-                50: "#f2fbf2",
-                100: "#dff3df",
-                200: "#b7e2b7",
-                300: "#8dce8d",
-                400: "#5fb25f",
-                500: "#3f8a3f",
-                600: "#2f6c2f",
-                700: "#215021",
-                800: "#153515",
-                900: "#0b1d0b",
-              },
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products | SL Farmer | Premium Sri Lankan Produce</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description"
+    content="Browse our premium collection of naturally grown produce: Pineapples, Ginger, Cinnamon, and Scotch Bonnet Peppers from SL Farmer." />
+  <meta name="keywords"
+    content="pineapple, ginger, cinnamon, scotch bonnet pepper, Sri Lankan produce, plants, natural farming" />
+  <meta name="author" content="SL Farmer - Rashmi Perera" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="images/logo.png" />
+  <link rel="apple-touch-icon" href="images/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            farm: {
+              50: "#f2fbf2",
+              100: "#dff3df",
+              200: "#b7e2b7",
+              300: "#8dce8d",
+              400: "#5fb25f",
+              500: "#3f8a3f",
+              600: "#2f6c2f",
+              700: "#215021",
+              800: "#153515",
+              900: "#0b1d0b",
             },
           },
         },
-      };
-    </script>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body
-    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900"
-  >
-    <header
-      class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80"
-    >
-      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
-        <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
-          <a
-            href="index.html"
-            class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100"
-          >
-            <img
-              src="images/logo.png"
-              alt="SL Farmer Logo"
-              class="h-20 w-26 object-contain"
-            />
-            <div>
-              <p
-                class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500"
-              >
-                SL Farmer
-              </p>
-              <p
-                class="text-2xl font-extrabold text-farm-800 dark:text-farm-100"
-              >
-                Farm Fresh Goodness
-              </p>
-            </div>
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body
+  class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900">
+  <header
+    class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80">
+    <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
+      <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
+        <a href="index.html" class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100">
+          <img src="images/logo.png" alt="SL Farmer Logo" class="h-20 w-26 object-contain" />
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500">
+              SL Farmer
+            </p>
+            <p class="text-2xl font-extrabold text-farm-800 dark:text-farm-100">
+              Farm Fresh Goodness
+            </p>
+          </div>
+        </a>
+        <nav class="order-3 w-full md:order-2 md:flex-1">
+          <ul
+            class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0">
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="index.html">Home</a>
+            </li>
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="products.html">Products</a>
+            </li>
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="gallery.html">Gallery</a>
+            </li>
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="index.html#about">About</a>
+            </li>
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="index.html#story">Our Story</a>
+            </li>
+            <li>
+              <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
+                href="contact.html">Contact</a>
+            </li>
+            <li class="md:hidden">
+              <a href="https://wa.me/94751519573" target="_blank"
+                class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow">Chat
+                on WhatsApp</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
+          <button id="themeToggle"
+            class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
+            aria-label="Toggle dark mode">
+            <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
+          </button>
+          <a href="https://wa.me/94751519573" target="_blank"
+            class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex">
+            <i class="fab fa-whatsapp text-base leading-none"></i><span class="tracking-wide">WhatsApp</span>
           </a>
-          <nav class="order-3 w-full md:order-2 md:flex-1">
-            <ul
-              class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0"
-            >
+          <button
+            class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
+            aria-label="Toggle navigation" aria-expanded="false">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-36">
+    <!-- Products Hero Section -->
+    <section
+      class="bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6">
+      <div class="mx-auto max-w-6xl text-center">
+        <p
+          class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200">
+          Our Products
+        </p>
+        <h1 class="gradient-text mt-6 text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
+          Premium Sri Lankan Produce
+        </h1>
+        <p class="mt-4 text-lg text-slate-600 dark:text-slate-200 max-w-2xl mx-auto">
+          Discover our complete collection of naturally grown fruits, spices, and plants from our sustainable farm in
+          Sri Lanka.
+        </p>
+      </div>
+    </section>
+
+    <!-- Products Grid Section -->
+    <section class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
+      <div class="mx-auto max-w-6xl">
+        <div class="products-grid mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+
+          <!-- Pineapple -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="pineapple">
+            <span
+              class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
+            <img src="images/Products/pineapple.jpg" alt="Pineapple" class="mt-4 h-64 w-full rounded-2xl object-cover"
+              loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Pineapple
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Sweet, juicy pineapples harvested at peak ripeness. Perfect for fresh eating, smoothies, or cooking.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$12.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per kg</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Pineapple Plant -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="pineapple-plant">
+            <span
+              class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
+            <img src="images/Products/Pineapple Plant.jpg" alt="Pineapple Plant"
+              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Pineapple Plant
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Healthy, mature pineapple plants ready for cultivation. Grow your own premium pineapples at home.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$15.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per plant</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Ginger -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="ginger">
+            <span
+              class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
+            <img src="images/Products/Ginger.jpg" alt="Ginger" class="mt-4 h-64 w-full rounded-2xl object-cover"
+              loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Ginger
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Hearty ginger with intense aroma for cooking, herbal teas, and natural remedies.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$8.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per kg</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Ginger Plant -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="ginger-plant">
+            <span
+              class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
+            <img src="images/Products/Ginger Plant.webp" alt="Ginger Plant"
+              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Ginger Plant
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Fresh ginger rhizomes for planting. Start your own ginger garden with our premium quality plants.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$12.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per plant</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Cinnamon -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="cinnamon">
+            <span
+              class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
+            <img src="images/Products/Cinnamon.jpg" alt="Cinnamon" class="mt-4 h-64 w-full rounded-2xl object-cover"
+              loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Cinnamon
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Pure Ceylon cinnamon sticks and powder. Premium quality cinnamon with authentic flavor and aroma.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$14.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per 100g</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Cinnamon Plant -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="cinnamon-plant">
+            <span
+              class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
+            <img src="images/Products/Cinnamon Plant.webp" alt="Cinnamon Plant"
+              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Cinnamon Plant
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  True Ceylon cinnamon saplings. Grow your own cinnamon tree and harvest premium quality cinnamon bark.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$18.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per plant</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+          <!-- Scotch Bonnet Pepper (Nai Miris) -->
+          <article
+            class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
+            data-product-id="scotch-bonnet">
+            <span
+              class="self-start rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200">Hot</span>
+            <img src="images/Products/Nai Miris.jpg" alt="Scotch Bonnet Pepper (Nai Miris)"
+              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="product-content mt-6 space-y-4">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                  Scotch Bonnet Pepper (Nai Miris)
+                </h3>
+                <p class="mt-2 text-slate-600 dark:text-slate-300">
+                  Fiery and flavorful Sri Lankan hot peppers. Perfect for adding authentic spice to your dishes.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200">
+                <span>$9.99</span>
+                <span class="text-base font-medium text-slate-500 dark:text-slate-400">per 250g</span>
+              </div>
+              <span
+                class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
+                data-status="available">Available</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6">
+      <div class="mx-auto max-w-4xl text-center">
+        <h2 class="section-title text-3xl font-bold text-slate-900 dark:text-white">
+          Ready to Order?
+        </h2>
+        <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">
+          Contact us today to place your order or learn more about our products
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-4">
+          <a href="contact.html"
+            class="inline-flex items-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5">Contact
+            Us</a>
+          <a href="https://wa.me/94751519573" target="_blank"
+            class="inline-flex items-center rounded-full border border-farm-300 px-7 py-3 text-base font-semibold text-farm-700 transition hover:bg-white dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-900">
+            <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="relative border-t-2 border-farm-200 dark:border-farm-800 bg-gradient-to-br from-farm-50 via-white to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <!-- Decorative top border -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-farm-400 via-farm-500 to-farm-600"></div>
+    
+    <div class="relative px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <!-- Main Footer Content -->
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-10">
+          <!-- Brand Section -->
+          <div class="lg:col-span-1">
+            <div class="flex items-center gap-3 mb-4">
+              <img
+                src="images/logo.png"
+                alt="SL Farmer Logo"
+                class="h-12 w-14 object-contain"
+              />
+              <div>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
+                  SL Farmer
+                </h3>
+                <p class="text-xs font-semibold uppercase tracking-wider text-farm-600 dark:text-farm-400">
+                  Farm Fresh Goodness
+                </p>
+              </div>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+              Premium naturally grown produce from our family farm in Sri Lanka. 
+              Founded by Rashmi Perera with a passion for sustainable farming.
+            </p>
+            <!-- Social Media -->
+            <div class="flex gap-3">
+              <a
+                href="https://www.facebook.com/profile.php?id=61583678220885"
+                target="_blank"
+                class="group relative h-11 w-11 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-farm-600 dark:text-farm-400 transition-all hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-1 dark:hover:bg-blue-500"
+                aria-label="Facebook"
+              >
+                <i class="fab fa-facebook text-lg"></i>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Facebook</span>
+              </a>
+              <a
+                href="https://www.instagram.com/slfarmer"
+                target="_blank"
+                class="group relative h-11 w-11 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-farm-600 dark:text-farm-400 transition-all hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-600 hover:text-white hover:shadow-lg hover:-translate-y-1"
+                aria-label="Instagram"
+              >
+                <i class="fab fa-instagram text-lg"></i>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Instagram</span>
+              </a>
+              <a
+                href="https://wa.me/94751519573"
+                target="_blank"
+                class="group relative h-11 w-11 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-farm-600 dark:text-farm-400 transition-all hover:bg-green-500 hover:text-white hover:shadow-lg hover:-translate-y-1 dark:hover:bg-green-600"
+                aria-label="WhatsApp"
+              >
+                <i class="fab fa-whatsapp text-lg"></i>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">WhatsApp</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div>
+            <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <i class="fas fa-link text-farm-600 dark:text-farm-400"></i>
+              Quick Links
+            </h4>
+            <ul class="space-y-3">
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="index.html"
-                  >Home</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
+                  <i class="fas fa-home text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>Home</span>
+                </a>
               </li>
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="products.html"
-                  >Products</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
+                  <i class="fas fa-box text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>Products</span>
+                </a>
               </li>
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="gallery.html"
-                  >Gallery</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
+                  <i class="fas fa-images text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>Gallery</span>
+                </a>
               </li>
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="index.html#about"
-                  >About</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
+                  <i class="fas fa-info-circle text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>About Us</span>
+                </a>
               </li>
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="index.html#story"
-                  >Our Story</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
+                  <i class="fas fa-book text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>Our Story</span>
+                </a>
               </li>
               <li>
                 <a
-                  class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                   href="contact.html"
-                  >Contact</a
+                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
-              </li>
-              <li class="md:hidden">
-                <a
-                  href="https://wa.me/94751519573"
-                  target="_blank"
-                  class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-4 py-2 text-white shadow"
-                  >Chat on WhatsApp</a
-                >
+                  <i class="fas fa-envelope text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  <span>Contact</span>
+                </a>
               </li>
             </ul>
-          </nav>
-          <div class="order-2 ml-auto flex items-center gap-3 md:order-3">
-            <button
-              id="themeToggle"
-              class="theme-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
-              aria-label="Toggle dark mode"
-            >
-              <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
-            </button>
-            <a
-              href="https://wa.me/94751519573"
-              target="_blank"
-              class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex"
-            >
-              <i class="fab fa-whatsapp text-base leading-none"></i
-              ><span class="tracking-wide">WhatsApp</span>
-            </a>
-            <button
-              class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
-              aria-label="Toggle navigation"
-              aria-expanded="false"
-            >
-              <i class="fas fa-bars text-xl"></i>
-            </button>
           </div>
-        </div>
-      </div>
-    </header>
 
-    <main class="pt-36">
-      <!-- Products Hero Section -->
-      <section class="bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6">
-        <div class="mx-auto max-w-6xl text-center">
-          <p class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200">
-            Our Products
-          </p>
-          <h1 class="mt-6 text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
-            Premium Sri Lankan Produce
-          </h1>
-          <p class="mt-4 text-lg text-slate-600 dark:text-slate-200 max-w-2xl mx-auto">
-            Discover our complete collection of naturally grown fruits, spices, and plants from our sustainable farm in Sri Lanka.
-          </p>
-        </div>
-      </section>
-
-      <!-- Products Grid Section -->
-      <section class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-        <div class="mx-auto max-w-6xl">
-          <div class="products-grid mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            
-            <!-- Pineapple -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="pineapple"
-            >
-              <span
-                class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
-                >Premium</span
-              >
-              <img
-                src="images/Products/pineapple.jpg"
-                alt="Pineapple"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
+          <!-- Contact Info -->
+          <div>
+            <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <i class="fas fa-address-card text-farm-600 dark:text-farm-400"></i>
+              Contact Us
+            </h4>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
+                <div class="mt-1 h-8 w-8 rounded-lg bg-farm-100 dark:bg-farm-900/40 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-phone text-farm-600 dark:text-farm-400 text-sm"></i>
+                </div>
                 <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Pineapple
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Sweet, juicy pineapples harvested at peak ripeness. Perfect for fresh eating, smoothies, or cooking.
-                  </p>
+                  <p class="font-medium text-slate-900 dark:text-white">Phone</p>
+                  <a href="tel:+94751519573" class="hover:text-farm-600 dark:hover:text-farm-400 transition-colors">
+                    +94 75 151 9573
+                  </a>
                 </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$12.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per kg</span
-                  >
+              </li>
+              <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
+                <div class="mt-1 h-8 w-8 rounded-lg bg-farm-100 dark:bg-farm-900/40 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-envelope text-farm-600 dark:text-farm-400 text-sm"></i>
                 </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
-            <!-- Pineapple Plant -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="pineapple-plant"
-            >
-              <span
-                class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                >Plant</span
-              >
-              <img
-                src="images/Products/Pineapple Plant.jpg"
-                alt="Pineapple Plant"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
                 <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Pineapple Plant
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Healthy, mature pineapple plants ready for cultivation. Grow your own premium pineapples at home.
-                  </p>
+                  <p class="font-medium text-slate-900 dark:text-white">Email</p>
+                  <a href="mailto:SLfarmercompany@gmail.com" class="hover:text-farm-600 dark:hover:text-farm-400 transition-colors break-all">
+                    SLfarmercompany@gmail.com
+                  </a>
                 </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$15.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per plant</span
-                  >
+              </li>
+              <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
+                <div class="mt-1 h-8 w-8 rounded-lg bg-farm-100 dark:bg-farm-900/40 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-map-marker-alt text-farm-600 dark:text-farm-400 text-sm"></i>
                 </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
-            <!-- Ginger -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="ginger"
-            >
-              <span
-                class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
-                >Premium</span
-              >
-              <img
-                src="images/Products/Ginger.jpg"
-                alt="Ginger"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
                 <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Ginger
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Hearty ginger with intense aroma for cooking, herbal teas, and natural remedies.
-                  </p>
+                  <p class="font-medium text-slate-900 dark:text-white">Address</p>
+                  <p>85/1 Pokunuwita Kulupana, Sri Lanka</p>
                 </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$8.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per kg</span
-                  >
-                </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
-            <!-- Ginger Plant -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="ginger-plant"
-            >
-              <span
-                class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                >Plant</span
-              >
-              <img
-                src="images/Products/Ginger Plant.webp"
-                alt="Ginger Plant"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
-                <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Ginger Plant
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Fresh ginger rhizomes for planting. Start your own ginger garden with our premium quality plants.
-                  </p>
-                </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$12.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per plant</span
-                  >
-                </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-red-100 px-6 py-3 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200"
-                  data-status="unavailable"
-                  >Unavailable</span
-                >
-              </div>
-            </article>
-
-            <!-- Cinnamon -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="cinnamon"
-            >
-              <span
-                class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
-                >Premium</span
-              >
-              <img
-                src="images/Products/Cinnamon.jpg"
-                alt="Cinnamon"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
-                <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Cinnamon
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Pure Ceylon cinnamon sticks and powder. Premium quality cinnamon with authentic flavor and aroma.
-                  </p>
-                </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$14.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per 100g</span
-                  >
-                </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
-            <!-- Cinnamon Plant -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="cinnamon-plant"
-            >
-              <span
-                class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                >Plant</span
-              >
-              <img
-                src="images/Products/Cinnamon Plant.webp"
-                alt="Cinnamon Plant"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
-                <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Cinnamon Plant
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    True Ceylon cinnamon saplings. Grow your own cinnamon tree and harvest premium quality cinnamon bark.
-                  </p>
-                </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$18.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per plant</span
-                  >
-                </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
-            <!-- Scotch Bonnet Pepper (Nai Miris) -->
-            <article
-              class="product-card flex flex-col rounded-[2rem] border border-farm-100 bg-white p-6 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
-              data-product-id="scotch-bonnet"
-            >
-              <span
-                class="self-start rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200"
-                >Hot</span
-              >
-              <img
-                src="images/Products/Nai Miris.jpg"
-                alt="Scotch Bonnet Pepper (Nai Miris)"
-                class="mt-4 h-64 w-full rounded-2xl object-cover"
-                loading="lazy"
-              />
-              <div class="product-content mt-6 space-y-4">
-                <div>
-                  <h3
-                    class="text-2xl font-semibold text-slate-900 dark:text-white"
-                  >
-                    Scotch Bonnet Pepper (Nai Miris)
-                  </h3>
-                  <p class="mt-2 text-slate-600 dark:text-slate-300">
-                    Fiery and flavorful Sri Lankan hot peppers. Perfect for adding authentic spice to your dishes.
-                  </p>
-                </div>
-                <div
-                  class="flex items-center gap-3 text-3xl font-bold text-farm-700 dark:text-amber-200"
-                >
-                  <span>$9.99</span>
-                  <span
-                    class="text-base font-medium text-slate-500 dark:text-slate-400"
-                    >per 250g</span
-                  >
-                </div>
-                <span
-                  class="product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200"
-                  data-status="available"
-                  >Available</span
-                >
-              </div>
-            </article>
-
+              </li>
+            </ul>
           </div>
-        </div>
-      </section>
 
-      <!-- Call to Action Section -->
-      <section class="bg-farm-50/50 px-4 py-20 dark:bg-slate-900 sm:px-6">
-        <div class="mx-auto max-w-4xl text-center">
-          <h2 class="text-3xl font-bold text-slate-900 dark:text-white">
-            Ready to Order?
-          </h2>
-          <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">
-            Contact us today to place your order or learn more about our products
-          </p>
-          <div class="mt-8 flex flex-wrap justify-center gap-4">
+          <!-- Newsletter / CTA -->
+          <div>
+            <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <i class="fas fa-bullhorn text-farm-600 dark:text-farm-400"></i>
+              Stay Connected
+            </h4>
+            <p class="text-slate-600 dark:text-slate-300 mb-4 text-sm">
+              Follow us for updates on new products, farming tips, and special offers.
+            </p>
             <a
               href="contact.html"
-              class="inline-flex items-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5"
-              >Contact Us</a
+              class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
             >
-            <a
-              href="https://wa.me/94751519573"
-              target="_blank"
-              class="inline-flex items-center rounded-full border border-farm-300 px-7 py-3 text-base font-semibold text-farm-700 transition hover:bg-white dark:border-farm-700 dark:text-amber-100 dark:hover:bg-slate-900"
-            >
-              <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+              <i class="fas fa-paper-plane"></i>
+              Get in Touch
             </a>
           </div>
         </div>
-      </section>
-    </main>
 
-    <footer
-      class="border-t border-farm-100 bg-farm-50/70 px-4 py-10 text-slate-600 dark:border-farm-800 dark:bg-slate-900 dark:text-slate-300 sm:px-6"
-    >
-      <div
-        class="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:justify-between"
-      >
-        <div>
-          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
-            SL Farmer
-          </h3>
-          <p class="mt-3 max-w-xs">
-            Founded by Rashmi Perera. Premium pineapples and ginger, naturally
-            grown on our family farm in Sri Lanka.
-          </p>
-          <div
-            class="mt-4 flex gap-3 text-xl text-farm-600 dark:text-amber-200"
-          >
-            <a
-              href="https://www.facebook.com/profile.php?id=61583678220885"
-              target="_blank"
-              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
-              aria-label="Facebook"
-              ><i class="fab fa-facebook"></i
-            ></a>
-            <a
-              href="#"
-              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
-              aria-label="Instagram"
-              ><i class="fab fa-instagram"></i
-            ></a>
-            <a
-              href="https://wa.me/94751519573"
-              target="_blank"
-              class="rounded-full bg-white/80 p-3 shadow dark:bg-slate-800"
-              aria-label="WhatsApp"
-              ><i class="fab fa-whatsapp"></i
-            ></a>
+        <!-- Bottom Bar -->
+        <div class="border-t border-farm-200 dark:border-farm-800 pt-8 mt-8">
+          <div class="flex justify-center items-center">
+            <p class="text-sm text-slate-600 dark:text-slate-400 text-center">
+              &copy; 2025 <span class="font-semibold text-farm-700 dark:text-farm-400">SL Farmer</span>. All Rights Reserved.
+            </p>
           </div>
         </div>
-        <div>
-          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Quick Links
-          </h3>
-          <ul class="mt-3 space-y-2">
-            <li>
-              <a
-                href="products.html"
-                class="hover:text-farm-600 dark:hover:text-amber-200"
-                >Products</a
-              >
-            </li>
-            <li>
-              <a
-                href="index.html#farm"
-                class="hover:text-farm-600 dark:hover:text-amber-200"
-                >Our Farm</a
-              >
-            </li>
-            <li>
-              <a
-                href="index.html#about"
-                class="hover:text-farm-600 dark:hover:text-amber-200"
-                >About Us</a
-              >
-            </li>
-            <li>
-              <a
-                href="index.html#story"
-                class="hover:text-farm-600 dark:hover:text-amber-200"
-                >Our Story</a
-              >
-            </li>
-            <li>
-              <a
-                href="contact.html"
-                class="hover:text-farm-600 dark:hover:text-amber-200"
-                >Contact</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Contact Info
-          </h3>
-          <ul class="mt-3 space-y-2">
-            <li><i class="fas fa-phone mr-2"></i> +94 75 151 9573</li>
-            <li><i class="fas fa-envelope mr-2"></i> SLfarmercompany@gmail.com</li>
-            <li>
-              <i class="fas fa-map-marker-alt mr-2"></i> 85/1 Pokunuwita
-              Kulupana
-            </li>
-          </ul>
-        </div>
       </div>
-      <p class="mt-8 text-center text-sm">
-        &copy; 2025 SL Farmer. All Rights Reserved.
-      </p>
-    </footer>
+    </div>
+  </footer>
 
-    <script src="style.js"></script>
-    <script>
-      // Load product availability from JSON file
-      document.addEventListener('DOMContentLoaded', async function() {
-        try {
-          // Load products from admin/products.json
-          const response = await fetch('admin/products.json');
-          if (!response.ok) {
-            console.warn('Failed to load products.json:', response.statusText);
-            return;
-          }
-          
-          const data = await response.json();
-          const products = data.products || [];
-          
-          // Create a map for quick lookup
-          const productMap = {};
-          products.forEach(product => {
-            productMap[product.id] = product.available;
-          });
-          
-          // Update each product card with availability from JSON file
-          document.querySelectorAll('[data-product-id]').forEach(card => {
-            const productId = card.getAttribute('data-product-id');
-            const statusElement = card.querySelector('.product-status');
-            
-            if (statusElement) {
-              // Default to available if product not found in JSON
-              const isAvailable = productMap[productId] !== undefined ? productMap[productId] : true;
-              
-              if (isAvailable) {
-                statusElement.textContent = 'Available';
-                statusElement.className = 'product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200';
-                statusElement.setAttribute('data-status', 'available');
-              } else {
-                statusElement.textContent = 'Unavailable';
-                statusElement.className = 'product-status inline-flex items-center justify-center rounded-full bg-red-100 px-6 py-3 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200';
-                statusElement.setAttribute('data-status', 'unavailable');
-              }
-            }
-          });
-        } catch (error) {
-          console.error('Error loading product availability:', error);
+  <script src="style.js"></script>
+
+  <!-- Supabase client for loading product availability -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Supabase configuration
+    const SUPABASE_URL = "https://puxiktpaztheoiglwsyl.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_svw-D9G9WubR9lDGoewQ1g_OBVg_zJD";
+
+    // Initialize Supabase client
+    let supabaseClient = null;
+
+    function initSupabase() {
+      if (typeof supabase !== 'undefined') {
+        const { createClient } = supabase;
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return true;
+      }
+      return false;
+    }
+
+    // Try to initialize immediately or wait
+    if (!initSupabase()) {
+      const checkSupabase = setInterval(() => {
+        if (initSupabase()) {
+          clearInterval(checkSupabase);
+          loadProductAvailability();
         }
-      });
-    </script>
-  </body>
-</html>
+      }, 100);
 
+      setTimeout(() => clearInterval(checkSupabase), 5000);
+    }
+
+    // Load product availability from Supabase database
+    async function loadProductAvailability() {
+      if (!supabaseClient) {
+        console.warn('Supabase client not available, using default availability');
+        return;
+      }
+
+      try {
+        // Fetch products from Supabase
+        const { data, error } = await supabaseClient
+          .from('products')
+          .select('id, name, available')
+          .order('name', { ascending: true });
+
+        if (error) {
+          console.error('Error loading products from database:', error);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          console.warn('No products found in database');
+          return;
+        }
+
+        // Create a map for quick lookup
+        const productMap = {};
+        data.forEach(product => {
+          productMap[product.id] = product.available;
+        });
+
+        // Update each product card with availability from database
+        document.querySelectorAll('[data-product-id]').forEach(card => {
+          const productId = card.getAttribute('data-product-id');
+          const statusElement = card.querySelector('.product-status');
+
+          if (statusElement) {
+            // Default to available if product not found in database
+            const isAvailable = productMap[productId] !== undefined ? productMap[productId] : true;
+
+            if (isAvailable) {
+              statusElement.textContent = 'Available';
+              statusElement.className = 'product-status inline-flex items-center justify-center rounded-full bg-green-100 px-6 py-3 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200';
+              statusElement.setAttribute('data-status', 'available');
+            } else {
+              statusElement.textContent = 'Unavailable';
+              statusElement.className = 'product-status inline-flex items-center justify-center rounded-full bg-red-100 px-6 py-3 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200';
+              statusElement.setAttribute('data-status', 'unavailable');
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error loading product availability:', error);
+      }
+    }
+
+    // Load availability when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+      if (supabaseClient) {
+        loadProductAvailability();
+      } else {
+        // Wait a bit more for Supabase to initialize
+        setTimeout(() => {
+          if (supabaseClient) {
+            loadProductAvailability();
+          }
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+
+</html>

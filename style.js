@@ -566,4 +566,217 @@ document.addEventListener('DOMContentLoaded', function() {
     galleryItems.forEach(item => {
         item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     });
+
+    // ============================================
+    // ENHANCED DESIGN EFFECTS & ANIMATIONS
+    // ============================================
+
+    // Scroll Progress Indicator
+    const scrollProgress = document.createElement('div');
+    scrollProgress.className = 'scroll-progress';
+    scrollProgress.style.width = '0%';
+    document.body.appendChild(scrollProgress);
+
+    window.addEventListener('scroll', () => {
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        scrollProgress.style.width = scrolled + '%';
+    });
+
+    // Scroll Reveal Animation with Intersection Observer
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    });
+
+    // Add reveal class to elements
+    document.querySelectorAll('.product-card, .feature-card, .testimonial-card, .contact-item, section > div').forEach(el => {
+        el.classList.add('reveal');
+        revealObserver.observe(el);
+    });
+
+    // Floating Decorative Elements
+    const createFloatingElements = () => {
+        const floatingContainer = document.createElement('div');
+        floatingContainer.className = 'floating-elements';
+        
+        const leafIcons = ['🍃', '🌿', '🍀', '🌱'];
+        for (let i = 0; i < 4; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'floating-leaf';
+            leaf.textContent = leafIcons[i] || '🍃';
+            leaf.style.fontSize = `${Math.random() * 1.5 + 1.5}rem`;
+            floatingContainer.appendChild(leaf);
+        }
+        
+        document.body.appendChild(floatingContainer);
+    };
+
+    // Only add floating elements on desktop
+    if (window.innerWidth > 768) {
+        createFloatingElements();
+    }
+
+    // Parallax Effect for Hero Section
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroContent = heroSection.querySelector('.hero-content');
+            if (heroContent && scrolled < window.innerHeight) {
+                heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
+                heroContent.style.opacity = 1 - (scrolled / window.innerHeight) * 0.5;
+            }
+        });
+    }
+
+    // Enhanced Button Ripple Effect
+    document.querySelectorAll('.btn, a[class*="rounded-full"][class*="bg-gradient"]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.5);
+                left: ${x}px;
+                top: ${y}px;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // Add ripple animation to CSS dynamically
+    if (!document.querySelector('#ripple-style')) {
+        const style = document.createElement('style');
+        style.id = 'ripple-style';
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Magnetic Hover Effect for Feature Cards (not product cards)
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const moveX = (x - centerX) / 10;
+            const moveY = (y - centerY) / 10;
+            
+            this.style.transform = `translateY(-12px) scale(1.02) perspective(1000px) rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    });
+
+    // Stagger Animation for Product Cards on Load
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
+    // Add gradient text class to headings
+    document.querySelectorAll('h1, h2').forEach(heading => {
+        if (heading.textContent.includes('Premium') || heading.textContent.includes('Natural')) {
+            heading.classList.add('gradient-text');
+        }
+    });
+
+    // Enhanced Image Loading with Blur Effect
+    document.querySelectorAll('img').forEach(img => {
+        if (!img.complete) {
+            img.style.filter = 'blur(5px)';
+            img.style.transition = 'filter 0.3s ease';
+            
+            img.addEventListener('load', function() {
+                this.style.filter = 'blur(0)';
+            });
+        }
+    });
+
+    // Counter Animation for Statistics
+    const animateCounter = (element, target, duration = 2000) => {
+        const start = 0;
+        const increment = target / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target + (element.textContent.includes('+') ? '+' : '');
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current) + (element.textContent.includes('+') ? '+' : '');
+            }
+        }, 16);
+    };
+
+    // Observe statistics for counter animation
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const text = entry.target.textContent;
+                const number = parseInt(text.replace(/\D/g, ''));
+                if (number) {
+                    animateCounter(entry.target, number);
+                    statsObserver.unobserve(entry.target);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('dd, .stat-number').forEach(stat => {
+        statsObserver.observe(stat);
+    });
+
+    // Add shimmer effect to product cards on hover
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.classList.add('shimmer');
+    });
+
+    // Section Title Animation
+    document.querySelectorAll('.section-title h2, section h2').forEach(title => {
+        if (!title.querySelector('::after')) {
+            title.style.position = 'relative';
+        }
+    });
 });
