@@ -6,8 +6,8 @@ A modern, responsive website for SL Farmer, showcasing premium naturally grown p
 
 SL Farmer is a family-owned farm dedicated to growing premium produce using natural farming practices. This website serves as the digital storefront, allowing customers to browse products, view the farm gallery, learn about the founder, and get in touch via multiple channels.
 
-**Founder:** Rashmi Perera  
-**Location:** 85/1 Pokunuwita Kulupana, Sri Lanka  
+**Founder:** Jayasanka Peiris  
+**Location:** No. 324/1, Meemana, Pokunuwita, Sri Lanka  
 **Website:** [slfarmer.com](https://slfarmer.com)
 
 ## ✨ Features
@@ -76,7 +76,6 @@ Hello/
 ├── index.html               # Homepage
 ├── products.html            # Products page
 ├── gallery.html             # Gallery page
-├── contact.html             # Contact page
 ├── style.css                # Main stylesheet
 ├── style.js                 # Main JavaScript
 ├── robots.txt               # SEO robots file
@@ -129,7 +128,7 @@ Hello/
 #### EmailJS Setup (Contact Form)
 1. Create an account at [EmailJS](https://www.emailjs.com/)
 2. Create an email service and template
-3. Update the EmailJS configuration in `contact.html` and `index.html`:
+3. Update the EmailJS configuration in `index.html`:
    ```javascript
    emailjs.init("YOUR_PUBLIC_KEY");
    // Update service ID and template ID in form submission handler
@@ -149,7 +148,7 @@ Hello/
 - Hero section with product slideshow
 - Why Choose Us section
 - About SL Farmer
-- Founder's story (Rashmi Perera)
+- Founder's story (Jayasanka Peiris)
 - Statistics and achievements
 - Footer with contact information and social links
 
@@ -164,7 +163,7 @@ Hello/
 - Farm and product photo gallery
 - Image lightbox functionality
 
-### Contact Page (`contact.html`)
+### Contact Section (in `index.html`)
 - Contact form (EmailJS integration)
 - Contact information cards
 - Embedded Google Maps
@@ -230,7 +229,7 @@ Replace images in the `images/` directory:
 
 - **Phone:** +94 75 151 9573
 - **Email:** SLfarmercompany@gmail.com
-- **Address:** 85/1 Pokunuwita Kulupana, Sri Lanka
+- **Address:** No. 324/1, Meemana, Pokunuwita, Sri Lanka
 - **WhatsApp:** [Chat on WhatsApp](https://wa.me/94751519573)
 - **Facebook:** [SL Farmer Facebook](https://www.facebook.com/profile.php?id=61583678220885)
 - **Instagram:** [@slfarmer](https://www.instagram.com/slfarmer)
@@ -275,9 +274,8 @@ All rights reserved. © 2025 SL Farmer
 
 ## 👤 Author
 
-**Rashmi Perera**  
-Founder & Head Farmer  
-SL Farmer
+**Jayasanka Peiris**  
+Founder – SL Farmer
 
 ---
 
