@@ -1516,6 +1516,7 @@ function bindLogoutButtons() {
     btn.addEventListener("click", async () => {
       try {
         await signOut(auth);
+        window.location.href = "../index.html";
       } catch (error) {
         showAlert(`Logout failed: ${error.message}`, "danger");
       }

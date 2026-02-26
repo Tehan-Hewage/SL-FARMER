@@ -163,7 +163,7 @@ const AdminSystem = {
         } catch (error) {
           console.error("Logout error:", error);
         }
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
       });
     }
 
