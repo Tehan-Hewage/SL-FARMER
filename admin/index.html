@@ -1,188 +1,445 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login | SL Farmer</title>
-    <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              farm: {
-                50: "#f2fbf2",
-                100: "#dff3df",
-                200: "#b7e2b7",
-                300: "#8dce8d",
-                400: "#5fb25f",
-                500: "#3f8a3f",
-                600: "#2f6c2f",
-                700: "#215021",
-                800: "#153515",
-                900: "#0b1d0b",
-              },
-            },
-          },
-        },
-      };
-    </script>
-    <link rel="stylesheet" href="admin.css" />
-  </head>
-  <body
-    class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex items-center justify-center"
-  >
-    <!-- Theme Toggle Button -->
-    <button
-      id="themeToggle"
-      class="fixed top-4 right-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900 bg-white dark:bg-slate-800 shadow-lg"
-      aria-label="Toggle dark mode"
-    >
-      <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
-    </button>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#166534">
+  <meta name="color-scheme" content="light dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Pineapple Farm">
+  <title>Pineapple Farm Management System</title>
+  <link rel="manifest" href="manifest.webmanifest?v=20260220-4">
+  <link rel="apple-touch-icon" href="Img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="Img/icon-192.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem("pf-theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=20260220-4">
+  <link rel="stylesheet" href="css/firebase-app.css?v=20260220-4">
+</head>
+<body>
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <img src="Img/logo.png" alt="Pineapple Farm Logo" class="auth-logo">
+      <h2>Pineapple Farm MS Login</h2>
+      <p>Sign in as <strong>Admin</strong> or <strong>User</strong></p>
+    </div>
+    <form id="loginForm" class="auth-form">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" class="form-control" placeholder="name@email.com" required>
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" class="form-control" placeholder="Enter password" required>
+      <button type="submit" class="btn auth-submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <p id="loginError" class="auth-error" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
 
-    <div class="w-full max-w-md mx-auto px-4">
-      <div class="text-center mb-8">
-        <img
-          src="../images/logo.png"
-          alt="SL Farmer Logo"
-          class="h-20 w-26 object-contain mx-auto mb-4"
-        />
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-          SL Farmer Admin
-        </h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">
-          Sign in to manage products
-        </p>
+<div class="container">
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="Img/logo.png" alt="Pineapple Farm Logo" class="logo-image">
+        <span>Pineapple Farm MS</span>
       </div>
-
-      <div
-        class="bg-white dark:bg-slate-900 rounded-2xl border border-farm-100 dark:border-farm-800 shadow-2xl p-8"
-      >
-        <form id="loginForm" class="space-y-6">
-          <div>
-            <label
-              for="username"
-              class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              required
-              class="w-full px-4 py-3 rounded-xl border border-farm-200 dark:border-farm-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-farm-500 transition"
-              placeholder="Enter username"
-            />
-          </div>
-
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              required
-              class="w-full px-4 py-3 rounded-xl border border-farm-200 dark:border-farm-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-farm-500 transition"
-              placeholder="Enter password"
-            />
-          </div>
-
-          <div id="errorMessage" class="hidden text-red-600 dark:text-red-400 text-sm"></div>
-
-          <button
-            type="submit"
-            class="w-full rounded-xl bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5 hover:shadow-emerald-900/30"
-          >
-            Sign In
+      <button id="mobile-menu-btn" class="mobile-menu-btn" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="nav-links">
+        <a href="#" class="active" data-section="dashboard"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="#" data-section="lands"><i class="fas fa-tractor"></i> Lands</a>
+        <a href="#" data-section="harvest"><i class="fas fa-apple-alt"></i> Harvest</a>
+        <a href="#" data-section="expenses"><i class="fas fa-money-bill-wave"></i> Expenses</a>
+        <a href="#" data-section="labor"><i class="fas fa-users"></i> Labor</a>
+        <a href="#" data-section="tasks"><i class="fas fa-calendar-check"></i> Tasks</a>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-tools">
+          <button type="button" class="btn btn-sm btn-install" id="installAppBtn">
+            <i class="fas fa-download"></i> Install App
           </button>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-          <a
-            href="../index.html"
-            class="text-farm-600 dark:text-amber-200 hover:underline"
-          >
-            ← Back to Website
-          </a>
+          <button type="button" class="btn btn-sm btn-theme-toggle" id="themeToggleBtn" aria-label="Toggle dark and light mode">
+            <i class="fas fa-moon"></i>
+            <span>Dark</span>
+          </button>
+        </div>
+        <div class="nav-auth" id="navAuth" hidden>
+          <button type="button" class="profile-btn" id="openProfileBtn" aria-label="Open profile">
+            <span class="profile-avatar" id="navProfileAvatar"><span id="navProfileInitials">U</span></span>
+            <span class="profile-btn-text">Profile</span>
+          </button>
+          <button type="button" class="btn btn-sm" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Logout</button>
         </div>
       </div>
+    </nav>
+  </header>
 
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <main class="main-content">
+    <div id="appAlert"></div>
+    <div id="accessNotice"></div>
 
-    <script src="admin.js"></script>
-    <script>
-      // Initialize theme toggle
-      function initThemeToggle() {
-        const html = document.documentElement;
-        const themeToggle = document.getElementById("themeToggle");
-        const themeToggleIcon = document.getElementById("themeToggleIcon");
-        const storedTheme = localStorage.getItem("slfarmer-theme");
+    <section id="section-dashboard" class="app-section active">
+      <div class="dashboard">
+        <h1><i class="fas fa-seedling"></i> Farm Dashboard</h1>
+        <p class="subtitle">Live metrics from Firestore</p>
+        <div class="dashboard-stats">
+          <div class="stat-card"><div class="stat-icon" style="background-color:#4CAF50;"><i class="fas fa-tractor"></i></div><div class="stat-info"><h3>Active Lands</h3><p class="stat-number" id="statActiveLands">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#2196F3;"><i class="fas fa-seedling"></i></div><div class="stat-info"><h3>Total Plants</h3><p class="stat-number" id="statTotalPlants">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#FF9800;"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h3>Total Revenue</h3><p class="stat-number" id="statRevenue">Rs. 0.00</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#E53935;"><i class="fas fa-file-invoice-dollar"></i></div><div class="stat-info"><h3>Total Expenses</h3><p class="stat-number" id="statExpenses">Rs. 0.00</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#7B1FA2;"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Net Profit</h3><p class="stat-number" id="statProfit">Rs. 0.00</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#00897B;"><i class="fas fa-calendar-day"></i></div><div class="stat-info"><h3>Upcoming Tasks (7d)</h3><p class="stat-number" id="statTasks">0</p></div></div>
+        </div>
+        <div class="table-section">
+          <h2><i class="fas fa-history"></i> Recent Harvests</h2>
+          <table class="data-table"><thead><tr><th>Date</th><th>Land</th><th>Quantity</th><th>Revenue</th></tr></thead><tbody id="dashboardHarvestRows"></tbody></table>
+        </div>
+      </div>
+    </section>
 
-        // Apply stored theme or default to light
-        if (storedTheme === "dark") {
-          html.classList.add("dark");
-        } else {
-          html.classList.remove("dark");
-          if (!storedTheme) {
-            localStorage.setItem("slfarmer-theme", "light");
-          }
-        }
+    <section id="section-lands" class="app-section">
+      <div class="dashboard lands-page">
+        <div class="dashboard-header">
+          <div>
+            <h1><i class="fas fa-tractor"></i> Land Management</h1>
+            <p class="subtitle section-subtitle">Manage your pineapple farming lands</p>
+          </div>
+          <button class="btn admin-only" type="button" id="toggleLandFormBtn"><i class="fas fa-plus"></i> Add New Land</button>
+        </div>
 
-        function updateThemeToggleIcon() {
-          if (!themeToggleIcon) return;
-          if (html.classList.contains("dark")) {
-            themeToggleIcon.classList.remove("fa-moon");
-            themeToggleIcon.classList.add("fa-sun");
-          } else {
-            themeToggleIcon.classList.remove("fa-sun");
-            themeToggleIcon.classList.add("fa-moon");
-          }
-        }
+        <div class="form-container collapsible-panel admin-only" id="landFormPanel">
+          <h2 class="form-title"><i class="fas fa-plus-circle"></i> Add New Land</h2>
+          <form id="landForm" class="simple-form"></form>
+        </div>
 
-        updateThemeToggleIcon();
+        <div class="dashboard-stats compact-stats">
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#4CAF50,#2E7D32);"><i class="fas fa-map-marked-alt"></i></div><div class="stat-info"><h3>Total Lands</h3><p class="stat-number" id="landStatTotal">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#2196F3,#1976D2);"><i class="fas fa-map"></i></div><div class="stat-info"><h3>Active Lands</h3><p class="stat-number" id="landStatActive">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#FF9800,#F57C00);"><i class="fas fa-seedling"></i></div><div class="stat-info"><h3>Total Plants</h3><p class="stat-number" id="landStatPlants">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7);"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Total Revenue</h3><p class="stat-number" id="landStatRevenue">Rs. 0.00</p></div></div>
+        </div>
 
-        if (themeToggle) {
-          themeToggle.addEventListener("click", () => {
-            const isDark = html.classList.toggle("dark");
-            localStorage.setItem("slfarmer-theme", isDark ? "dark" : "light");
-            updateThemeToggleIcon();
-          });
-        }
-      }
+        <div class="section-row section-title-row">
+          <div>
+            <h2><i class="fas fa-map-marked-alt"></i> Select Land</h2>
+            <p>Click on a land to view details and manage activities</p>
+          </div>
+        </div>
 
-      // Initialize admin system (wait for it to be available)
-      function initAdmin() {
-        if (typeof AdminSystem !== 'undefined') {
-          AdminSystem.initLogin();
-        } else {
-          // Wait for AdminSystem to load
-          setTimeout(initAdmin, 100);
-        }
-      }
-      
-      // Start initialization when DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          initThemeToggle();
-          initAdmin();
-        });
-      } else {
-        initThemeToggle();
-        initAdmin();
-      }
-    </script>
-  </body>
+        <div id="landsGrid" class="lands-grid"></div>
+      </div>
+    </section>
+
+    <section id="section-harvest" class="app-section">
+      <div class="dashboard harvest-page">
+        <div class="dashboard-header">
+          <div>
+            <h1><i class="fas fa-apple-alt"></i> Harvest Management</h1>
+            <p class="subtitle section-subtitle">Track and manage all pineapple harvests efficiently</p>
+          </div>
+          <button class="btn btn-outline admin-only" type="button" id="toggleHarvestFormBtn"><i class="fas fa-plus"></i> Add Harvest Record</button>
+        </div>
+
+        <div class="form-container collapsible-panel admin-only" id="harvestFormPanel">
+          <h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Harvest</h2>
+          <form id="harvestForm" class="simple-form"></form>
+        </div>
+
+        <div class="dashboard-stats compact-stats">
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);"><i class="fas fa-seedling"></i></div><div class="stat-info"><h3>Total Plants</h3><p class="stat-number" id="harvestStatPlants">0</p><small>Active cultivation</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);"><i class="fas fa-calendar-alt"></i></div><div class="stat-info"><h3>Total Harvest Events</h3><p class="stat-number" id="harvestStatEvents">0</p><small>All time records</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);"><i class="fas fa-clock"></i></div><div class="stat-info"><h3>Last Harvest</h3><p class="stat-number stat-number-sm" id="harvestStatLast">N/A</p><small>Most recent activity</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Total Revenue</h3><p class="stat-number" id="harvestStatRevenue">Rs. 0.00</p><small>Cumulative earnings</small></div></div>
+        </div>
+
+        <div class="table-section">
+          <div class="section-row">
+            <h2><i class="fas fa-history"></i> Recent Harvests</h2>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Land</th>
+                <th>Total KG</th>
+                <th>Grades (A/B/C)</th>
+                <th>Revenue</th>
+                <th>Avg Price/KG</th>
+                <th>Buyer</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="harvestRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-expenses" class="app-section">
+      <div class="dashboard expenses-page">
+        <div class="dashboard-header">
+          <h1><i class="fas fa-money-bill-wave"></i> Expenses Management</h1>
+          <button class="btn admin-only" type="button" id="toggleExpenseFormBtn"><i class="fas fa-plus-circle"></i> Add New Expense</button>
+        </div>
+
+        <div class="form-container collapsible-panel admin-only" id="expenseFormPanel">
+          <h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Expense</h2>
+          <form id="expenseForm" class="simple-form"></form>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label><i class="fas fa-tractor"></i> Land</label>
+              <select id="expenseFilterLand" class="form-control"></select>
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-tags"></i> Type</label>
+              <select id="expenseFilterType" class="form-control">
+                <option value="">All Types</option>
+                <option value="plants">Plants</option>
+                <option value="labor">Labor</option>
+                <option value="fertilizer">Fertilizer</option>
+                <option value="chemicals">Chemicals</option>
+                <option value="tools_equipment">Tools &amp; Equipment</option>
+                <option value="machines">Machines</option>
+                <option value="transport">Transport</option>
+                <option value="irrigation">Irrigation</option>
+                <option value="land_preparation">Land Preparation</option>
+                <option value="extra">Extra</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-calendar"></i> Date From</label>
+              <input id="expenseFilterFrom" class="form-control" type="date">
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-calendar"></i> Date To</label>
+              <input id="expenseFilterTo" class="form-control" type="date">
+            </div>
+            <div class="filter-group filter-button-wrap">
+              <button type="button" class="btn btn-secondary" id="expenseFilterReset"><i class="fas fa-redo"></i> Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stats compact-stats">
+          <div class="stat-card"><div class="stat-icon" style="background-color:#dc3545;"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h3>Total Expenses</h3><p class="stat-number" id="expenseStatTotal">Rs. 0.00</p><small id="expenseStatScope">All Lands</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#ff9800;"><i class="fas fa-calendar-alt"></i></div><div class="stat-info"><h3>This Month</h3><p class="stat-number" id="expenseStatMonth">Rs. 0.00</p><small>Current month</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#2196F3;"><i class="fas fa-chart-pie"></i></div><div class="stat-info"><h3>Top Category</h3><p class="stat-number" id="expenseStatTopCategory">N/A</p><small>Highest spend</small></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#9C27B0;"><i class="fas fa-receipt"></i></div><div class="stat-info"><h3>Total Records</h3><p class="stat-number" id="expenseStatRecords">0</p><small>Filtered results</small></div></div>
+        </div>
+
+        <div class="export-buttons">
+          <button type="button" class="export-btn excel" id="expenseExportCsv"><i class="fas fa-file-excel"></i> Export Excel</button>
+          <button type="button" class="export-btn pdf" id="expenseExportPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          <button type="button" class="export-btn print" id="expensePrintBtn"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+
+        <div class="table-section">
+          <h2><i class="fas fa-list"></i> Expenses List</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Land</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Plant Count</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenseRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-labor" class="app-section">
+      <div class="dashboard labor-page">
+        <div class="dashboard-header">
+          <h1><i class="fas fa-users"></i> Manage Laborers</h1>
+          <button class="btn admin-only" type="button" id="toggleLaborFormBtn"><i class="fas fa-user-plus"></i> Add New Laborer</button>
+        </div>
+
+        <div class="form-container collapsible-panel admin-only" id="laborFormPanel">
+          <h2 class="form-title"><i class="fas fa-user-plus"></i> Add Laborer</h2>
+          <form id="laborForm" class="simple-form"></form>
+        </div>
+
+        <div class="dashboard-stats compact-stats">
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#4CAF50,#2E7D32);"><i class="fas fa-users"></i></div><div class="stat-info"><h3>Total Laborers</h3><p class="stat-number" id="laborStatTotal">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#2196F3,#1976D2);"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3>Active</h3><p class="stat-number" id="laborStatActive">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#FF9800,#F57C00);"><i class="fas fa-user-clock"></i></div><div class="stat-info"><h3>On Leave</h3><p class="stat-number" id="laborStatLeave">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#9C27B0,#7B1FA2);"><i class="fas fa-user-slash"></i></div><div class="stat-info"><h3>Inactive</h3><p class="stat-number" id="laborStatInactive">0</p></div></div>
+        </div>
+
+        <div class="filter-section">
+          <div class="form-group search-group">
+            <div class="input-group">
+              <input id="laborSearch" class="form-control" placeholder="Search by name, contact, skills, or land...">
+              <button id="laborSearchBtn" class="btn" type="button"><i class="fas fa-search"></i> Search</button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-group">
+              <label><i class="fas fa-tractor"></i> Filter by Land</label>
+              <select id="laborFilterLand" class="form-control"></select>
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-user-check"></i> Filter by Status</label>
+              <select id="laborFilterStatus" class="form-control">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="on_leave">On Leave</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-calendar"></i> Join Date From</label>
+              <input id="laborFilterFrom" class="form-control" type="date">
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-calendar"></i> Join Date To</label>
+              <input id="laborFilterTo" class="form-control" type="date">
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-sort"></i> Sort By</label>
+              <select id="laborSortBy" class="form-control">
+                <option value="laborer_name">Name</option>
+                <option value="join_date">Join Date</option>
+                <option value="status">Status</option>
+                <option value="land_name">Land</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label><i class="fas fa-sort-amount-down"></i> Order</label>
+              <select id="laborSortOrder" class="form-control">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-section">
+          <h2><i class="fas fa-users"></i> Laborer List</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Join Date</th>
+                <th>Assigned Land</th>
+                <th>Skills</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="laborRows"></tbody>
+          </table>
+          <div class="export-buttons labor-export">
+            <small class="light-text">Export:</small>
+            <button class="export-btn print" id="laborPrintBtn" type="button"><i class="fas fa-print"></i> Print List</button>
+            <button class="export-btn excel" id="laborExportCsv" type="button"><i class="fas fa-file-excel"></i> Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="quick-actions labor-quick-actions">
+          <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+          <div class="action-buttons">
+            <button type="button" class="action-btn quick-action-btn admin-only" id="quickAddLaborer"><i class="fas fa-user-plus"></i><span>Add New Laborer</span></button>
+            <button type="button" class="action-btn quick-action-btn" id="quickActiveLaborers"><i class="fas fa-user-check"></i><span>View Active Laborers</span></button>
+            <button type="button" class="action-btn quick-action-btn" id="quickLandLaborers"><i class="fas fa-tractor"></i><span>Laborers in First Land</span></button>
+            <button type="button" class="action-btn quick-action-btn" id="quickMonthJoiners"><i class="fas fa-calendar"></i><span>This Month's Joiners</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-tasks" class="app-section">
+      <div class="dashboard-header"><h1><i class="fas fa-calendar-check"></i> Fertilizer Tasks</h1></div>
+      <div class="form-container admin-only"><h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Task</h2><form id="taskForm" class="simple-form"></form></div>
+      <div class="table-section"><h2><i class="fas fa-list-check"></i> Task List</h2><table class="data-table"><thead><tr><th>Date</th><th>Land</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="taskRows"></tbody></table></div>
+    </section>
+
+    <section id="section-profile" class="app-section">
+      <div class="dashboard profile-page">
+        <div class="dashboard-header">
+          <div>
+            <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+            <p class="subtitle section-subtitle">Manage your account details</p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="profileLogoutBtn"><i class="fas fa-right-from-bracket"></i> Logout</button>
+        </div>
+
+        <div class="profile-layout">
+          <div class="profile-summary">
+            <div class="profile-avatar-large" id="profileAvatarLarge"><span id="profileInitials">U</span></div>
+            <h3 id="profileNameHeading">User</h3>
+            <span id="profileRoleBadge" class="role-badge role-user">User</span>
+            <p id="profileEmailText" class="profile-email">-</p>
+            <p id="profileUpdatedAt" class="light-text">No profile updates yet.</p>
+          </div>
+
+          <div class="form-container profile-editor">
+            <h2 class="form-title"><i class="fas fa-pen-to-square"></i> Edit Profile</h2>
+            <form id="profileForm" class="simple-form">
+              <div class="simple-form-grid">
+                <div class="form-group">
+                  <label for="profileEmail">Email</label>
+                  <input id="profileEmail" class="form-control" type="email" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="profileRole">Role</label>
+                  <input id="profileRole" class="form-control" type="text" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="profileDisplayName">Display Name</label>
+                  <input id="profileDisplayName" class="form-control" type="text" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                  <label for="profilePhone">Phone</label>
+                  <input id="profilePhone" class="form-control" type="tel" placeholder="+94 7X XXX XXXX">
+                </div>
+                <div class="form-group">
+                  <label for="profileLocation">Location</label>
+                  <input id="profileLocation" class="form-control" type="text" placeholder="City / Area">
+                </div>
+                <div class="form-group full">
+                  <label for="profileBio">Bio</label>
+                  <textarea id="profileBio" class="form-control" placeholder="Short bio"></textarea>
+                </div>
+              </div>
+              <div class="form-actions-row">
+                <button type="submit" class="btn" id="profileSaveBtn"><i class="fas fa-save"></i> Save Profile</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="footer-content"><p>&copy; <span id="year"></span> Pineapple Farm Management System</p></div></footer>
+</div>
+<script src="js/theme.js?v=20260220-4" defer></script>
+<script type="module" src="js/firebase-app.js?v=20260220-4"></script>
+<script src="js/pwa.js?v=20260220-4" defer></script>
+</body>
 </html>
-

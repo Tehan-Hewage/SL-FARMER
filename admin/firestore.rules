@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      // Allow each new authenticated user to create their own profile as USER only.
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && !exists(/databases/$(database)/documents/users/$(userId))
+        && request.resource.data.role == "user";
+
+      // Admin manages user roles.
+      allow update, delete: if isAdmin();
+    }
+
+    // App collections: signed-in users can read, only admins can change data.
+    match /{document=**} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,562 @@
+.app-section { display: none; }
+.app-section.active { display: block; }
+
+.section-subtitle {
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.collapsible-panel {
+  display: none;
+}
+
+.collapsible-panel.open {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+.simple-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.simple-form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.form-actions-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--secondary-green);
+  border: 2px solid var(--accent-green);
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, var(--accent-green) 0%, var(--secondary-green) 100%);
+  color: #fff;
+}
+
+.compact-stats {
+  gap: 1.7rem;
+  margin: 1rem 0 2.25rem;
+}
+
+.compact-stats .stat-number {
+  font-size: 2rem;
+}
+
+.compact-stats .stat-card {
+  margin: 0;
+}
+
+.compact-stats .stat-info small {
+  color: var(--light-text);
+  font-size: 0.82rem;
+}
+
+.stat-number-sm {
+  font-size: 1.65rem !important;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-title-row {
+  margin-top: 1rem;
+}
+
+.section-title-row h2 {
+  color: var(--secondary-green);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.section-title-row p {
+  color: var(--light-text);
+}
+
+.inline-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+}
+
+.inline-btn.delete { background: #c62828; }
+.inline-btn.delete:hover { background: #b71c1c; }
+
+.inline-btn.complete { background: #2e7d32; }
+.inline-btn.complete:hover { background: #1b5e20; }
+
+button.btn-icon {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.data-table .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-actions .action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.quick-action-btn {
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  font: inherit;
+  width: 100%;
+  appearance: none;
+}
+
+.lands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 1.25rem;
+}
+
+.land-card {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.land-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg), 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.land-card-header {
+  color: #fff;
+  padding: 1rem 1rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.land-card-header h3 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.land-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.land-status.active {
+  background: rgba(255, 255, 255, 0.26);
+  color: #fff;
+}
+
+.land-status.inactive {
+  background: rgba(33, 33, 33, 0.18);
+  color: #fff;
+}
+
+.land-card-body {
+  padding: 1rem;
+}
+
+.land-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.48rem 0;
+  border-bottom: 1px solid #eef1f3;
+  color: var(--medium-text);
+}
+
+.land-info-item:last-of-type {
+  border-bottom: none;
+}
+
+.land-info-item i {
+  color: var(--accent-green);
+  width: 18px;
+  text-align: center;
+}
+
+.land-stats-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0.95rem 0 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e8edf2;
+  border-radius: var(--radius-lg);
+}
+
+.land-stats-box .stat {
+  text-align: center;
+}
+
+.land-stats-box .stat-label {
+  font-size: 0.73rem;
+  color: var(--light-text);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.land-stats-box .stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.land-stats-box .stat-value.expense { color: #d32f2f; }
+.land-stats-box .stat-value.revenue { color: #2e7d32; }
+.land-stats-box .stat-value.profit { color: #2e7d32; }
+.land-stats-box .stat-value.loss { color: #d32f2f; }
+
+.harvest-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: 0.58rem 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.harvest-indicator.soon {
+  background: #ffebee;
+  color: #b71c1c;
+  border-left: 4px solid #c62828;
+}
+
+.harvest-indicator.near {
+  background: #fff3e0;
+  color: #ef6c00;
+  border-left: 4px solid #ef6c00;
+}
+
+.harvest-indicator.later {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #2e7d32;
+}
+
+.land-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  background: #fafbfd;
+  padding: 0.75rem 1rem;
+}
+
+.btn-view {
+  padding: 0.62rem 1rem;
+  font-size: 0.88rem;
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+.btn-view:hover {
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.28);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  background: #fff;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.empty-state i {
+  color: var(--accent-green);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  margin-bottom: 0.5rem;
+  color: var(--medium-text);
+}
+
+.empty-state p {
+  color: var(--light-text);
+  margin-bottom: 1rem;
+}
+
+.harvest-date-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #f1f8e9;
+  border: 1px solid #c8e6c9;
+}
+
+.harvest-date-badge strong {
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--secondary-green);
+}
+
+.harvest-date-badge span {
+  font-size: 0.74rem;
+  letter-spacing: 0.7px;
+  color: var(--medium-text);
+}
+
+.harvest-grades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.grade-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.grade-chip.grade-a { background: #43a047; }
+.grade-chip.grade-b { background: #fb8c00; }
+.grade-chip.grade-c { background: #1e88e5; }
+
+.revenue-text {
+  color: var(--secondary-green);
+}
+
+.search-group {
+  margin-bottom: 1rem;
+}
+
+.search-group .input-group .btn {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.filter-button-wrap {
+  display: flex;
+  align-items: flex-end;
+}
+
+.filter-button-wrap .btn {
+  width: 100%;
+}
+
+.labor-export {
+  margin-top: 1.25rem;
+  align-items: center;
+}
+
+.light-text {
+  color: var(--light-text);
+  font-style: italic;
+}
+
+#appAlert .alert { margin-bottom: 1rem; }
+
+.muted { color: #666; font-size: 0.85rem; }
+
+.empty-row { text-align: center; color: #666; font-style: italic; }
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.record-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(8, 20, 14, 0.52);
+  backdrop-filter: blur(3px);
+}
+
+.record-modal-overlay[hidden] {
+  display: none !important;
+}
+
+.record-modal-card {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 2.5rem);
+  overflow: auto;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.99), rgba(245, 251, 247, 0.99));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+}
+
+.record-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.record-modal-header h3 {
+  color: var(--primary-green);
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.record-modal-close {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  cursor: pointer;
+}
+
+.record-modal-body {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.record-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.record-detail-item {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  background: #fff;
+}
+
+.record-detail-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #335f48;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.record-detail-value {
+  color: #163a29;
+  font-weight: 600;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.record-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.record-modal-grid .full {
+  grid-column: 1 / -1;
+}
+
+.record-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+html[data-theme="dark"] .record-modal-card {
+  background: linear-gradient(170deg, rgba(14, 33, 24, 0.98), rgba(11, 27, 19, 0.98));
+  border-color: rgba(134, 239, 172, 0.28);
+}
+
+html[data-theme="dark"] .record-modal-header {
+  border-bottom-color: rgba(134, 239, 172, 0.2);
+}
+
+html[data-theme="dark"] .record-modal-header h3 {
+  color: #d7fbe0;
+}
+
+html[data-theme="dark"] .record-detail-item {
+  background: rgba(16, 38, 27, 0.9);
+  border-color: rgba(134, 239, 172, 0.2);
+}
+
+html[data-theme="dark"] .record-detail-label {
+  color: #8bc9a3;
+}
+
+html[data-theme="dark"] .record-detail-value {
+  color: #e4f5e9;
+}
+
+@media (max-width: 768px) {
+  .simple-form-grid { grid-template-columns: 1fr; }
+  .compact-stats {
+    gap: 1rem;
+    margin: 0.75rem 0 1.5rem;
+  }
+  .compact-stats .stat-number {
+    font-size: 1.5rem;
+  }
+  .section-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .quick-actions .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  .lands-grid {
+    grid-template-columns: 1fr;
+  }
+  .land-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .land-card-footer .action-buttons {
+    justify-content: center;
+  }
+  .land-stats-box {
+    grid-template-columns: 1fr;
+  }
+  .record-modal-actions .btn {
+    width: 100%;
+  }
+}
