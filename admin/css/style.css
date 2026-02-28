@@ -746,11 +746,22 @@ html[data-theme="dark"] .dashboard-stats .stat-icon {
     letter-spacing: 0.5px;
 }
 
+.stat-info {
+    min-width: 0;
+    flex: 1;
+}
+
 .stat-number {
-    font-size: 2.25rem;
+    font-size: clamp(1rem, 5.2vw, 2.25rem);
     font-weight: 700;
     color: var(--secondary-green);
-    line-height: 1;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 /* ===== QUICK ACTIONS ===== */
@@ -2130,14 +2141,16 @@ input.form-control[type="date"] {
         grid-area: actions;
         margin-left: 0;
         width: 100%;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
+        display: flex;
+        flex-wrap: nowrap;
         gap: 0.55rem;
         background: linear-gradient(135deg, rgba(7, 35, 26, 0.5), rgba(11, 63, 42, 0.52));
         border: 1px solid rgba(220, 255, 236, 0.22);
         border-radius: 1rem;
         padding: 0.5rem;
         align-items: stretch;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .nav-tools {
@@ -2189,7 +2202,7 @@ input.form-control[type="date"] {
     }
 
     #installAppBtn {
-        width: 100%;
+        width: auto;
         justify-content: center;
         font-size: 0.82rem;
         min-height: 44px;
@@ -2200,7 +2213,7 @@ input.form-control[type="date"] {
     }
 
     .btn-theme-toggle {
-        width: 100%;
+        width: auto;
         justify-content: center;
         font-size: 0.82rem;
         min-height: 44px;
@@ -2215,7 +2228,7 @@ input.form-control[type="date"] {
     }
 
     .profile-btn {
-        width: 100%;
+        width: auto;
         justify-content: center;
         min-height: 44px;
         padding: 0.56rem 0.55rem;
@@ -2228,6 +2241,9 @@ input.form-control[type="date"] {
 
     .nav-actions .btn,
     .nav-actions .profile-btn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -2245,7 +2261,7 @@ input.form-control[type="date"] {
     }
 
     #logoutBtn {
-        width: 100%;
+        width: auto;
         min-width: 0;
         min-height: 44px;
         padding: 0.56rem 0.55rem;
@@ -2275,7 +2291,6 @@ input.form-control[type="date"] {
     }
 
     .nav-actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.45rem;
         padding: 0.45rem;
     }
@@ -2450,11 +2465,11 @@ input.form-control[type="date"] {
     }
 
     .nav-actions {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: nowrap;
         gap: 0.38rem;
         padding: 0.4rem;
-        overflow: visible;
+        overflow-x: auto;
     }
 
     .nav-tools,
@@ -2589,7 +2604,7 @@ input.form-control[type="date"] {
 
 @media (max-width: 360px) {
     .nav-actions {
-        grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+        gap: 0.28rem;
     }
 
     #installAppBtn .btn-label,

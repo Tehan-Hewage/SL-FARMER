@@ -210,7 +210,7 @@ button.btn-icon {
 
 .land-stats-box {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.5rem;
   margin: 0.95rem 0 0.75rem;
   padding: 0.75rem;
@@ -221,6 +221,7 @@ button.btn-icon {
 
 .land-stats-box .stat {
   text-align: center;
+  min-width: 0;
 }
 
 .land-stats-box .stat-label {
@@ -232,11 +233,19 @@ button.btn-icon {
 }
 
 .land-stats-box .stat-value {
-  font-size: 0.9rem;
+  font-size: clamp(0.74rem, 2.4vw, 0.95rem);
   font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  display: block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .land-stats-box .stat-value.expense { color: #d32f2f; }
+.land-stats-box .stat-value.cost { color: #0f766e; }
 .land-stats-box .stat-value.revenue { color: #2e7d32; }
 .land-stats-box .stat-value.profit { color: #2e7d32; }
 .land-stats-box .stat-value.loss { color: #d32f2f; }
@@ -287,6 +296,162 @@ button.btn-icon {
 
 .btn-view:hover {
   box-shadow: 0 6px 16px rgba(33, 150, 243, 0.28);
+}
+
+html[data-theme="dark"] #section-lands .land-card {
+  background:
+    radial-gradient(120% 110% at 0% 0%, rgba(46, 124, 84, 0.24), transparent 58%),
+    linear-gradient(168deg, rgba(12, 34, 24, 0.98), rgba(9, 26, 19, 0.98));
+  border: 1px solid rgba(132, 223, 170, 0.3);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(195, 255, 216, 0.07);
+}
+
+html[data-theme="dark"] #section-lands .land-card:hover {
+  border-color: rgba(168, 246, 202, 0.46);
+  box-shadow: 0 24px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(90, 194, 135, 0.2);
+}
+
+html[data-theme="dark"] #section-lands .land-card-header {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(204, 255, 227, 0.16);
+}
+
+html[data-theme="dark"] #section-lands .land-card-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(140deg, rgba(5, 17, 11, 0.1), rgba(5, 17, 11, 0.36));
+  pointer-events: none;
+}
+
+html[data-theme="dark"] #section-lands .land-card-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="dark"] #section-lands .land-card-header h3 {
+  color: #f2fff7;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 0 rgba(4, 14, 9, 0.45);
+}
+
+html[data-theme="dark"] #section-lands .land-status {
+  background: rgba(6, 20, 13, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  color: #f5fff8;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] #section-lands .land-status.inactive {
+  background: rgba(40, 18, 18, 0.5);
+  border-color: rgba(255, 181, 181, 0.52);
+  color: #ffd6d6;
+}
+
+html[data-theme="dark"] #section-lands .land-card-body {
+  background: linear-gradient(180deg, rgba(8, 28, 19, 0.92), rgba(8, 24, 17, 0.98));
+}
+
+html[data-theme="dark"] #section-lands .land-info-item {
+  color: #d8f3e2;
+  border-bottom-color: rgba(154, 228, 184, 0.26);
+}
+
+html[data-theme="dark"] #section-lands .land-info-item i {
+  color: #44dd86;
+  filter: drop-shadow(0 2px 4px rgba(5, 19, 12, 0.45));
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box {
+  background: linear-gradient(165deg, rgba(15, 40, 29, 0.96), rgba(10, 30, 22, 0.98));
+  border-color: rgba(136, 224, 171, 0.32);
+  box-shadow: inset 0 1px 0 rgba(190, 255, 214, 0.08), 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box .stat-label {
+  color: #9ad6b3;
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box .stat-value.expense {
+  color: #ff7d7d;
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box .stat-value.cost {
+  color: #7be7dc;
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box .stat-value.revenue,
+html[data-theme="dark"] #section-lands .land-stats-box .stat-value.profit {
+  color: #6ef2a1;
+}
+
+html[data-theme="dark"] #section-lands .land-stats-box .stat-value.loss {
+  color: #ff7d7d;
+}
+
+html[data-theme="dark"] #section-lands .harvest-indicator {
+  border: 1px solid rgba(148, 230, 181, 0.36);
+  box-shadow: inset 0 1px 0 rgba(224, 255, 236, 0.08);
+}
+
+html[data-theme="dark"] #section-lands .harvest-indicator.soon {
+  background: linear-gradient(135deg, rgba(114, 28, 36, 0.62), rgba(77, 18, 24, 0.62));
+  color: #ffd8dd;
+  border-left-color: #ff6b7a;
+}
+
+html[data-theme="dark"] #section-lands .harvest-indicator.near {
+  background: linear-gradient(135deg, rgba(120, 71, 18, 0.58), rgba(82, 46, 12, 0.58));
+  color: #ffe4b8;
+  border-left-color: #ffb54a;
+}
+
+html[data-theme="dark"] #section-lands .harvest-indicator.later {
+  background: linear-gradient(135deg, rgba(22, 68, 47, 0.62), rgba(14, 46, 33, 0.62));
+  color: #d6ffe5;
+  border-left-color: #4ad68a;
+}
+
+html[data-theme="dark"] #section-lands .land-card-footer {
+  background: linear-gradient(180deg, rgba(10, 30, 21, 0.94), rgba(8, 23, 17, 0.98));
+  border-top-color: rgba(143, 224, 177, 0.24);
+}
+
+html[data-theme="dark"] #section-lands .btn-view {
+  background: linear-gradient(135deg, #1da56b 0%, #137f53 100%);
+  border: 1px solid rgba(154, 241, 197, 0.34);
+  box-shadow: 0 10px 20px rgba(6, 29, 20, 0.42);
+}
+
+html[data-theme="dark"] #section-lands .btn-view:hover {
+  box-shadow: 0 12px 24px rgba(5, 32, 21, 0.5);
+}
+
+html[data-theme="dark"] #section-lands .btn-icon {
+  background: linear-gradient(135deg, rgba(22, 54, 39, 0.95), rgba(15, 42, 30, 0.95));
+  border: 1px solid rgba(134, 223, 170, 0.3);
+  color: #d9f6e5;
+}
+
+html[data-theme="dark"] #section-lands .btn-icon:hover {
+  background: linear-gradient(135deg, #1fa86b, #147f52);
+  border-color: rgba(174, 248, 204, 0.5);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(6, 34, 22, 0.42);
+}
+
+html[data-theme="dark"] #section-lands .btn-icon.btn-danger {
+  background: linear-gradient(135deg, rgba(96, 28, 35, 0.9), rgba(73, 20, 27, 0.9));
+  border-color: rgba(255, 170, 170, 0.36);
+  color: #ffd9dd;
+}
+
+html[data-theme="dark"] #section-lands .btn-icon.btn-danger:hover {
+  background: linear-gradient(135deg, #cf3f4c, #b7323e);
+  border-color: rgba(255, 205, 205, 0.52);
+  color: #fff;
 }
 
 .empty-state {

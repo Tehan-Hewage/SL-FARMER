@@ -62,7 +62,7 @@ const filters = {
 
 const expenseCategories = {
   plants: ["Loading", "Unloading", "Tip", "Pineapple Plants"],
-  labor: ["Pineapple Planting", "Tip", "Daily Wages"],
+  labor: ["Pineapple Planting", "Tip", "Daily Wages", "Hotel Rent", "Transport"],
   fertilizer: ["Urea", "Diarone", "Liquid Fertilizer", "Propenapose", "Pineapple Fertilizer"],
   chemicals: ["Pesticides", "Herbicides", "Fungicides", "Growth Regulators", "Other"],
   tools_equipment: ["Purchase", "Repair", "Maintenance", "Rental", "Fuel", "Other"],
@@ -1150,6 +1150,7 @@ function renderLands() {
     const revenue = state.harvest.filter((h) => idsMatch(h.land_id, landKey, land.id)).reduce((s, h) => s + Number(h.total_revenue || 0), 0);
     const expense = state.expenses.filter((e) => idsMatch(e.land_id, landKey, land.id)).reduce((s, e) => s + Number(e.amount || 0), 0);
     const profit = revenue - expense;
+    const costPerPlant = plants > 0 ? expense / plants : 0;
     const size = land.size_hectares ? `${formatNum(Number(land.size_hectares))} Hectares` : (land.size_perches ? `${formatNum(Number(land.size_perches))} Perches` : "-");
     const plantingDate = parseDate(land.planting_date);
     const expectedHarvest = parseDate(land.expected_harvest_date);
@@ -1168,6 +1169,7 @@ function renderLands() {
       revenue,
       expense,
       profit,
+      costPerPlant,
       size,
       ageMonths,
       harvestStatus,
@@ -1201,7 +1203,7 @@ function renderLands() {
   }
 
   grid.innerHTML = lands.map((entry) => {
-    const { land, landKey, plants, revenue, expense, profit, size, ageMonths, harvestStatus, harvestLabel, status } = entry;
+    const { land, landKey, plants, revenue, expense, profit, costPerPlant, size, ageMonths, harvestStatus, harvestLabel, status } = entry;
     const statusClass = status === "active" ? "active" : "inactive";
 
     return `
@@ -1220,6 +1222,7 @@ function renderLands() {
 
           <div class="land-stats-box">
             <div class="stat"><div class="stat-label">Expenses</div><div class="stat-value expense">${esc(formatCurrency(expense))}</div></div>
+            <div class="stat"><div class="stat-label">Cost / Plant</div><div class="stat-value cost">${esc(formatCurrency(costPerPlant))}</div></div>
             <div class="stat"><div class="stat-label">Revenue</div><div class="stat-value revenue">${esc(formatCurrency(revenue))}</div></div>
             <div class="stat"><div class="stat-label">Profit</div><div class="stat-value ${profit >= 0 ? "profit" : "loss"}">${esc(formatCurrency(profit))}</div></div>
           </div>
