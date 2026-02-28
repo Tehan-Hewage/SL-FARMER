@@ -26,8 +26,8 @@
       } catch (error) {}
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=20260220-4">
-  <link rel="stylesheet" href="css/firebase-app.css?v=20260220-4">
+  <link rel="stylesheet" href="css/style.css?v=20260228-1">
+  <link rel="stylesheet" href="css/firebase-app.css?v=20260228-1">
 </head>
 <body>
 <div id="authOverlay" class="auth-overlay">
@@ -66,25 +66,29 @@
         <a href="#" data-section="labor"><i class="fas fa-users"></i> Labor</a>
         <a href="#" data-section="tasks"><i class="fas fa-calendar-check"></i> Tasks</a>
       </div>
-      <div class="nav-actions">
-        <div class="nav-tools">
-          <button type="button" class="btn btn-sm btn-install" id="installAppBtn">
-            <i class="fas fa-download"></i> Install App
+        <div class="nav-actions">
+          <div class="nav-tools">
+          <button type="button" class="btn btn-sm btn-install" id="installAppBtn" aria-label="Install app">
+            <i class="fas fa-download"></i>
+            <span class="btn-label">Install App</span>
           </button>
           <button type="button" class="btn btn-sm btn-theme-toggle" id="themeToggleBtn" aria-label="Toggle dark and light mode">
             <i class="fas fa-moon"></i>
-            <span>Dark</span>
+            <span class="btn-label">Dark</span>
           </button>
-        </div>
-        <div class="nav-auth" id="navAuth" hidden>
-          <button type="button" class="profile-btn" id="openProfileBtn" aria-label="Open profile">
-            <span class="profile-avatar" id="navProfileAvatar"><span id="navProfileInitials">U</span></span>
-            <span class="profile-btn-text">Profile</span>
+          </div>
+          <div class="nav-auth" id="navAuth" hidden>
+            <button type="button" class="profile-btn" id="openProfileBtn" aria-label="Open profile">
+              <span class="profile-avatar" id="navProfileAvatar"><span id="navProfileInitials">U</span></span>
+              <span class="profile-btn-text">Profile</span>
+            </button>
+          <button type="button" class="btn btn-sm" id="logoutBtn" aria-label="Logout">
+            <i class="fas fa-right-from-bracket"></i>
+            <span class="btn-label">Logout</span>
           </button>
-          <button type="button" class="btn btn-sm" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Logout</button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
   </header>
 
   <main class="main-content">

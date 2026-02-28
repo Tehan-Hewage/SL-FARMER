@@ -18,6 +18,7 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { ResponsiveTableCards } from "./responsive-table.js?v=20260220-4";
 
 const state = {
   lands: [],
@@ -81,6 +82,39 @@ const refs = {
   tasks: collection(db, "fertilizer_schedule")
 };
 
+const responsiveTables = new ResponsiveTableCards({
+  breakpoint: 768,
+  tableConfigs: {
+    dashboardHarvestRows: {
+      titleField: "Land",
+      primaryFields: ["Date", "Quantity", "Revenue"]
+    },
+    harvestRows: {
+      titleField: "Land",
+      actionsField: "Actions",
+      primaryFields: ["Date", "Total KG", "Grades (A/B/C)", "Revenue", "Avg Price/KG", "Buyer"]
+    },
+    expenseRows: {
+      titleField: "Land",
+      statusField: "Type",
+      actionsField: "Actions",
+      primaryFields: ["Date", "Category", "Plant Count", "Amount"]
+    },
+    laborRows: {
+      titleField: "Name",
+      statusField: "Status",
+      actionsField: "Actions",
+      primaryFields: ["ID", "Contact", "Join Date", "Assigned Land", "Skills"]
+    },
+    taskRows: {
+      titleField: "Land",
+      statusField: "Status",
+      actionsField: "Actions",
+      primaryFields: ["Date", "Type"]
+    }
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -92,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initQuickActions();
   initSubmitHandlers();
   ensureRecordModal();
+  responsiveTables.registerAll();
   initAuth();
 });
 
@@ -1281,8 +1316,11 @@ function renderHarvest() {
     const dateObj = parseDate(h.harvest_date);
     const day = dateObj ? String(dateObj.getDate()).padStart(2, "0") : "--";
     const month = dateObj ? dateObj.toLocaleDateString("en-US", { month: "short" }).toUpperCase() : "---";
+    const mobileExtras = mobileExtraFieldsAttr([
+      { label: "Notes", value: h.notes || "-" }
+    ]);
 
-    return `<tr>
+    return `<tr${mobileExtras}>
       <td><div class="harvest-date-badge"><strong>${esc(day)}</strong><span>${esc(month)}</span></div></td>
       <td>${esc(land?.land_name || "Unknown")}</td>
       <td><strong>${esc(formatNum(qty))} kg</strong></td>
@@ -1357,7 +1395,10 @@ function renderExpenses() {
     const plantCount = shouldTrackPlantCount(expenseType, e.category) && Number(e.plant_count || 0) > 0
       ? formatInt(Number(e.plant_count))
       : "-";
-    return `<tr>
+    const mobileExtras = mobileExtraFieldsAttr([
+      { label: "Description", value: e.description || "-" }
+    ]);
+    return `<tr${mobileExtras}>
       <td>${esc(formatDate(e.expense_date))}</td>
       <td>${esc(land?.land_name || "General Expense")}</td>
       <td><span class="status-badge ${esc(expenseType)}">${esc(expenseTypeLabel)}</span></td>
@@ -1458,7 +1499,10 @@ function renderTasks() {
         : "";
       const deleteBtn = admin ? `<button class="inline-btn delete" data-delete="tasks" data-id="${esc(t.id)}">Delete</button>` : "";
       const actionCell = (completeBtn || deleteBtn) ? `${completeBtn} ${deleteBtn}`.trim() : '<span class="muted">View only</span>';
-      return `<tr>
+      const mobileExtras = mobileExtraFieldsAttr([
+        { label: "Notes", value: t.notes || "-" }
+      ]);
+      return `<tr${mobileExtras}>
         <td>${esc(formatDate(t.next_date))}</td>
         <td>${esc(land?.land_name || "Unknown")}</td>
         <td>${esc(t.fertilizer_type || "")}</td>
@@ -1556,29 +1600,23 @@ function profileInitials(name) {
     .join("");
 }
 
-function setRows(id, rows, colSpan, emptyText) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (!rows.length) {
-    el.innerHTML = `<tr><td class="empty-row" colspan="${colSpan}">${esc(emptyText)}</td></tr>`;
-  } else {
-    el.innerHTML = rows.join("");
-  }
+function bindRowActionHandlers(root) {
+  if (!root) return;
 
-  el.querySelectorAll("button[data-record-view]").forEach((btn) => {
+  root.querySelectorAll("button[data-record-view]").forEach((btn) => {
     btn.addEventListener("click", () => {
       openRecordModal(btn.dataset.recordView, btn.dataset.recordId, "view");
     });
   });
 
-  el.querySelectorAll("button[data-record-edit]").forEach((btn) => {
+  root.querySelectorAll("button[data-record-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (!requireAdmin("edit records")) return;
       openRecordModal(btn.dataset.recordEdit, btn.dataset.recordId, "edit");
     });
   });
 
-  el.querySelectorAll("button[data-delete]").forEach((btn) => {
+  root.querySelectorAll("button[data-delete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       if (!requireAdmin("delete records")) return;
       try {
@@ -1600,7 +1638,7 @@ function setRows(id, rows, colSpan, emptyText) {
     });
   });
 
-  el.querySelectorAll("button[data-complete]").forEach((btn) => {
+  root.querySelectorAll("button[data-complete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       if (!requireAdmin("update task status")) return;
       try {
@@ -1612,12 +1650,47 @@ function setRows(id, rows, colSpan, emptyText) {
     });
   });
 
-  el.querySelectorAll("button[data-info]").forEach((btn) => {
+  root.querySelectorAll("button[data-info]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const msg = btn.dataset.info || "No additional information.";
       showAlert(unescapeHtml(msg), "info");
     });
   });
+}
+
+function mobileExtraFieldsAttr(fields = []) {
+  const normalizedFields = fields
+    .map((field) => ({
+      label: normalizeId(field?.label),
+      value: normalizeId(field?.value)
+    }))
+    .filter((field) => field.label || field.value);
+
+  if (!normalizedFields.length) return "";
+
+  const payload = encodeURIComponent(JSON.stringify(
+    normalizedFields.map((field) => ({
+      label: field.label || "Details",
+      value: field.value || "-"
+    }))
+  ));
+  return ` data-mobile-extra="${esc(payload)}"`;
+}
+
+function setRows(id, rows, colSpan, emptyText) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!rows.length) {
+    el.innerHTML = `<tr><td class="empty-row" colspan="${colSpan}">${esc(emptyText)}</td></tr>`;
+  } else {
+    el.innerHTML = rows.join("");
+  }
+
+  responsiveTables.sync(id);
+
+  bindRowActionHandlers(el);
+  const cardsContainer = responsiveTables.getCardsContainer(id);
+  if (cardsContainer) bindRowActionHandlers(cardsContainer);
 }
 
 function ensureRecordModal() {

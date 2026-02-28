@@ -23,6 +23,13 @@
     tailwind.config = {
       darkMode: "class",
       theme: {
+        screens: {
+          sm: "480px",
+          md: "768px",
+          lg: "1024px",
+          xl: "1280px",
+          "2xl": "1536px",
+        },
         extend: {
           colors: {
             farm: {
@@ -48,23 +55,25 @@
 <body
   class="bg-farm-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-farm-200 selection:text-farm-900">
   <header
-    class="fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80">
-    <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 2xl:px-10">
-      <div class="flex flex-wrap items-center gap-4 py-3 md:flex-nowrap">
-        <a href="index.html" class="flex flex-shrink-0 items-center gap-5 text-farm-700 dark:text-farm-100">
-          <img src="images/logo.png" alt="SL Farmer Logo" class="h-20 w-26 object-contain" />
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.4em] text-farm-500">
+    class="site-header fixed inset-x-0 top-0 z-50 border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-950/80">
+    <div class="site-container site-container-wide w-full">
+      <div class="site-header-inner flex flex-wrap items-center gap-3 py-2 md:gap-4 md:py-3 lg:flex-nowrap">
+        <a href="index.html" class="header-brand flex flex-shrink-0 items-center text-farm-700 dark:text-farm-100">
+          <img src="images/logo.png" alt="SL Farmer Logo" class="header-brand-logo object-contain" />
+          <div class="header-brand-text">
+            <p class="header-brand-kicker font-semibold uppercase text-farm-500">
               SL Farmer
             </p>
-            <p class="text-2xl font-extrabold text-farm-800 dark:text-farm-100">
-              Farm Fresh Goodness
+            <p class="header-brand-title font-extrabold text-farm-800 dark:text-farm-100">
+              <span class="hidden sm:inline">Farm Fresh Goodness</span>
+              <span class="sm:hidden">Farm Fresh</span>
             </p>
           </div>
         </a>
         <nav class="order-3 w-full md:order-2 md:flex-1">
           <ul
-            class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0">
+            id="primaryNav"
+            class="nav-menu hidden w-full flex-col gap-4 rounded-3xl border border-farm-100/50 bg-white/95 px-6 py-5 text-base font-semibold text-farm-700 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100/30 dark:border-farm-800 dark:bg-slate-950/90 dark:text-slate-100 dark:ring-emerald-900/40 md:flex md:w-full md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-3 lg:gap-5 md:rounded-full md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:font-medium md:shadow-none md:ring-0 md:dark:bg-transparent md:dark:border-0 md:dark:ring-0">
             <li>
               <a class="nav-link tracking-wide text-slate-600 transition hover:text-farm-600 dark:text-slate-200 dark:hover:text-amber-200"
                 href="index.html">Home</a>
@@ -91,7 +100,7 @@
             </li>
             <li class="md:hidden">
               <a href="admin/index.html"
-                class="inline-flex w-full items-center justify-center rounded-full border border-farm-300 px-4 py-2 text-farm-700 shadow-sm transition hover:border-farm-500 hover:text-farm-800 dark:border-farm-700 dark:text-amber-200 dark:hover:border-amber-300">Admin
+                class="mobile-admin-btn inline-flex w-full items-center justify-center rounded-full border border-farm-300 px-4 py-2 text-farm-700 shadow-sm transition hover:border-farm-500 hover:text-farm-800 dark:border-farm-700 dark:text-amber-200 dark:hover:border-amber-300">Admin
                 Login</a>
             </li>
             <li class="md:hidden">
@@ -108,28 +117,31 @@
             <i id="themeToggleIcon" class="fas fa-moon text-lg"></i>
           </button>
           <a href="admin/index.html"
-            class="hidden items-center gap-2 rounded-full border border-farm-300 px-5 py-2 text-sm font-semibold text-farm-700 shadow-sm transition hover:border-farm-500 hover:text-farm-800 md:inline-flex dark:border-farm-700 dark:text-amber-200 dark:hover:border-amber-300">
-            <i class="fas fa-user-shield text-sm leading-none"></i><span class="tracking-wide">Admin Login</span>
+            class="hidden h-11 w-11 items-center justify-center rounded-full border border-farm-300 text-farm-700 transition hover:bg-farm-50 md:inline-flex dark:border-farm-700 dark:text-amber-200 dark:hover:bg-slate-900"
+            aria-label="Admin Login">
+            <i class="fas fa-user-shield text-sm leading-none"></i>
           </a>
           <a href="https://wa.me/94751519573" target="_blank"
-            class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-farm-500 to-farm-700 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex">
-            <i class="fab fa-whatsapp text-base leading-none"></i><span class="tracking-wide">WhatsApp</span>
+            class="hidden h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-farm-500 to-farm-700 text-white shadow-lg shadow-emerald-900/10 transition hover:shadow-emerald-900/30 md:inline-flex"
+            aria-label="Chat on WhatsApp">
+            <i class="fab fa-whatsapp text-base leading-none"></i>
           </a>
           <button
             class="mobile-toggle inline-flex h-11 w-11 items-center justify-center rounded-full border border-farm-200 text-farm-700 transition hover:bg-farm-50 md:hidden dark:border-farm-700 dark:text-farm-50"
-            aria-label="Toggle navigation" aria-expanded="false">
+            aria-label="Toggle navigation" aria-controls="primaryNav" aria-expanded="false">
             <i class="fas fa-bars text-xl"></i>
           </button>
         </div>
       </div>
     </div>
   </header>
+  <div class="mobile-nav-backdrop" data-nav-backdrop></div>
 
-  <main class="pt-36">
+  <main class="page-main">
     <!-- Products Hero Section -->
     <section
       class="bg-gradient-to-br from-farm-50 via-white to-emerald-50 px-4 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:px-6">
-      <div class="mx-auto max-w-6xl text-center">
+      <div class="site-container text-center">
         <p
           class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-farm-600 shadow-sm ring-1 ring-emerald-100 dark:bg-slate-900/70 dark:text-emerald-200">
           Our Products
@@ -146,8 +158,8 @@
 
     <!-- Products Grid Section -->
     <section class="bg-white px-4 py-20 dark:bg-slate-950 sm:px-6">
-      <div class="mx-auto max-w-6xl">
-        <div class="products-grid mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div class="site-container">
+        <div class="products-grid mt-12 grid">
 
           <!-- Pineapple -->
           <article
@@ -155,7 +167,7 @@
             data-product-id="pineapple">
             <span
               class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
-            <img src="images/Products/pineapple.jpg" alt="Pineapple" class="mt-4 h-64 w-full rounded-2xl object-cover"
+            <img src="images/Products/pineapple.jpg" alt="Pineapple" class="mt-4 w-full rounded-2xl object-cover"
               loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
@@ -183,7 +195,7 @@
             <span
               class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
             <img src="images/Products/Pineapple Plant.jpg" alt="Pineapple Plant"
-              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+              class="mt-4 w-full rounded-2xl object-cover" loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
                 <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -209,7 +221,7 @@
             data-product-id="ginger">
             <span
               class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
-            <img src="images/Products/Ginger.jpg" alt="Ginger" class="mt-4 h-64 w-full rounded-2xl object-cover"
+            <img src="images/Products/Ginger.jpg" alt="Ginger" class="mt-4 w-full rounded-2xl object-cover"
               loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
@@ -237,7 +249,7 @@
             <span
               class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
             <img src="images/Products/Ginger Plant.webp" alt="Ginger Plant"
-              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+              class="mt-4 w-full rounded-2xl object-cover" loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
                 <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -263,7 +275,7 @@
             data-product-id="cinnamon">
             <span
               class="self-start rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">Premium</span>
-            <img src="images/Products/Cinnamon.jpg" alt="Cinnamon" class="mt-4 h-64 w-full rounded-2xl object-cover"
+            <img src="images/Products/Cinnamon.jpg" alt="Cinnamon" class="mt-4 w-full rounded-2xl object-cover"
               loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
@@ -291,7 +303,7 @@
             <span
               class="self-start rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700 dark:bg-green-500/20 dark:text-green-200">Plant</span>
             <img src="images/Products/Cinnamon Plant.webp" alt="Cinnamon Plant"
-              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+              class="mt-4 w-full rounded-2xl object-cover" loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
                 <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -318,7 +330,7 @@
             <span
               class="self-start rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-200">Hot</span>
             <img src="images/Products/Nai Miris.jpg" alt="Scotch Bonnet Pepper (Nai Miris)"
-              class="mt-4 h-64 w-full rounded-2xl object-cover" loading="lazy" />
+              class="mt-4 w-full rounded-2xl object-cover" loading="lazy" />
             <div class="product-content mt-6 space-y-4">
               <div>
                 <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -369,7 +381,7 @@
     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-farm-400 via-farm-500 to-farm-600"></div>
     
     <div class="relative px-4 py-12 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-7xl">
+      <div class="site-container site-container-wide">
         <!-- Main Footer Content -->
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-10">
           <!-- Brand Section -->
@@ -402,7 +414,7 @@
                 aria-label="Facebook"
               >
                 <i class="fab fa-facebook text-lg"></i>
-                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Facebook</span>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity social-tooltip">Facebook</span>
               </a>
               <a
                 href="https://www.instagram.com/slfarmer"
@@ -411,7 +423,7 @@
                 aria-label="Instagram"
               >
                 <i class="fab fa-instagram text-lg"></i>
-                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Instagram</span>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity social-tooltip">Instagram</span>
               </a>
               <a
                 href="https://wa.me/94751519573"
@@ -420,7 +432,7 @@
                 aria-label="WhatsApp"
               >
                 <i class="fab fa-whatsapp text-lg"></i>
-                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">WhatsApp</span>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity social-tooltip">WhatsApp</span>
               </a>
             </div>
           </div>
@@ -435,7 +447,7 @@
               <li>
                 <a
                   href="index.html"
-                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                  class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
                   <i class="fas fa-home text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                   <span>Home</span>
@@ -444,7 +456,7 @@
               <li>
                 <a
                   href="products.html"
-                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                  class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
                   <i class="fas fa-box text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                   <span>Products</span>
@@ -453,7 +465,7 @@
               <li>
                 <a
                   href="gallery.html"
-                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                  class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
                   <i class="fas fa-images text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                   <span>Gallery</span>
@@ -462,7 +474,7 @@
               <li>
                 <a
                   href="index.html#about"
-                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                  class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
                   <i class="fas fa-info-circle text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                   <span>About Us</span>
@@ -471,7 +483,7 @@
               <li>
                 <a
                   href="index.html#story"
-                  class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                  class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                 >
                   <i class="fas fa-book text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                   <span>Our Story</span>
@@ -480,7 +492,7 @@
               <li>
                   <a
                     href="index.html#contact"
-                    class="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
+                    class="footer-link group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-farm-600 dark:hover:text-farm-400 transition-colors"
                   >
                     <i class="fas fa-envelope text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     <span>Contact</span>

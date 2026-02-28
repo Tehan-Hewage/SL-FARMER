@@ -88,12 +88,15 @@ class Slideshow {
 
 // Initialize slideshows when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+
     // Initialize all slideshows
     const slideshowContainers = document.querySelectorAll('.slideshow-container');
     
     slideshowContainers.forEach((container, index) => {
         const interval = index === 0 ? 4000 : 5000;
-        new Slideshow(container, true, interval);
+        new Slideshow(container, !prefersReducedMotion, interval);
     });
     
     const html = document.documentElement;
@@ -130,15 +133,125 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    const headerElement = document.querySelector('.site-header') || document.querySelector('header');
     const navMenu = document.querySelector('.nav-menu');
     const mobileToggle = document.querySelector('.mobile-toggle');
+    const navBackdrop = document.querySelector('[data-nav-backdrop]');
+    const desktopMediaQuery = window.matchMedia('(min-width: 768px)');
+    const mobileToggleIcon = mobileToggle?.querySelector('i');
+    let lastMenuFocusedElement = null;
+
+    const syncHeaderHeight = () => {
+        if (!headerElement) return;
+        const measuredHeight = Math.ceil(headerElement.getBoundingClientRect().height);
+        if (measuredHeight > 0) {
+            document.documentElement.style.setProperty('--header-height', `${measuredHeight}px`);
+        }
+    };
+
+    const isMenuOpen = () => mobileToggle?.getAttribute('aria-expanded') === 'true';
+    const isVisible = (element) => !!(element && element.offsetParent !== null);
+
+    const closeMobileMenu = ({ restoreFocus = true } = {}) => {
+        if (!mobileToggle || !navMenu) return;
+        navMenu.classList.add('hidden');
+        navMenu.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+        if (mobileToggleIcon) {
+            mobileToggleIcon.classList.remove('fa-xmark');
+            mobileToggleIcon.classList.add('fa-bars');
+        }
+        document.body.classList.remove('mobile-menu-open');
+        if (navBackdrop) {
+            navBackdrop.classList.remove('is-open');
+        }
+
+        if (restoreFocus) {
+            if (lastMenuFocusedElement instanceof HTMLElement && document.contains(lastMenuFocusedElement)) {
+                lastMenuFocusedElement.focus();
+            } else {
+                mobileToggle.focus();
+            }
+        }
+        lastMenuFocusedElement = null;
+    };
+
+    const openMobileMenu = () => {
+        if (!mobileToggle || !navMenu) return;
+        lastMenuFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : mobileToggle;
+        navMenu.classList.remove('hidden');
+        navMenu.classList.add('active');
+        mobileToggle.setAttribute('aria-expanded', 'true');
+        if (mobileToggleIcon) {
+            mobileToggleIcon.classList.remove('fa-bars');
+            mobileToggleIcon.classList.add('fa-xmark');
+        }
+        document.body.classList.add('mobile-menu-open');
+        if (navBackdrop) {
+            navBackdrop.classList.add('is-open');
+        }
+
+        const firstMenuAction = navMenu.querySelector('a, button');
+        if (firstMenuAction instanceof HTMLElement) {
+            firstMenuAction.focus();
+        }
+    };
+
+    const trapFocusInMenu = (event) => {
+        if (!mobileToggle || !navMenu || !isMenuOpen()) return;
+        const focusableElements = [
+            mobileToggle,
+            ...Array.from(navMenu.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        ].filter(el => el instanceof HTMLElement && isVisible(el));
+
+        if (!focusableElements.length) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement;
+
+        if (event.shiftKey && activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+            return;
+        }
+
+        if (!event.shiftKey && activeElement === lastElement) {
+            event.preventDefault();
+            firstElement.focus();
+        }
+    };
+
+    syncHeaderHeight();
+    window.addEventListener('resize', syncHeaderHeight);
 
     if (mobileToggle && navMenu) {
-        mobileToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            navMenu.classList.toggle('hidden');
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', (!expanded).toString());
+        closeMobileMenu({ restoreFocus: false });
+
+        mobileToggle.addEventListener('click', () => {
+            if (isMenuOpen()) {
+                closeMobileMenu({ restoreFocus: false });
+            } else {
+                openMobileMenu();
+            }
+        });
+
+        navMenu.querySelectorAll('a[href]').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (!desktopMediaQuery.matches) {
+                    closeMobileMenu({ restoreFocus: false });
+                }
+            });
+        });
+
+        if (navBackdrop) {
+            navBackdrop.addEventListener('click', () => closeMobileMenu());
+        }
+
+        desktopMediaQuery.addEventListener('change', (event) => {
+            if (event.matches) {
+                closeMobileMenu({ restoreFocus: false });
+            }
         });
     }
 
@@ -240,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(targetElement) {
                 window.scrollTo({
                     top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
+                    behavior: scrollBehavior
                 });
                 
                 // Update URL hash without jumping
@@ -249,11 +362,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update active nav link
                 setActiveNavLink();
                 
-                if (navMenu) {
-                    navMenu.classList.remove('active');
-                    if (window.innerWidth < 768 && !navMenu.classList.contains('hidden')) {
-                        navMenu.classList.add('hidden');
-                    }
+                if (navMenu && !desktopMediaQuery.matches) {
+                    closeMobileMenu({ restoreFocus: false });
                 }
             }
         });
@@ -334,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toast notification function
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
-        toast.className = `fixed top-24 right-6 z-50 rounded-2xl px-6 py-4 shadow-2xl transition-all transform translate-x-0 ${
+        toast.className = `toast fixed z-50 rounded-2xl px-4 py-3 shadow-2xl transition-all ${
             type === 'success' 
                 ? 'bg-green-500 text-white' 
                 : 'bg-red-500 text-white'
@@ -348,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(toast);
         
         setTimeout(() => {
-            toast.style.transform = 'translateX(400px)';
+            toast.style.transform = 'translateX(calc(100% + 1rem))';
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
@@ -369,32 +479,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add scroll animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    if (!prefersReducedMotion) {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .product-card, .testimonial-card, .contact-item, .story-content').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
         });
-    }, observerOptions);
-
-    // Observe elements for animation
-    document.querySelectorAll('.feature-card, .product-card, .testimonial-card, .contact-item, .story-content').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
+    }
 
     // Add loading animation to hero section
     window.addEventListener('load', function() {
-        document.querySelector('.hero-content').classList.add('fade-in-up');
-        document.querySelector('.hero-image').classList.add('fade-in-up');
+        if (prefersReducedMotion) return;
+        const heroContent = document.querySelector('.hero-content');
+        const heroImage = document.querySelector('.hero-image');
+        if (heroContent) {
+            heroContent.classList.add('fade-in-up');
+        }
+        if (heroImage) {
+            heroImage.classList.add('fade-in-up');
+        }
     });
 
     // Add scroll to top functionality
@@ -403,10 +522,10 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToTop.className = 'scroll-to-top';
     scrollToTop.style.cssText = `
         position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        right: max(16px, env(safe-area-inset-right));
+        width: 48px;
+        height: 48px;
         background: linear-gradient(135deg, #4fa34f, #215021);
         color: #ffffff;
         border: 1px solid rgba(33, 80, 33, 0.15);
@@ -422,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToTop.addEventListener('click', () => {
         window.scrollTo({
             top: 0,
-            behavior: 'smooth'
+            behavior: scrollBehavior
         });
     });
 
@@ -489,6 +608,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const lightbox = document.createElement('div');
         lightbox.className = 'lightbox fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm';
         lightbox.style.display = 'none';
+        lightbox.setAttribute('role', 'dialog');
+        lightbox.setAttribute('aria-modal', 'true');
+        lightbox.setAttribute('aria-label', 'Gallery image viewer');
+        lightbox.setAttribute('tabindex', '-1');
         lightbox.innerHTML = `
             <button class="lightbox-close absolute top-6 right-6 z-10 rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Close lightbox">
                 <i class="fas fa-times text-2xl"></i>
@@ -499,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="lightbox-next absolute right-6 z-10 rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Next image">
                 <i class="fas fa-chevron-right text-2xl"></i>
             </button>
-            <img class="lightbox-image max-h-[90vh] max-w-[90vw] rounded-2xl object-contain" src="" alt="Gallery Image" />
+            <img class="lightbox-image rounded-2xl object-contain" src="" alt="Gallery Image" />
         `;
         document.body.appendChild(lightbox);
         return lightbox;
@@ -512,31 +635,75 @@ document.addEventListener('DOMContentLoaded', function() {
     const lightboxNext = lightbox.querySelector('.lightbox-next');
     let currentImageIndex = 0;
     let visibleImages = [];
+    let lightboxLastFocusedElement = null;
+
+    const focusableInLightbox = () => Array.from(
+        lightbox.querySelectorAll('button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+    ).filter(el => el instanceof HTMLElement && isVisible(el));
+
+    const trapFocusInLightbox = (event) => {
+        const focusableElements = focusableInLightbox();
+        if (!focusableElements.length) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement;
+
+        if (event.shiftKey && activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+            return;
+        }
+
+        if (!event.shiftKey && activeElement === lastElement) {
+            event.preventDefault();
+            firstElement.focus();
+        }
+    };
+
+    const updateLightboxNavState = () => {
+        const hasMultipleImages = visibleImages.length > 1;
+        lightboxPrev.classList.toggle('hidden', !hasMultipleImages);
+        lightboxNext.classList.toggle('hidden', !hasMultipleImages);
+        lightboxPrev.setAttribute('aria-hidden', hasMultipleImages ? 'false' : 'true');
+        lightboxNext.setAttribute('aria-hidden', hasMultipleImages ? 'false' : 'true');
+    };
 
     const openLightbox = (index) => {
         visibleImages = Array.from(galleryItems).filter(item => 
             item.style.display !== 'none'
         ).map(item => item.querySelector('img').src);
-        
-        currentImageIndex = visibleImages.indexOf(galleryItems[index].querySelector('img').src);
+
+        if (!visibleImages.length) return;
+        const clickedImage = galleryItems[index]?.querySelector('img');
+        currentImageIndex = visibleImages.indexOf(clickedImage?.src || '');
         if (currentImageIndex === -1) currentImageIndex = 0;
-        
+
+        lightboxLastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         lightboxImage.src = visibleImages[currentImageIndex];
+        updateLightboxNavState();
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => lightboxClose.focus());
     };
 
-    const closeLightbox = () => {
+    const closeLightbox = ({ restoreFocus = true } = {}) => {
         lightbox.style.display = 'none';
         document.body.style.overflow = '';
+        if (restoreFocus && lightboxLastFocusedElement instanceof HTMLElement && document.contains(lightboxLastFocusedElement)) {
+            lightboxLastFocusedElement.focus();
+        }
+        lightboxLastFocusedElement = null;
     };
 
     const showNextImage = () => {
+        if (!visibleImages.length) return;
         currentImageIndex = (currentImageIndex + 1) % visibleImages.length;
         lightboxImage.src = visibleImages[currentImageIndex];
     };
 
     const showPrevImage = () => {
+        if (!visibleImages.length) return;
         currentImageIndex = (currentImageIndex - 1 + visibleImages.length) % visibleImages.length;
         lightboxImage.src = visibleImages[currentImageIndex];
     };
@@ -546,19 +713,31 @@ document.addEventListener('DOMContentLoaded', function() {
         item.addEventListener('click', () => openLightbox(index));
     });
 
-    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxClose.addEventListener('click', () => closeLightbox());
     lightboxNext.addEventListener('click', showNextImage);
     lightboxPrev.addEventListener('click', showPrevImage);
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) closeLightbox();
     });
 
-    // Keyboard navigation for lightbox
+    // Keyboard navigation for lightbox and mobile menu
     document.addEventListener('keydown', (e) => {
+        if (!desktopMediaQuery.matches && isMenuOpen()) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeMobileMenu();
+                return;
+            }
+            if (e.key === 'Tab') {
+                trapFocusInMenu(e);
+            }
+        }
+
         if (lightbox.style.display === 'flex') {
             if (e.key === 'Escape') closeLightbox();
             if (e.key === 'ArrowRight') showNextImage();
             if (e.key === 'ArrowLeft') showPrevImage();
+            if (e.key === 'Tab') trapFocusInLightbox(e);
         }
     });
 
@@ -584,34 +763,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Scroll Reveal Animation with Intersection Observer
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                revealObserver.unobserve(entry.target);
-            }
+    if (!prefersReducedMotion) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    });
 
-    // Add reveal class to elements
-    document.querySelectorAll('.product-card, .feature-card, .testimonial-card, .contact-item, section > div').forEach(el => {
-        el.classList.add('reveal');
-        revealObserver.observe(el);
-    });
+        // Add reveal class to elements
+        document.querySelectorAll('.product-card, .feature-card, .testimonial-card, .contact-item, section > div').forEach(el => {
+            el.classList.add('reveal');
+            revealObserver.observe(el);
+        });
+    }
 
     // Floating Decorative Elements
     const createFloatingElements = () => {
         const floatingContainer = document.createElement('div');
         floatingContainer.className = 'floating-elements';
         
-        const leafIcons = ['🍃', '🌿', '🍀', '🌱'];
+        const leafIcons = ['\u{1F343}', '\u{1F33F}', '\u{1F340}', '\u{1F331}'];
         for (let i = 0; i < 4; i++) {
             const leaf = document.createElement('div');
             leaf.className = 'floating-leaf';
-            leaf.textContent = leafIcons[i] || '🍃';
+            leaf.textContent = leafIcons[i] || '\u{1F343}';
             leaf.style.fontSize = `${Math.random() * 1.5 + 1.5}rem`;
             floatingContainer.appendChild(leaf);
         }
@@ -620,13 +801,13 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Only add floating elements on desktop
-    if (window.innerWidth > 768) {
+    if (!prefersReducedMotion && window.innerWidth > 768) {
         createFloatingElements();
     }
 
     // Parallax Effect for Hero Section
     const heroSection = document.querySelector('.hero');
-    if (heroSection) {
+    if (heroSection && !prefersReducedMotion) {
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
             const heroContent = heroSection.querySelector('.hero-content');
@@ -640,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enhanced Button Ripple Effect
     document.querySelectorAll('.btn, a[class*="rounded-full"][class*="bg-gradient"]').forEach(button => {
         button.addEventListener('click', function(e) {
+            if (prefersReducedMotion) return;
             const ripple = document.createElement('span');
             const rect = this.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -683,6 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Magnetic Hover Effect for Feature Cards (not product cards)
     document.querySelectorAll('.feature-card').forEach(card => {
         card.addEventListener('mousemove', function(e) {
+            if (prefersReducedMotion) return;
             const rect = this.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -703,16 +886,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Stagger Animation for Product Cards on Load
     const productCards = document.querySelectorAll('.product-card');
-    productCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(50px)';
-        
-        setTimeout(() => {
-            card.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
+    if (!prefersReducedMotion) {
+        productCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
 
     // Add gradient text class to headings
     document.querySelectorAll('h1, h2').forEach(heading => {

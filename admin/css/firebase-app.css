@@ -405,7 +405,10 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem;
+  padding: max(0.75rem, env(safe-area-inset-top))
+           max(0.75rem, env(safe-area-inset-right))
+           max(0.75rem, env(safe-area-inset-bottom))
+           max(0.75rem, env(safe-area-inset-left));
   background: rgba(8, 20, 14, 0.52);
   backdrop-filter: blur(3px);
 }
@@ -417,6 +420,7 @@ body.modal-open {
 .record-modal-card {
   width: min(920px, 100%);
   max-height: calc(100vh - 2.5rem);
+  max-height: calc(100dvh - 2.5rem);
   overflow: auto;
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.99), rgba(245, 251, 247, 0.99));
   border: 1px solid var(--border-color);
