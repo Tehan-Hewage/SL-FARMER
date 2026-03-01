@@ -757,6 +757,71 @@ body.mobile-menu-open {
     object-position: top;
 }
 
+.founder-slider-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.founder-nav-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(63, 138, 63, 0.24);
+    background: rgba(255, 255, 255, 0.9);
+    color: #215021;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.founder-nav-btn:hover {
+    background: #3f8a3f;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.founder-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.founder-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 9999px;
+    border: 0;
+    background: rgba(63, 138, 63, 0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.founder-dot.active {
+    background: #3f8a3f;
+    transform: scale(1.16);
+}
+
+.dark .founder-nav-btn {
+    border-color: rgba(95, 178, 95, 0.32);
+    background: rgba(15, 23, 42, 0.86);
+    color: #86efac;
+}
+
+.dark .founder-nav-btn:hover {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.dark .founder-dot {
+    background: rgba(134, 239, 172, 0.35);
+}
+
+.dark .founder-dot.active {
+    background: #4ade80;
+}
+
 /* Desktop: Image fits container height */
 @media (min-width: 1024px) {
     .owner-image {

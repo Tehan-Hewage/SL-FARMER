@@ -98,6 +98,153 @@ document.addEventListener('DOMContentLoaded', function() {
         const interval = index === 0 ? 4000 : 5000;
         new Slideshow(container, !prefersReducedMotion, interval);
     });
+
+    // Founder profiles slider (Owner 2 first, then Owner 1)
+    const ownerSlideshowImage = document.querySelector('[data-owner-slideshow]');
+    const founderNameEl = document.getElementById('founderName');
+    const founderRoleEl = document.getElementById('founderRole');
+    const founderBio1El = document.getElementById('founderBio1');
+    const founderBio2El = document.getElementById('founderBio2');
+    const founderBio3El = document.getElementById('founderBio3');
+    const founderAchievement1El = document.getElementById('founderAchievement1');
+    const founderAchievement2El = document.getElementById('founderAchievement2');
+    const founderPrevBtn = document.getElementById('founderPrevBtn');
+    const founderNextBtn = document.getElementById('founderNextBtn');
+    const founderDotsEl = document.getElementById('founderDots');
+
+    const canInitFounderSlider = [
+        ownerSlideshowImage,
+        founderNameEl,
+        founderRoleEl,
+        founderBio1El,
+        founderBio2El,
+        founderBio3El,
+        founderAchievement1El,
+        founderAchievement2El,
+        founderDotsEl
+    ].every(Boolean);
+
+    if (canInitFounderSlider) {
+        const founderProfiles = [
+            {
+                key: 'owner-2',
+                name: 'Upul Premakumara',
+                role: 'Founder - SL Farmer',
+                image: 'images/owner 2.jpg',
+                alt: 'Upul Premakumara - Founder & SL Farmer',
+                bio: [
+                    'Upul Premakumara is a hands-on farm leader focused on practical growth, crop health, and disciplined field operations. His day-to-day management helps keep SL Farmer productive through every season.',
+                    'With a strong commitment to sustainable methods, Upul supports efficient planting, expense control, and quality-first harvesting standards across the farm.',
+                    'His leadership strengthens SL Farmer\'s mission to deliver naturally grown produce while building long-term value for the local farming community.'
+                ],
+                achievements: ['2+ Years Farming Experience', 'Farm Operations Leader']
+            },
+            {
+                key: 'owner-1',
+                name: 'Jayasanka Peiris',
+                role: 'Founder - SL Farmer',
+                image: 'images/owner.JPG',
+                alt: 'Jayasanka Peiris - Founder & SL Farmer',
+                bio: [
+                    'Rooted in more than a decade of hands-on experience in sustainable agriculture, Jayasanka Peiris created SL Farmer with a simple purpose: to grow premium, naturally cultivated produce while honoring farming traditions passed down through generations.',
+                    'Raised in a family of farmers, Jayasanka blends ancient agricultural wisdom with modern sustainable innovations, crafting a farming model that is both environmentally responsible and exceptionally productive.',
+                    'Guided by purpose, driven by heritage, and committed to purity, Jayasanka continues to lead SL Farmer toward a future where sustainability and excellence grow side by side.'
+                ],
+                achievements: ['2+ Years Farming Experience', 'Local Community Leader']
+            }
+        ];
+
+        const validateFounderImage = (profile) => new Promise((resolve) => {
+            const probe = new Image();
+            probe.onload = () => resolve(profile);
+            probe.onerror = () => resolve(null);
+            probe.src = profile.image;
+        });
+
+        Promise.all(founderProfiles.map(validateFounderImage)).then((validProfiles) => {
+            const profiles = validProfiles.filter(Boolean);
+            if (!profiles.length) return;
+
+            let currentFounderIndex = 0;
+            let founderIntervalId = null;
+
+            const renderFounder = (index) => {
+                currentFounderIndex = (index + profiles.length) % profiles.length;
+                const profile = profiles[currentFounderIndex];
+
+                founderNameEl.textContent = profile.name;
+                founderRoleEl.textContent = profile.role;
+                founderBio1El.textContent = profile.bio[0] || '';
+                founderBio2El.textContent = profile.bio[1] || '';
+                founderBio3El.textContent = profile.bio[2] || '';
+                founderAchievement1El.textContent = profile.achievements[0] || '';
+                founderAchievement2El.textContent = profile.achievements[1] || '';
+                ownerSlideshowImage.src = profile.image;
+                ownerSlideshowImage.alt = profile.alt;
+
+                Array.from(founderDotsEl.children).forEach((dot, dotIndex) => {
+                    dot.classList.toggle('active', dotIndex === currentFounderIndex);
+                    dot.setAttribute('aria-selected', dotIndex === currentFounderIndex ? 'true' : 'false');
+                });
+            };
+
+            const stopFounderAutoSlide = () => {
+                if (!founderIntervalId) return;
+                clearInterval(founderIntervalId);
+                founderIntervalId = null;
+            };
+
+            const startFounderAutoSlide = () => {
+                stopFounderAutoSlide();
+                if (profiles.length < 2 || prefersReducedMotion) return;
+                founderIntervalId = setInterval(() => {
+                    renderFounder(currentFounderIndex + 1);
+                }, 5000);
+            };
+
+            founderDotsEl.innerHTML = '';
+            profiles.forEach((profile, index) => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'founder-dot';
+                dot.setAttribute('aria-label', `Show ${profile.name} profile`);
+                dot.setAttribute('aria-selected', 'false');
+                dot.addEventListener('click', () => {
+                    renderFounder(index);
+                    startFounderAutoSlide();
+                });
+                founderDotsEl.appendChild(dot);
+            });
+
+            if (profiles.length < 2) {
+                founderPrevBtn?.setAttribute('hidden', '');
+                founderNextBtn?.setAttribute('hidden', '');
+                founderDotsEl.innerHTML = '';
+            } else {
+                founderPrevBtn?.removeAttribute('hidden');
+                founderNextBtn?.removeAttribute('hidden');
+            }
+
+            founderPrevBtn?.addEventListener('click', () => {
+                renderFounder(currentFounderIndex - 1);
+                startFounderAutoSlide();
+            });
+
+            founderNextBtn?.addEventListener('click', () => {
+                renderFounder(currentFounderIndex + 1);
+                startFounderAutoSlide();
+            });
+
+            const storyContainer = document.querySelector('#story .story-content');
+            if (storyContainer && profiles.length > 1) {
+                storyContainer.addEventListener('mouseenter', stopFounderAutoSlide);
+                storyContainer.addEventListener('mouseleave', startFounderAutoSlide);
+            }
+
+            renderFounder(0);
+            startFounderAutoSlide();
+        });
+    }
     
     const html = document.documentElement;
     const themeToggle = document.getElementById('themeToggle');
