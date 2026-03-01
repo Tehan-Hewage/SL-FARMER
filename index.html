@@ -783,10 +783,10 @@
               Our Story
             </p>
             <h2 class="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
-              Meet Our Founder
+              Meet Our Founders
             </h2>
             <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
-              The passion behind SL Farmer
+              The people behind SL Farmer
             </p>
           </div>
           <div
@@ -795,10 +795,11 @@
             <div
               class="owner-info order-2 lg:order-1 rounded-[2rem] border border-farm-100 bg-white/80 p-8 shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
             >
-              <h3 class="text-3xl font-bold text-slate-900 dark:text-white">
-                Jayasanka Peiris
+              <h3 id="founderName" class="text-3xl font-bold text-slate-900 dark:text-white">
+                Upul Premakumara
               </h3>
               <p
+                id="founderRole"
                 class="owner-title mt-2 text-sm uppercase tracking-[0.4em] text-farm-500"
               >
                 Founder - SL Farmer
@@ -806,14 +807,14 @@
               <div
                 class="owner-bio mt-6 space-y-4 text-slate-600 dark:text-slate-300"
               >
-                <p>
-                  Rooted in more than a decade of hands-on experience in sustainable agriculture, Jayasanka Peiris created <strong>SL Farmer</strong> with a simple purpose - to grow premium, naturally cultivated produce while honoring the farming traditions passed down through generations.
+                <p id="founderBio1">
+                  Upul Premakumara is a hands-on farm leader focused on practical growth, crop health, and disciplined field operations. His day-to-day management helps keep SL Farmer productive through every season.
                 </p>
-                <p>
-                  Raised in a family of farmers, Jayasanka blends <strong>ancient agricultural wisdom</strong> with <strong>modern sustainable innovations</strong>, crafting a farming model that is both environmentally responsible and exceptionally productive. His passion for organic methods and unwavering commitment to quality have transformed SL Farmer into a renowned name for <strong>premium pineapples, ginger, and other naturally grown crops</strong>.
+                <p id="founderBio2">
+                  With a strong commitment to sustainable methods, Upul supports efficient planting, expense control, and quality-first harvesting standards across the farm.
                 </p>
-                <p>
-                  Guided by purpose, driven by heritage, and committed to purity - Jayasanka continues to lead SL Farmer toward a future where sustainability and excellence grow side by side.
+                <p id="founderBio3">
+                  His leadership strengthens SL Farmer's mission to deliver naturally grown produce while building long-term value for the local farming community.
                 </p>
               </div>
               <div class="owner-achievements mx-auto mt-6 grid max-w-md gap-4 md:grid-cols-2">
@@ -823,7 +824,7 @@
                   <i
                     class="fas fa-hand-holding-heart inline-block w-8 text-center text-2xl text-farm-500"
                   ></i>
-                  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  <p id="founderAchievement1" class="mt-2 text-sm text-slate-600 dark:text-slate-300">
                     2+ Years Farming Experience
                   </p>
                 </div>
@@ -831,10 +832,29 @@
                   class="achievement rounded-2xl bg-white/90 p-4 text-center shadow-sm dark:bg-slate-800"
                 >
                   <i class="fas fa-users inline-block w-8 text-center text-2xl text-farm-500"></i>
-                  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                    Local Community Leader
+                  <p id="founderAchievement2" class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    Farm Operations Leader
                   </p>
                 </div>
+              </div>
+              <div class="founder-slider-controls mt-6" data-founder-slider-controls>
+                <button
+                  type="button"
+                  class="founder-nav-btn"
+                  id="founderPrevBtn"
+                  aria-label="Previous founder profile"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="founder-dots" id="founderDots" aria-label="Founder profiles"></div>
+                <button
+                  type="button"
+                  class="founder-nav-btn"
+                  id="founderNextBtn"
+                  aria-label="Next founder profile"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
               </div>
             </div>
             <div class="owner-image order-1 lg:order-2">
@@ -842,8 +862,10 @@
                 class="overflow-hidden rounded-[2rem] border border-farm-100 bg-white shadow-2xl shadow-emerald-900/10 dark:border-farm-800 dark:bg-slate-900"
               >
                 <img
-                  src="images/owner.jpg"
-                  alt="Jayasanka Peiris - Founder & SL Farmer"
+                  src="images/owner 2.jpg"
+                  alt="Upul Premakumara - Founder & SL Farmer"
+                  id="ownerSlideshowImage"
+                  data-owner-slideshow
                   class="w-full object-cover owner-image-zoom"
                   style="object-position: 50% 0%;"
                   loading="lazy"
