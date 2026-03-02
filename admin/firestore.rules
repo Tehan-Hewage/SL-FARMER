@@ -7,14 +7,14 @@ service cloud.firestore {
 
     function isAdmin() {
       return signedIn()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ["admin", "manager"];
     }
 
     function hasApprovedAccess() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && (
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin"
+          isAdmin()
           || !("access_granted" in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
           || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.access_granted == true
         );
@@ -30,11 +30,11 @@ service cloud.firestore {
         && request.resource.data.role == "user"
         && request.resource.data.access_granted == false;
 
-      // Admin manages user roles.
+      // Admin/Manager manages user roles.
       allow update, delete: if isAdmin();
     }
 
-    // App collections: signed-in users can read, only admins can change data.
+    // App collections: signed-in users can read, only admins/managers can change data.
     match /{document=**} {
       allow read: if hasApprovedAccess();
       allow write: if isAdmin();

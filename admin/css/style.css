@@ -297,6 +297,10 @@ header::before {
     background: linear-gradient(135deg, #dc2626, #ef4444);
 }
 
+.role-badge.role-manager {
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+
 .role-badge.role-user {
     background: linear-gradient(135deg, #15803d, #16a34a);
 }

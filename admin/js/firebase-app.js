@@ -324,9 +324,7 @@ async function resolveUserRole(uid) {
 
     const profileData = snap.data() || {};
     authState.profile = profileData;
-    const role = normalizeId(profileData.role).toLowerCase();
-    if (role === "admin") return "admin";
-    return "user";
+    return normalizeUserRole(profileData.role);
   } catch (error) {
     console.error("Role lookup failed:", error);
     authState.profile = buildDefaultProfile();
@@ -401,11 +399,11 @@ function applyRoleAccess() {
     if (!signedIn) {
       accessNotice.innerHTML = "";
     } else if (admin) {
-      accessNotice.innerHTML = `<div class="alert alert-success"><i class="fas fa-shield-alt"></i><div>Admin mode enabled. You can add, update, and delete records.</div></div>`;
+      accessNotice.innerHTML = `<div class="alert alert-success"><i class="fas fa-shield-alt"></i><div>${getRoleLabel()} mode enabled. You can add, update, and delete records.</div></div>`;
     } else if (accessPending) {
       accessNotice.innerHTML = `<div class="alert alert-warning"><i class="fas fa-hourglass-half"></i><div>Wait Until Admin Give permission.</div></div>`;
     } else {
-      accessNotice.innerHTML = `<div class="alert alert-info"><i class="fas fa-eye"></i><div>Read-only mode enabled. You can view data, but only admins can make changes.</div></div>`;
+      accessNotice.innerHTML = `<div class="alert alert-info"><i class="fas fa-eye"></i><div>Read-only mode enabled. You can view data, but only admins and managers can make changes.</div></div>`;
     }
 
     if (signedIn && !accessPending) {
@@ -439,7 +437,21 @@ function applyRoleAccess() {
 }
 
 function isAdmin() {
-  return normalizeId(authState.role).toLowerCase() === "admin";
+  const role = normalizeUserRole(authState.role);
+  return role === "admin" || role === "manager";
+}
+
+function normalizeUserRole(roleValue) {
+  const normalized = normalizeId(roleValue).toLowerCase();
+  if (normalized === "admin" || normalized === "manager") return normalized;
+  return "user";
+}
+
+function getRoleLabel(roleValue = authState.role) {
+  const role = normalizeUserRole(roleValue);
+  if (role === "admin") return "Admin";
+  if (role === "manager") return "Manager";
+  return "User";
 }
 
 function isProfileAccessGranted(profile = authState.profile) {
@@ -467,7 +479,7 @@ function requireAdmin(actionLabel = "perform this action") {
     return false;
   }
   if (isAdmin()) return true;
-  showAlert(`Only admins can ${actionLabel}.`, "warning");
+  showAlert(`Only admins and managers can ${actionLabel}.`, "warning");
   return false;
 }
 
@@ -1868,10 +1880,11 @@ function renderUsers() {
     const uid = normalizeId(user.id);
     const displayName = normalizeId(user.display_name) || defaultDisplayNameFromEmail(user.email || `user_${index + 1}`);
     const email = normalizeId(user.email) || "-";
-    const roleValue = normalizeId(user.role).toLowerCase() === "admin" ? "admin" : "user";
+    const roleValue = normalizeUserRole(user.role);
+    const isPrivilegedUser = roleValue === "admin" || roleValue === "manager";
     const isAdminUser = roleValue === "admin";
     const isCurrentUser = idsMatch(uid, authState.user?.uid);
-    const accessGranted = isAdminUser ? true : isProfileAccessGranted(user);
+    const accessGranted = isPrivilegedUser ? true : isProfileAccessGranted(user);
     const assignedLandIds = getUserAssignedLandIds(user);
     const assignedLandNames = assignedLandIds.map((landId) => {
       const land = findLand(landId);
@@ -1889,12 +1902,13 @@ function renderUsers() {
         ? `<span class="status-badge normal">Admin</span>`
         : `<select class="form-control user-manage-select" data-user-role-select="${esc(uid)}">
           <option value="user"${roleValue === "user" ? " selected" : ""}>User</option>
+          <option value="manager"${roleValue === "manager" ? " selected" : ""}>Manager</option>
           <option value="admin"${roleValue === "admin" ? " selected" : ""}>Admin</option>
         </select>`);
 
     const accessControl = !canEdit
       ? `<span class="status-badge ${accessGranted ? "normal" : "upcoming"}">${esc(accessGranted ? "Approved" : "Pending")}</span>`
-      : (isAdminUser
+      : (isPrivilegedUser
         ? `<span class="status-badge normal">Approved</span>`
         : `<select class="form-control user-manage-select" data-user-access-select="${esc(uid)}">
           <option value="pending"${!accessGranted ? " selected" : ""}>Pending</option>
@@ -1933,16 +1947,15 @@ function renderUsers() {
             data-user-current-role="${esc(roleValue)}"
             data-user-current-access="${esc(accessGranted ? "approved" : "pending")}"
           >Save</button>
-          ${(!isAdminUser && !isCurrentUser)
+          ${(!isCurrentUser)
             ? `<button
                 class="inline-btn delete"
                 type="button"
                 data-user-delete="${esc(uid)}"
-                data-user-role="${esc(roleValue)}"
                 data-user-name="${esc(displayName)}"
                 data-user-email="${esc(email)}"
               >Delete</button>`
-            : `<span class="muted">${isCurrentUser ? "Current user" : "Admin protected"}</span>`}
+            : `<span class="muted">Current user</span>`}
         </div>`
       : '<span class="muted">View only</span>';
 
@@ -2155,7 +2168,7 @@ async function upsertTaskFcmTokenRecord(token) {
     token: normalizeId(token),
     user_id: normalizeId(authState.user.uid),
     email: normalizeId(authState.user.email),
-    role: isAdmin() ? "admin" : "user",
+    role: normalizeUserRole(authState.role),
     enabled: true,
     source: "admin-web",
     user_agent: normalizeId(navigator.userAgent),
@@ -2554,7 +2567,8 @@ function renderProfile() {
   const profile = authState.profile || {};
   const email = authState.user?.email || normalizeId(profile.email);
   const displayName = normalizeId(profile.display_name) || defaultDisplayNameFromEmail(email);
-  const roleLabel = isAdmin() ? "Admin" : "User";
+  const roleLabel = getRoleLabel();
+  const roleValue = normalizeUserRole(authState.role);
   const initials = profileInitials(displayName);
 
   text("navProfileInitials", initials);
@@ -2571,8 +2585,8 @@ function renderProfile() {
   const roleBadge = document.getElementById("profileRoleBadge");
   if (roleBadge) {
     roleBadge.textContent = roleLabel;
-    roleBadge.classList.remove("role-admin", "role-user");
-    roleBadge.classList.add(isAdmin() ? "role-admin" : "role-user");
+    roleBadge.classList.remove("role-admin", "role-manager", "role-user");
+    roleBadge.classList.add(`role-${roleValue}`);
   }
 
   const updatedText = formatDateTime(profile.updated_at);
@@ -2725,9 +2739,9 @@ function bindRowActionHandlers(root) {
         const landSelect = Array.from(root.querySelectorAll("select[data-user-land-select]"))
           .find((el) => normalizeId(el.dataset.userLandSelect) === userId);
 
-        const currentRole = normalizeId(btn.dataset.userCurrentRole).toLowerCase() === "admin" ? "admin" : "user";
+        const currentRole = normalizeUserRole(btn.dataset.userCurrentRole);
         const nextRole = roleSelect
-          ? (normalizeId(roleSelect?.value).toLowerCase() === "admin" ? "admin" : "user")
+          ? normalizeUserRole(roleSelect?.value)
           : currentRole;
         const currentAccessGranted = normalizeId(btn.dataset.userCurrentAccess).toLowerCase() === "approved";
         const nextAccessGranted = accessSelect
@@ -2747,8 +2761,10 @@ function bindRowActionHandlers(root) {
           return;
         }
 
-        if (isSelf && nextRole !== "admin") {
-          const ok = window.confirm("You are changing your own role to User. You will lose admin access. Continue?");
+        const currentHasFullAccess = currentRole === "admin" || currentRole === "manager";
+        const nextHasFullAccess = nextRole === "admin" || nextRole === "manager";
+        if (isSelf && currentHasFullAccess && !nextHasFullAccess) {
+          const ok = window.confirm("You are changing your own role to User. You will lose admin/manager access. Continue?");
           if (!ok) return;
         }
 
@@ -2810,7 +2826,6 @@ function bindRowActionHandlers(root) {
         const userId = normalizeId(btn.dataset.userDelete);
         if (!userId) return;
 
-        const roleValue = normalizeId(btn.dataset.userRole).toLowerCase();
         const userName = normalizeId(btn.dataset.userName) || "this user";
         const userEmail = normalizeId(btn.dataset.userEmail) || "";
 
@@ -2819,17 +2834,22 @@ function bindRowActionHandlers(root) {
           return;
         }
 
-        if (roleValue === "admin") {
-          showAlert("Admin users are protected and cannot be deleted here.", "warning");
-          return;
-        }
-
         const labelText = userEmail ? `${userName} (${userEmail})` : userName;
         const ok = window.confirm(`Delete user ${labelText}? This cannot be undone.`);
         if (!ok) return;
 
+        // Remove this user's saved notification tokens first.
+        try {
+          const tokenSnap = await getDocs(query(collection(db, TASK_FCM_TOKEN_COLLECTION), where("user_id", "==", userId)));
+          for (const tokenDoc of tokenSnap.docs) {
+            await deleteDoc(tokenDoc.ref);
+          }
+        } catch (tokenError) {
+          console.warn("Token cleanup failed for deleted user:", tokenError);
+        }
+
         await deleteDoc(doc(db, "users", userId));
-        showAlert("User deleted.", "success");
+        showAlert("User deleted from database.", "success");
       } catch (error) {
         showAlert(`User delete failed: ${error.message}`, "danger");
       }
