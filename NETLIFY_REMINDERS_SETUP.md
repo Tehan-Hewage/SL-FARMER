@@ -28,7 +28,7 @@ Email variables (SMTP):
 - `SMTP_PASS`
 - `SMTP_SECURE` (`true` for SSL port 465, otherwise `false`)
 - `EMAIL_FROM` (sender email)
-- `TASK_REMINDER_EMAILS` (optional comma-separated extra recipients)
+- `TASK_REMINDER_EMAILS` (required comma-separated recipient list)
 
 ## 2) Admin VAPID Key
 
@@ -44,7 +44,6 @@ Use your Firebase Web Push certificate public key.
 
 - `fertilizer_schedule` (tasks)
 - `lands` (land names)
-- `users` (admin emails)
 - `notification_tokens` (web push tokens from admin devices)
 - `task_reminder_dispatch_log` (dedupe log)
 

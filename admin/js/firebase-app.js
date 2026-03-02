@@ -59,9 +59,14 @@ const TASK_FCM_TOKEN_KEY = "pf-task-fcm-token-v1";
 const TASK_FCM_TOKEN_COLLECTION = "notification_tokens";
 const TASK_FCM_SW_PATH = "/firebase-messaging-sw.js?v=20260302-1";
 const TASK_FCM_SW_SCOPE = "/";
+const APP_BOOT_MIN_LOADING_MS = 900;
+const SECTION_SWITCH_LOADING_MS = 260;
 
 let taskReminderIntervalId = null;
 let taskReminderVisibilityBound = false;
+let appBootLoadingStartTs = Date.now();
+let appBootLoadingDone = false;
+let sectionLoadingTimeoutId = null;
 const taskMessagingState = {
   supportChecked: false,
   supported: false,
@@ -144,6 +149,8 @@ const responsiveTables = new ResponsiveTableCards({
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  appBootLoadingStartTs = Date.now();
+  setAppLoadingVisible(true, "Checking secure session...");
   document.getElementById("year").textContent = new Date().getFullYear();
 
   renderForms();
@@ -208,6 +215,7 @@ function initAuth() {
 
     authState.hasSessionResolved = true;
     applyRoleAccess();
+    finishAppBootLoading();
   });
 }
 
@@ -424,6 +432,40 @@ function renderForms() {
   applyLandFormMode();
 }
 
+function setAppLoadingVisible(visible, message = "") {
+  const loadingOverlay = document.getElementById("appLoadingOverlay");
+  if (!loadingOverlay) return;
+
+  const loadingMessage = document.getElementById("appLoadingMessage");
+  if (loadingMessage && normalizeId(message)) {
+    loadingMessage.textContent = normalizeId(message);
+  }
+
+  loadingOverlay.classList.toggle("hidden", !visible);
+  loadingOverlay.setAttribute("aria-hidden", visible ? "false" : "true");
+  document.body.classList.toggle("app-is-loading", visible);
+}
+
+function finishAppBootLoading() {
+  if (appBootLoadingDone) return;
+  appBootLoadingDone = true;
+
+  const elapsed = Date.now() - appBootLoadingStartTs;
+  const remaining = Math.max(0, APP_BOOT_MIN_LOADING_MS - elapsed);
+  window.setTimeout(() => {
+    setAppLoadingVisible(false);
+  }, remaining);
+}
+
+function applySectionState(section) {
+  document.querySelectorAll(".nav-links a[data-section]").forEach((n) => n.classList.remove("active"));
+  document.querySelectorAll(".app-section").forEach((s) => s.classList.remove("active"));
+
+  document.querySelector(`.nav-links a[data-section="${section}"]`)?.classList.add("active");
+  document.getElementById(`section-${section}`)?.classList.add("active");
+  document.getElementById("openProfileBtn")?.classList.toggle("active", section === "profile");
+}
+
 function initNav() {
   const mobileMenuBtn = document.getElementById("mobile-menu-btn");
   const navLinks = document.querySelector(".nav-links");
@@ -443,13 +485,10 @@ function initNav() {
       event.preventDefault();
       const section = link.getAttribute("data-section");
       if (!section) return;
-
-      document.querySelectorAll(".nav-links a[data-section]").forEach((n) => n.classList.remove("active"));
-      document.querySelectorAll(".app-section").forEach((s) => s.classList.remove("active"));
-      profileBtn?.classList.remove("active");
-
-      link.classList.add("active");
-      document.getElementById(`section-${section}`)?.classList.add("active");
+      activateSection(section, {
+        withLoader: true,
+        loadingMessage: `Opening ${label(section)}...`
+      });
 
       if (navLinks?.classList.contains("show")) {
         navLinks.classList.remove("show");
@@ -464,7 +503,10 @@ function initNav() {
   if (profileBtn) {
     profileBtn.addEventListener("click", (event) => {
       event.preventDefault();
-      activateSection("profile");
+      activateSection("profile", {
+        withLoader: true,
+        loadingMessage: "Opening Profile..."
+      });
       if (navLinks?.classList.contains("show")) {
         navLinks.classList.remove("show");
         if (mobileMenuBtn) {
@@ -476,14 +518,29 @@ function initNav() {
   }
 }
 
-function activateSection(section) {
+function activateSection(section, options = {}) {
   if (!section) return;
-  document.querySelectorAll(".nav-links a[data-section]").forEach((n) => n.classList.remove("active"));
-  document.querySelectorAll(".app-section").forEach((s) => s.classList.remove("active"));
 
-  document.querySelector(`.nav-links a[data-section="${section}"]`)?.classList.add("active");
-  document.getElementById(`section-${section}`)?.classList.add("active");
-  document.getElementById("openProfileBtn")?.classList.toggle("active", section === "profile");
+  const withLoader = options?.withLoader === true;
+  if (!withLoader) {
+    applySectionState(section);
+    return;
+  }
+
+  if (sectionLoadingTimeoutId) {
+    clearTimeout(sectionLoadingTimeoutId);
+    sectionLoadingTimeoutId = null;
+  }
+
+  const defaultMessage = `Opening ${label(section)}...`;
+  const loadingMessage = normalizeId(options?.loadingMessage) || defaultMessage;
+  setAppLoadingVisible(true, loadingMessage);
+
+  sectionLoadingTimeoutId = window.setTimeout(() => {
+    applySectionState(section);
+    setAppLoadingVisible(false);
+    sectionLoadingTimeoutId = null;
+  }, SECTION_SWITCH_LOADING_MS);
 }
 
 function applyStartupSectionFromUrl() {
@@ -1341,7 +1398,10 @@ function renderLands() {
 
   grid.querySelectorAll("button[data-land-harvest]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      activateSection("harvest");
+      activateSection("harvest", {
+        withLoader: true,
+        loadingMessage: "Opening Harvest..."
+      });
       setValue("harvest_land_id", normalizeId(btn.dataset.landHarvest));
       openPanel("harvestFormPanel", "toggleHarvestFormBtn");
     });
@@ -1349,7 +1409,10 @@ function renderLands() {
 
   grid.querySelectorAll("button[data-land-expense]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      activateSection("expenses");
+      activateSection("expenses", {
+        withLoader: true,
+        loadingMessage: "Opening Expenses..."
+      });
       setValue("expense_land_id", normalizeId(btn.dataset.landExpense));
       openPanel("expenseFormPanel", "toggleExpenseFormBtn");
     });
@@ -2025,7 +2088,10 @@ async function showTaskReminderNotification(task, dueAt, now = new Date()) {
     const fallbackNotification = new Notification(title, options);
     fallbackNotification.onclick = () => {
       window.focus();
-      activateSection("tasks");
+      activateSection("tasks", {
+        withLoader: true,
+        loadingMessage: "Opening Tasks..."
+      });
     };
     return true;
   } catch (error) {
@@ -2339,7 +2405,10 @@ function bindRecordModalEvents(recordType, record) {
       const mode = btn.dataset.recordMode === "edit" ? "edit" : "view";
       if (recordType === "lands" && mode === "edit") {
         closeRecordModal();
-        activateSection("lands");
+        activateSection("lands", {
+          withLoader: true,
+          loadingMessage: "Opening Land Management..."
+        });
         openLandEdit(record.id);
         return;
       }

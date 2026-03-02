@@ -31,7 +31,23 @@
   <link rel="stylesheet" href="css/firebase-app.css?v=20260228-1">
 </head>
 <body>
-<div id="authOverlay" class="auth-overlay">
+<div id="appLoadingOverlay" class="app-loading-overlay" aria-hidden="false">
+  <div class="app-loading-shell" role="status" aria-live="polite">
+    <div class="app-loading-brand">
+      <img src="Img/logo.png" alt="Pineapple Farm Logo" class="app-loading-logo">
+      <div class="app-loading-brand-copy">
+        <h2>Pineapple Farm Admin</h2>
+        <p>Securing your workspace and syncing live data</p>
+      </div>
+    </div>
+    <div class="app-loading-status">
+      <span class="app-loading-pulse"></span>
+      <span id="appLoadingMessage">Preparing admin panel...</span>
+    </div>
+    <div class="app-loading-track"><span></span></div>
+  </div>
+</div>
+<div id="authOverlay" class="auth-overlay hidden">
   <div class="auth-card">
     <div class="auth-brand">
       <img src="Img/logo.png" alt="Pineapple Farm Logo" class="auth-logo">

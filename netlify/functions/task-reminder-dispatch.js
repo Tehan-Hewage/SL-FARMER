@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 
 const TASK_COLLECTION = "fertilizer_schedule";
 const LANDS_COLLECTION = "lands";
-const USERS_COLLECTION = "users";
 const TOKEN_COLLECTION = "notification_tokens";
 const LOG_COLLECTION = "task_reminder_dispatch_log";
 const REMINDER_DAYS = [3, 2, 1, 0];
@@ -16,6 +15,15 @@ const DEFAULT_TIME = "09:00";
 function normalizeId(value) {
   if (value === null || value === undefined) return "";
   return String(value).trim();
+}
+
+function escapeHtml(value) {
+  return normalizeId(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function parseCsv(value) {
@@ -205,14 +213,12 @@ async function loadPushTargets(db) {
   };
 }
 
-async function loadAdminEmails(db) {
-  const recipients = new Set(parseCsv(process.env.TASK_REMINDER_EMAILS).map((email) => email.toLowerCase()));
-  const snap = await db.collection(USERS_COLLECTION).where("role", "==", "admin").get();
-  snap.forEach((docSnap) => {
-    const email = normalizeId(docSnap.data()?.email).toLowerCase();
-    if (email) recipients.add(email);
-  });
-  return [...recipients];
+function loadConfiguredEmailRecipients() {
+  const recipients = [...new Set(parseCsv(process.env.TASK_REMINDER_EMAILS).map((email) => email.toLowerCase()))];
+  if (!recipients.length) {
+    console.warn("TASK_REMINDER_EMAILS is empty. Email reminders will be skipped.");
+  }
+  return recipients;
 }
 
 function buildReminderPayload(task, landName, dueAt, daysBefore, now, timeZone, adminUrl) {
@@ -339,14 +345,45 @@ async function sendEmailReminder(mailer, recipients, payload) {
     return { sent: false, skipped: true };
   }
 
+  const safeTitle = escapeHtml(payload.title);
+  const safeWhenText = escapeHtml(payload.whenText);
+  const safeLandName = escapeHtml(payload.landName);
+  const safeTaskName = escapeHtml(payload.taskName);
+  const safeDueText = escapeHtml(payload.dueText);
+  const safeAdminUrl = escapeHtml(payload.adminUrl);
+
   const html = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5;">
-      <h2 style="margin: 0 0 12px;">${payload.title}</h2>
-      <p style="margin: 0 0 10px;">${payload.whenText}</p>
-      <p style="margin: 0 0 6px;"><strong>Land:</strong> ${payload.landName}</p>
-      <p style="margin: 0 0 6px;"><strong>Task:</strong> ${payload.taskName}</p>
-      <p style="margin: 0 0 14px;"><strong>When:</strong> ${payload.dueText}</p>
-      <p style="margin: 0;">Open admin tasks: <a href="${payload.adminUrl}">${payload.adminUrl}</a></p>
+    <div style="background:#f4f7fb;padding:24px 16px;font-family:'Segoe UI',Arial,sans-serif;color:#1f2937;">
+      <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#14532d,#166534);padding:18px 22px;">
+          <h1 style="margin:0;font-size:20px;line-height:1.3;color:#ffffff;">Pineapple Farm Task Reminder</h1>
+          <p style="margin:6px 0 0;color:#d1fae5;font-size:13px;">Automated schedule notification</p>
+        </div>
+        <div style="padding:22px;">
+          <h2 style="margin:0 0 10px;font-size:18px;color:#111827;">${safeTitle}</h2>
+          <p style="margin:0 0 18px;color:#374151;font-size:14px;">${safeWhenText}</p>
+          <table role="presentation" style="width:100%;border-collapse:collapse;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="padding:10px 12px;font-size:13px;color:#6b7280;width:120px;border-bottom:1px solid #e5e7eb;">Land</td>
+              <td style="padding:10px 12px;font-size:14px;color:#111827;border-bottom:1px solid #e5e7eb;">${safeLandName}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;font-size:13px;color:#6b7280;width:120px;border-bottom:1px solid #e5e7eb;">Task</td>
+              <td style="padding:10px 12px;font-size:14px;color:#111827;border-bottom:1px solid #e5e7eb;">${safeTaskName}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;font-size:13px;color:#6b7280;width:120px;">Due</td>
+              <td style="padding:10px 12px;font-size:14px;color:#111827;">${safeDueText}</td>
+            </tr>
+          </table>
+          <div style="margin-top:20px;">
+            <a href="${safeAdminUrl}" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;">Open Admin Tasks</a>
+          </div>
+          <p style="margin:18px 0 0;font-size:12px;color:#6b7280;">
+            This is an automated reminder from Pineapple Farm Management System.
+          </p>
+        </div>
+      </div>
     </div>
   `;
 
@@ -361,7 +398,7 @@ async function sendEmailReminder(mailer, recipients, payload) {
 
   await mailer.transporter.sendMail({
     from: mailer.from,
-    to: mailer.from,
+    to: "undisclosed-recipients:;",
     bcc: recipients.join(","),
     subject: payload.subject,
     text,
@@ -401,7 +438,7 @@ exports.handler = schedule("*/15 * * * *", async () => {
     db.collection(TASK_COLLECTION).get(),
     loadLandsMap(db),
     loadPushTargets(db),
-    loadAdminEmails(db)
+    loadConfiguredEmailRecipients()
   ]);
 
   const tasks = tasksSnap.docs.map((docSnap) => ({
