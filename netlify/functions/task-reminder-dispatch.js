@@ -105,9 +105,21 @@ function chunk(array, size) {
 }
 
 function parseServiceAccount() {
+  const projectId = normalizeId(process.env.FIREBASE_PROJECT_ID);
+  const clientEmail = normalizeId(process.env.FIREBASE_CLIENT_EMAIL);
+  const privateKeyRaw = normalizeId(process.env.FIREBASE_PRIVATE_KEY);
+  if (projectId && clientEmail && privateKeyRaw) {
+    return {
+      type: "service_account",
+      project_id: projectId,
+      client_email: clientEmail,
+      private_key: privateKeyRaw.replace(/\\n/g, "\n")
+    };
+  }
+
   const raw = normalizeId(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
   if (!raw) {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is required.");
+    throw new Error("Firebase credentials are missing. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY.");
   }
 
   let parsed;
