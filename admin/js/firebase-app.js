@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase-config.js?v=20260220-4";
+import { app, auth, db } from "./firebase-config.js?v=20260220-4";
 import {
   collection,
   addDoc,
@@ -18,6 +18,13 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import {
+  deleteToken,
+  getMessaging,
+  getToken,
+  isSupported as isMessagingSupported,
+  onMessage
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
 import { ResponsiveTableCards } from "./responsive-table.js?v=20260220-4";
 
 const state = {
@@ -42,13 +49,25 @@ const uiState = {
   recordModal: null
 };
 const TASK_REMINDER_DAYS = [3, 2, 1, 0];
+const TASK_COUNTDOWN_SOON_THRESHOLD_DAYS = 3;
 const TASK_REMINDER_DEFAULT_TIME = "09:00";
 const TASK_REMINDER_CHECK_INTERVAL_MS = 60 * 1000;
+const TASK_REMINDER_SW_READY_TIMEOUT_MS = 2000;
 const TASK_REMINDER_LOG_KEY = "pf-task-reminders-v1";
 const TASK_REMINDERS_ENABLED_KEY = "pf-task-reminders-enabled";
+const TASK_FCM_TOKEN_KEY = "pf-task-fcm-token-v1";
+const TASK_FCM_TOKEN_COLLECTION = "notification_tokens";
+const TASK_FCM_SW_PATH = "/firebase-messaging-sw.js?v=20260302-1";
+const TASK_FCM_SW_SCOPE = "/";
 
 let taskReminderIntervalId = null;
 let taskReminderVisibilityBound = false;
+const taskMessagingState = {
+  supportChecked: false,
+  supported: false,
+  instance: null,
+  foregroundBound: false
+};
 
 const filters = {
   expenses: {
@@ -171,9 +190,11 @@ function initAuth() {
       authState.user = user;
       authState.role = await resolveUserRole(user.uid);
       setLoginError("");
+      await syncTaskFcmSubscription();
       initListeners();
       showAlert(`Signed in as ${authState.role.toUpperCase()}.`, "success");
     } else {
+      await disableTaskFcmSubscription();
       clearRealtimeListeners();
       resetState();
       authState.user = null;
@@ -269,6 +290,10 @@ function applyRoleAccess() {
     }
   }
 
+  updateTaskReminderUi();
+  syncTaskFcmSubscription().catch((error) => {
+    console.warn("Task FCM sync failed after role update:", error);
+  });
   renderProfile();
 }
 
@@ -1567,6 +1592,193 @@ function renderTasks() {
     });
   setRows("taskRows", rows, 8, "No tasks found.");
 }
+
+function getTaskFcmVapidKey() {
+  const meta = document.querySelector('meta[name="pf-fcm-vapid-key"]');
+  return normalizeId(meta?.content);
+}
+
+function getStoredTaskFcmToken() {
+  try {
+    return normalizeId(localStorage.getItem(TASK_FCM_TOKEN_KEY));
+  } catch (error) {
+    console.warn("Unable to read stored FCM token:", error);
+    return "";
+  }
+}
+
+function setStoredTaskFcmToken(token) {
+  try {
+    localStorage.setItem(TASK_FCM_TOKEN_KEY, normalizeId(token));
+  } catch (error) {
+    console.warn("Unable to store FCM token:", error);
+  }
+}
+
+function clearStoredTaskFcmToken() {
+  try {
+    localStorage.removeItem(TASK_FCM_TOKEN_KEY);
+  } catch (error) {
+    console.warn("Unable to clear stored FCM token:", error);
+  }
+}
+
+function buildTaskFcmTokenDocId(token) {
+  const safe = normalizeId(token).replace(/[^A-Za-z0-9_-]/g, "_");
+  return `tok_${safe.slice(0, 1400)}`;
+}
+
+async function supportsTaskMessaging() {
+  if (taskMessagingState.supportChecked) return taskMessagingState.supported;
+  try {
+    taskMessagingState.supported = await isMessagingSupported();
+  } catch (error) {
+    console.warn("Messaging support check failed:", error);
+    taskMessagingState.supported = false;
+  }
+  taskMessagingState.supportChecked = true;
+  return taskMessagingState.supported;
+}
+
+async function getTaskMessagingInstance() {
+  const supported = await supportsTaskMessaging();
+  if (!supported) return null;
+
+  if (!taskMessagingState.instance) {
+    taskMessagingState.instance = getMessaging(app);
+  }
+
+  if (!taskMessagingState.foregroundBound) {
+    onMessage(taskMessagingState.instance, (payload) => {
+      const title = normalizeId(payload?.notification?.title) || "Task Reminder";
+      const body = normalizeId(payload?.notification?.body) || "You have a task reminder.";
+      showAlert(`${title}: ${body}`, "info");
+    });
+    taskMessagingState.foregroundBound = true;
+  }
+
+  return taskMessagingState.instance;
+}
+
+async function getTaskFcmServiceWorkerRegistration() {
+  if (!("serviceWorker" in navigator)) return null;
+
+  try {
+    const existing = await navigator.serviceWorker.getRegistration(TASK_FCM_SW_SCOPE);
+    if (existing) return existing;
+  } catch (error) {
+    console.warn("Unable to read existing FCM service worker registration:", error);
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.register(TASK_FCM_SW_PATH, {
+      scope: TASK_FCM_SW_SCOPE
+    });
+    return registration;
+  } catch (error) {
+    console.warn("FCM service worker registration failed:", error);
+    return null;
+  }
+}
+
+async function upsertTaskFcmTokenRecord(token) {
+  if (!authState.user) return;
+  const tokenId = buildTaskFcmTokenDocId(token);
+  await setDoc(doc(db, TASK_FCM_TOKEN_COLLECTION, tokenId), {
+    token: normalizeId(token),
+    user_id: normalizeId(authState.user.uid),
+    email: normalizeId(authState.user.email),
+    role: isAdmin() ? "admin" : "user",
+    enabled: true,
+    source: "admin-web",
+    user_agent: normalizeId(navigator.userAgent),
+    updated_at: serverTimestamp(),
+    last_seen_at: serverTimestamp()
+  }, { merge: true });
+}
+
+async function removeTaskFcmTokenRecord(token) {
+  const normalizedToken = normalizeId(token);
+  if (!normalizedToken) return;
+  const tokenId = buildTaskFcmTokenDocId(normalizedToken);
+  try {
+    await deleteDoc(doc(db, TASK_FCM_TOKEN_COLLECTION, tokenId));
+  } catch (error) {
+    console.warn("Unable to remove FCM token record:", error);
+  }
+}
+
+async function registerTaskFcmSubscription() {
+  if (!authState.user || !isAdmin() || !isTaskRemindersEnabled()) return false;
+  if (!("Notification" in window) || Notification.permission !== "granted") return false;
+
+  const messaging = await getTaskMessagingInstance();
+  if (!messaging) return false;
+
+  const swRegistration = await getTaskFcmServiceWorkerRegistration();
+  if (!swRegistration) return false;
+
+  const tokenOptions = { serviceWorkerRegistration: swRegistration };
+  const vapidKey = getTaskFcmVapidKey();
+  if (vapidKey) {
+    tokenOptions.vapidKey = vapidKey;
+  } else {
+    console.warn("FCM VAPID key meta tag is empty. Add it to enable reliable web push on all browsers.");
+  }
+
+  try {
+    const token = await getToken(messaging, tokenOptions);
+    if (!normalizeId(token)) {
+      console.warn("FCM token was not returned.");
+      return false;
+    }
+
+    const previousToken = getStoredTaskFcmToken();
+    if (previousToken && previousToken !== token) {
+      await removeTaskFcmTokenRecord(previousToken);
+    }
+
+    await upsertTaskFcmTokenRecord(token);
+    setStoredTaskFcmToken(token);
+    return true;
+  } catch (error) {
+    console.warn("Unable to register FCM token:", error);
+    return false;
+  }
+}
+
+async function disableTaskFcmSubscription() {
+  const previousToken = getStoredTaskFcmToken();
+  if (previousToken) {
+    await removeTaskFcmTokenRecord(previousToken);
+  }
+
+  const messaging = await getTaskMessagingInstance();
+  if (messaging) {
+    try {
+      await deleteToken(messaging);
+    } catch (error) {
+      console.warn("Unable to delete local FCM token:", error);
+    }
+  }
+
+  clearStoredTaskFcmToken();
+}
+
+async function syncTaskFcmSubscription() {
+  if (!authState.user || !isAdmin() || !isTaskRemindersEnabled()) {
+    await disableTaskFcmSubscription();
+    return;
+  }
+
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    await disableTaskFcmSubscription();
+    return;
+  }
+
+  await registerTaskFcmSubscription();
+}
+
 function initTaskReminderControls() {
   const toggleBtn = document.getElementById("toggleTaskNotificationsBtn");
   if (!toggleBtn || toggleBtn.dataset.bound === "1") {
@@ -1579,8 +1791,9 @@ function initTaskReminderControls() {
     const currentlyEnabled = isTaskRemindersEnabled();
     if (currentlyEnabled) {
       setTaskRemindersEnabled(false);
+      await disableTaskFcmSubscription();
       updateTaskReminderUi();
-      showAlert("Task notifications turned off.", "info");
+      showAlert("3-to-today task alerts turned off.", "info");
       return;
     }
 
@@ -1591,9 +1804,10 @@ function initTaskReminderControls() {
     }
 
     setTaskRemindersEnabled(true);
+    await syncTaskFcmSubscription();
     updateTaskReminderUi();
     await checkAndSendTaskReminders();
-    showAlert("Task notifications turned on.", "success");
+    showAlert("3-to-today task alerts turned on.", "success");
   });
 
   updateTaskReminderUi();
@@ -1602,6 +1816,12 @@ function initTaskReminderControls() {
 function updateTaskReminderUi() {
   const toggleBtn = document.getElementById("toggleTaskNotificationsBtn");
   if (!toggleBtn) return;
+
+  if (!authState.user || !isAdmin()) {
+    toggleBtn.disabled = true;
+    toggleBtn.innerHTML = '<i class="fas fa-user-shield"></i> Admin Only Alerts';
+    return;
+  }
 
   if (!("Notification" in window)) {
     toggleBtn.disabled = true;
@@ -1618,8 +1838,8 @@ function updateTaskReminderUi() {
   const enabled = isTaskRemindersEnabled();
   toggleBtn.disabled = false;
   toggleBtn.innerHTML = enabled
-    ? '<i class="fas fa-bell-slash"></i> Turn Off Notifications'
-    : '<i class="fas fa-bell"></i> Turn On Notifications';
+    ? '<i class="fas fa-bell-slash"></i> Turn Off 3-to-Today Alerts'
+    : '<i class="fas fa-bell"></i> Turn On 3-to-Today Alerts';
 }
 
 async function ensureTaskNotificationPermission() {
@@ -1689,6 +1909,10 @@ function refreshTaskCountdownViews() {
 }
 
 async function checkAndSendTaskReminders() {
+  if (!authState.user || !isAdmin()) {
+    return;
+  }
+
   if (!isTaskRemindersEnabled()) {
     return;
   }
@@ -1704,7 +1928,6 @@ async function checkAndSendTaskReminders() {
   const now = new Date();
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
-
   const reminderLog = loadTaskReminderLog();
   let changed = false;
 
@@ -1714,24 +1937,18 @@ async function checkAndSendTaskReminders() {
     const dueAt = getTaskDateTime(task);
     if (!dueAt) continue;
 
-    const dueWindowEnd = new Date(dueAt);
-    dueWindowEnd.setDate(dueWindowEnd.getDate() + 1);
-    if (now > dueWindowEnd) continue;
+    if (now > dueAt) continue;
 
     for (const daysBefore of TASK_REMINDER_DAYS) {
-      const reminderAt = new Date(dueAt);
-      reminderAt.setDate(reminderAt.getDate() - daysBefore);
-
-      const reminderDayStart = new Date(reminderAt);
-      reminderDayStart.setHours(0, 0, 0, 0);
-
-      if (reminderDayStart.getTime() !== todayStart.getTime()) continue;
-      if (now < reminderAt) continue;
+      const reminderDate = new Date(dueAt);
+      reminderDate.setHours(0, 0, 0, 0);
+      reminderDate.setDate(reminderDate.getDate() - daysBefore);
+      if (todayStart.getTime() !== reminderDate.getTime()) continue;
 
       const token = buildTaskReminderToken(task, daysBefore, dueAt);
       if (reminderLog[token]) continue;
 
-      const sent = await showTaskReminderNotification(task, daysBefore, dueAt);
+      const sent = await showTaskReminderNotification(task, dueAt, now);
       if (sent) {
         reminderLog[token] = Date.now();
         changed = true;
@@ -1744,18 +1961,43 @@ async function checkAndSendTaskReminders() {
   }
 }
 
-async function showTaskReminderNotification(task, daysBefore, dueAt) {
+async function getTaskNotificationRegistration() {
+  if (!("serviceWorker" in navigator)) return null;
+
+  try {
+    const existingRegistration = await navigator.serviceWorker.getRegistration();
+    if (existingRegistration?.showNotification) return existingRegistration;
+  } catch (error) {
+    console.warn("Unable to get service worker registration:", error);
+  }
+
+  try {
+    const readyRegistration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((resolve) => window.setTimeout(() => resolve(null), TASK_REMINDER_SW_READY_TIMEOUT_MS))
+    ]);
+    if (readyRegistration?.showNotification) return readyRegistration;
+  } catch (error) {
+    console.warn("Service worker ready check failed:", error);
+  }
+
+  return null;
+}
+
+async function showTaskReminderNotification(task, dueAt, now = new Date()) {
   const land = findLand(task.land_id);
   const typeKey = canonicalExpenseType(task.expense_type || "");
   const typeLabel = label(typeKey || task.expense_type || "task");
   const categoryLabel = normalizeId(task.category || task.fertilizer_type);
   const taskName = categoryLabel ? `${typeLabel} - ${categoryLabel}` : typeLabel;
   const dueText = `${formatDate(dueAt)} at ${formatTaskTime(task.task_time)}`;
-  const whenText = daysBefore === 0
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const remainingDays = Math.max(0, Math.ceil((dueAt.getTime() - now.getTime()) / msPerDay));
+  const whenText = remainingDays === 0
     ? "Task is due today"
-    : `Task is due in ${daysBefore} day${daysBefore === 1 ? "" : "s"}`;
+    : `Task is due in ${remainingDays} day${remainingDays === 1 ? "" : "s"}`;
 
-  const title = daysBefore === 0
+  const title = remainingDays === 0
     ? `Task Day: ${taskName}`
     : `Task Reminder: ${taskName}`;
 
@@ -1774,12 +2016,10 @@ async function showTaskReminderNotification(task, daysBefore, dueAt) {
   };
 
   try {
-    if ("serviceWorker" in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      if (registration?.showNotification) {
-        await registration.showNotification(title, options);
-        return true;
-      }
+    const registration = await getTaskNotificationRegistration();
+    if (registration?.showNotification) {
+      await registration.showNotification(title, options);
+      return true;
     }
 
     const fallbackNotification = new Notification(title, options);
@@ -1874,6 +2114,7 @@ function bindLogoutButtons() {
     btn.dataset.logoutBound = "1";
     btn.addEventListener("click", async () => {
       try {
+        await disableTaskFcmSubscription();
         await signOut(auth);
         window.location.href = "../index.html";
       } catch (error) {
@@ -2612,7 +2853,7 @@ function taskCountdownClass(taskDateTime, now = new Date()) {
   if (!(taskDateTime instanceof Date) || Number.isNaN(taskDateTime.getTime())) return "countdown-unknown";
   const diffMs = taskDateTime.getTime() - now.getTime();
   if (diffMs < 0) return "countdown-overdue";
-  if (diffMs <= (24 * 60 * 60 * 1000)) return "countdown-soon";
+  if (diffMs <= (TASK_COUNTDOWN_SOON_THRESHOLD_DAYS * 24 * 60 * 60 * 1000)) return "countdown-soon";
   return "countdown-upcoming";
 }
 function formatTaskCountdown(taskDateTime, now = new Date()) {
