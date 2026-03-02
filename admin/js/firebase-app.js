@@ -1744,6 +1744,66 @@ async function getTaskFcmServiceWorkerRegistration() {
   }
 }
 
+async function waitForTaskFcmServiceWorkerActive(registration, timeoutMs = 4000) {
+  if (!registration) return registration;
+  if (registration.active) return registration;
+
+  const worker = registration.installing || registration.waiting;
+  if (!worker) return registration;
+
+  await Promise.race([
+    new Promise((resolve) => {
+      worker.addEventListener("statechange", () => {
+        if (worker.state === "activated") resolve();
+      });
+    }),
+    new Promise((resolve) => window.setTimeout(resolve, timeoutMs))
+  ]);
+
+  return registration;
+}
+
+async function clearTaskFcmPushSubscription(registration) {
+  if (!registration?.pushManager) return;
+  try {
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      await subscription.unsubscribe();
+    }
+  } catch (error) {
+    console.warn("Unable to clear existing push subscription:", error);
+  }
+}
+
+function isRecoverableTaskFcmRegistrationError(error) {
+  const name = normalizeId(error?.name).toLowerCase();
+  const message = normalizeId(error?.message).toLowerCase();
+  return name === "aborterror"
+    || message.includes("push service error")
+    || message.includes("registration failed");
+}
+
+async function requestTaskFcmToken(messaging, tokenOptions, swRegistration) {
+  await waitForTaskFcmServiceWorkerActive(swRegistration);
+  return getToken(messaging, tokenOptions);
+}
+
+async function finalizeTaskFcmToken(token) {
+  if (!normalizeId(token)) {
+    console.warn("FCM token was not returned.");
+    return false;
+  }
+
+  const previousToken = getStoredTaskFcmToken();
+  if (previousToken && previousToken !== token) {
+    await removeTaskFcmTokenRecord(previousToken);
+  }
+
+  await upsertTaskFcmTokenRecord(token);
+  setStoredTaskFcmToken(token);
+  return true;
+}
+
 async function upsertTaskFcmTokenRecord(token) {
   if (!authState.user) return;
   const tokenId = buildTaskFcmTokenDocId(token);
@@ -1790,22 +1850,29 @@ async function registerTaskFcmSubscription() {
   }
 
   try {
-    const token = await getToken(messaging, tokenOptions);
-    if (!normalizeId(token)) {
-      console.warn("FCM token was not returned.");
-      return false;
-    }
-
-    const previousToken = getStoredTaskFcmToken();
-    if (previousToken && previousToken !== token) {
-      await removeTaskFcmTokenRecord(previousToken);
-    }
-
-    await upsertTaskFcmTokenRecord(token);
-    setStoredTaskFcmToken(token);
-    return true;
+    const token = await requestTaskFcmToken(messaging, tokenOptions, swRegistration);
+    return finalizeTaskFcmToken(token);
   } catch (error) {
-    console.warn("Unable to register FCM token:", error);
+    if (isRecoverableTaskFcmRegistrationError(error)) {
+      console.warn("FCM registration failed, retrying once after subscription reset:", error);
+      try {
+        await clearTaskFcmPushSubscription(swRegistration);
+        await deleteToken(messaging).catch(() => {});
+        const retryToken = await requestTaskFcmToken(messaging, tokenOptions, swRegistration);
+        return finalizeTaskFcmToken(retryToken);
+      } catch (retryError) {
+        console.warn("FCM retry failed:", retryError);
+      }
+    } else {
+      console.warn("Unable to register FCM token:", error);
+    }
+
+    const message = [
+      "Push registration failed.",
+      "Allow notifications, refresh the page, and ensure browser push service is enabled.",
+      "Then turn alerts on again."
+    ].join(" ");
+    showAlert(message, "warning");
     return false;
   }
 }
@@ -1831,15 +1898,15 @@ async function disableTaskFcmSubscription() {
 async function syncTaskFcmSubscription() {
   if (!authState.user || !isAdmin() || !isTaskRemindersEnabled()) {
     await disableTaskFcmSubscription();
-    return;
+    return false;
   }
 
   if (!("Notification" in window) || Notification.permission !== "granted") {
     await disableTaskFcmSubscription();
-    return;
+    return false;
   }
 
-  await registerTaskFcmSubscription();
+  return registerTaskFcmSubscription();
 }
 
 function initTaskReminderControls() {
@@ -1867,10 +1934,14 @@ function initTaskReminderControls() {
     }
 
     setTaskRemindersEnabled(true);
-    await syncTaskFcmSubscription();
+    const fcmReady = await syncTaskFcmSubscription();
     updateTaskReminderUi();
     await checkAndSendTaskReminders();
-    showAlert("3-to-today task alerts turned on.", "success");
+    if (fcmReady) {
+      showAlert("3-to-today task alerts turned on.", "success");
+    } else {
+      showAlert("Alerts turned on, but push token setup failed on this browser. Check permissions and browser push settings.", "warning");
+    }
   });
 
   updateTaskReminderUi();
