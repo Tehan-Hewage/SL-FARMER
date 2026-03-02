@@ -130,14 +130,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 key: 'owner-2',
                 name: 'Upul Premakumara',
                 role: 'Founder - SL Farmer',
-                image: 'images/owner 2.jpg',
+                image: 'images/Owner1.png',
                 alt: 'Upul Premakumara - Founder & SL Farmer',
                 bio: [
                     'Upul Premakumara is a hands-on farm leader focused on practical growth, crop health, and disciplined field operations. His day-to-day management helps keep SL Farmer productive through every season.',
                     'With a strong commitment to sustainable methods, Upul supports efficient planting, expense control, and quality-first harvesting standards across the farm.',
                     'His leadership strengthens SL Farmer\'s mission to deliver naturally grown produce while building long-term value for the local farming community.'
                 ],
-                achievements: ['2+ Years Farming Experience', 'Farm Operations Leader']
+                achievements: ['10+ Years Farming Experience', 'Farm Operations Leader']
             },
             {
                 key: 'owner-1',
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (profiles.length < 2 || prefersReducedMotion) return;
                 founderIntervalId = setInterval(() => {
                     renderFounder(currentFounderIndex + 1);
-                }, 5000);
+                }, 10000);
             };
 
             founderDotsEl.innerHTML = '';

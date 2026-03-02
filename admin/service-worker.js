@@ -115,3 +115,32 @@ async function staleWhileRevalidate(request) {
 
   return cached || fetchPromise;
 }
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification?.close();
+
+  const targetUrl = event.notification?.data?.url || "./index.html?section=tasks";
+
+  event.waitUntil((async () => {
+    const windowClients = await clients.matchAll({ type: "window", includeUncontrolled: true });
+
+    for (const client of windowClients) {
+      try {
+        if ("navigate" in client) {
+          await client.navigate(targetUrl);
+        }
+      } catch (error) {
+        // Ignore navigation errors and still try to focus.
+      }
+
+      if ("focus" in client) {
+        await client.focus();
+        return;
+      }
+    }
+
+    if (clients.openWindow) {
+      await clients.openWindow(targetUrl);
+    }
+  })());
+});

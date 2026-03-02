@@ -41,6 +41,14 @@ const uiState = {
   editingLandId: "",
   recordModal: null
 };
+const TASK_REMINDER_DAYS = [3, 2, 1, 0];
+const TASK_REMINDER_DEFAULT_TIME = "09:00";
+const TASK_REMINDER_CHECK_INTERVAL_MS = 60 * 1000;
+const TASK_REMINDER_LOG_KEY = "pf-task-reminders-v1";
+const TASK_REMINDERS_ENABLED_KEY = "pf-task-reminders-enabled";
+
+let taskReminderIntervalId = null;
+let taskReminderVisibilityBound = false;
 
 const filters = {
   expenses: {
@@ -85,9 +93,10 @@ const refs = {
 const responsiveTables = new ResponsiveTableCards({
   breakpoint: 768,
   tableConfigs: {
-    dashboardHarvestRows: {
+    dashboardPendingTaskRows: {
       titleField: "Land",
-      primaryFields: ["Date", "Quantity", "Revenue"]
+      statusField: "Status",
+      primaryFields: ["Date", "Time", "Countdown", "Type", "Category"]
     },
     harvestRows: {
       titleField: "Land",
@@ -110,7 +119,7 @@ const responsiveTables = new ResponsiveTableCards({
       titleField: "Land",
       statusField: "Status",
       actionsField: "Actions",
-      primaryFields: ["Date", "Type"]
+      primaryFields: ["Date", "Time", "Countdown", "Type", "Category"]
     }
   }
 });
@@ -121,9 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
   renderForms();
   initNav();
   initUiControls();
+  applyStartupSectionFromUrl();
+  initTaskReminderControls();
+  startTaskReminderEngine();
   initFilterHandlers();
   initExportHandlers();
-  initQuickActions();
   initSubmitHandlers();
   ensureRecordModal();
   responsiveTables.registerAll();
@@ -370,8 +381,10 @@ function renderForms() {
   document.getElementById("taskForm").innerHTML = `
     <div class="simple-form-grid">
       <div class="form-group"><label>Land *</label><select id="task_land_id" class="form-control" required></select></div>
-      <div class="form-group"><label>Fertilizer Type *</label><input id="task_fertilizer_type" class="form-control" required></div>
+      <div class="form-group"><label>Type *</label><select id="task_type" class="form-control" required><option value="fertilizer">Fertilizer</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="irrigation">Irrigation</option><option value="land_preparation">Land Preparation</option><option value="extra">Extra</option></select></div>
+      <div class="form-group"><label>Category *</label><select id="task_category" class="form-control" required></select></div>
       <div class="form-group"><label>Next Date *</label><input id="task_next_date" class="form-control" type="date" value="${today}" required></div>
+      <div class="form-group"><label>Time *</label><input id="task_time" class="form-control" type="time" value="${TASK_REMINDER_DEFAULT_TIME}" required></div>
       <div class="form-group"><label>Status</label><select id="task_status" class="form-control"><option value="pending">Pending</option><option value="completed">Completed</option></select></div>
       <div class="form-group full"><label>Notes</label><input id="task_notes" class="form-control"></div>
     </div>
@@ -381,6 +394,8 @@ function renderForms() {
   document.getElementById("expense_type").addEventListener("change", () => refreshExpenseCategoryOptions());
   document.getElementById("expense_category")?.addEventListener("change", () => refreshExpensePlantCountInput());
   refreshExpenseCategoryOptions();
+  document.getElementById("task_type")?.addEventListener("change", () => refreshTaskCategoryOptions());
+  refreshTaskCategoryOptions();
   applyLandFormMode();
 }
 
@@ -446,11 +461,27 @@ function activateSection(section) {
   document.getElementById("openProfileBtn")?.classList.toggle("active", section === "profile");
 }
 
+function applyStartupSectionFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const section = normalizeId(params.get("section")).toLowerCase();
+  if (!section) return;
+
+  const validSections = ["dashboard", "lands", "harvest", "expenses", "labor", "tasks", "profile"];
+  if (!validSections.includes(section)) return;
+
+  activateSection(section);
+
+  params.delete("section");
+  const nextQuery = params.toString();
+  const cleanUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`;
+  window.history.replaceState({}, "", cleanUrl);
+}
 function initUiControls() {
   bindToggle("toggleLandFormBtn", "landFormPanel", "Add New Land", "Close Land Form");
   bindToggle("toggleHarvestFormBtn", "harvestFormPanel", "Add Harvest Record", "Close Harvest Form");
   bindToggle("toggleExpenseFormBtn", "expenseFormPanel", "Add New Expense", "Close Expense Form");
   bindToggle("toggleLaborFormBtn", "laborFormPanel", "Add New Laborer", "Close Labor Form");
+  bindToggle("toggleTaskFormBtn", "taskFormPanel", "Add Task", "Close Task Form");
 }
 
 function bindToggle(buttonId, panelId, closedText, openText) {
@@ -585,47 +616,6 @@ function initExportHandlers() {
     expenseExportPdf.addEventListener("click", () => {
       window.print();
       showAlert("Print dialog opened. Save as PDF from your browser.", "info");
-    });
-  }
-}
-
-function initQuickActions() {
-  const addBtn = document.getElementById("quickAddLaborer");
-  if (addBtn) {
-    addBtn.addEventListener("click", () => openPanel("laborFormPanel", "toggleLaborFormBtn"));
-  }
-
-  const activeBtn = document.getElementById("quickActiveLaborers");
-  if (activeBtn) {
-    activeBtn.addEventListener("click", () => {
-      setValue("laborFilterStatus", "active");
-      filters.labor.status = "active";
-      renderLabor();
-    });
-  }
-
-  const landBtn = document.getElementById("quickLandLaborers");
-  if (landBtn) {
-    landBtn.addEventListener("click", () => {
-      const firstLand = state.lands[0];
-      if (!firstLand) {
-        showAlert("No lands available for filtering.", "warning");
-        return;
-      }
-      const key = getLandKey(firstLand);
-      setValue("laborFilterLand", key);
-      filters.labor.land = key;
-      renderLabor();
-    });
-  }
-
-  const monthBtn = document.getElementById("quickMonthJoiners");
-  if (monthBtn) {
-    monthBtn.addEventListener("click", () => {
-      const monthStart = formatDateInput(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-      setValue("laborFilterFrom", monthStart);
-      filters.labor.from = monthStart;
-      renderLabor();
     });
   }
 }
@@ -984,17 +974,28 @@ function initSubmitHandlers() {
     event.preventDefault();
     if (!requireAdmin("add tasks")) return;
     try {
+      const taskType = canonicalExpenseType(value("task_type")) || value("task_type");
+      const taskCategory = value("task_category");
+
       await addDoc(refs.tasks, {
         land_id: value("task_land_id"),
-        fertilizer_type: value("task_fertilizer_type"),
+        expense_type: taskType,
+        category: taskCategory,
+        fertilizer_type: taskCategory,
         next_date: value("task_next_date"),
+        task_time: normalizeTaskTime(value("task_time")),
         status: value("task_status"),
         notes: value("task_notes"),
         created_at: serverTimestamp()
       });
 
       event.target.reset();
+      setValue("task_type", "fertilizer");
+      refreshTaskCategoryOptions();
       document.getElementById("task_next_date").value = formatDateInput(new Date());
+      document.getElementById("task_time").value = TASK_REMINDER_DEFAULT_TIME;
+      closePanel("taskFormPanel", "toggleTaskFormBtn");
+      await checkAndSendTaskReminders();
       showAlert("Task saved successfully.", "success");
     } catch (error) {
       showAlert(`Error adding task: ${error.message}`, "danger");
@@ -1041,8 +1042,8 @@ function renderAll() {
   renderLabor();
   renderTasks();
   renderProfile();
+  checkAndSendTaskReminders();
 }
-
 function fillReferenceSelects() {
   const landOptions = ['<option value="">Select Land</option>']
     .concat(state.lands.map((l) => `<option value="${esc(getLandKey(l))}">${esc(l.land_name || "Unnamed")} - ${esc(l.location || "")}</option>`));
@@ -1092,6 +1093,24 @@ function refreshExpenseCategoryOptions() {
   refreshExpensePlantCountInput(type, categoryEl.value);
 }
 
+function refreshTaskCategoryOptions() {
+  const taskTypeEl = document.getElementById("task_type");
+  const categoryEl = document.getElementById("task_category");
+  if (!taskTypeEl || !categoryEl) return;
+
+  const selectedType = canonicalExpenseType(taskTypeEl.value) || "fertilizer";
+  const selectedCategory = normalizeId(categoryEl.value);
+  const categories = expenseCategories[selectedType] || ["Other"];
+
+  categoryEl.innerHTML = ['<option value="">Select Category</option>']
+    .concat(categories.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`)).join("");
+
+  if (selectedCategory && categories.includes(selectedCategory)) {
+    categoryEl.value = selectedCategory;
+  } else if (categories.length) {
+    categoryEl.value = categories[0];
+  }
+}
 function refreshExpensePlantCountInput(typeValue = value("expense_type"), categoryValue = value("expense_category")) {
   const wrap = document.getElementById("expense_plant_count_wrap");
   const input = document.getElementById("expense_plant_count");
@@ -1127,14 +1146,32 @@ function renderDashboard() {
   text("statProfit", formatCurrency(profit));
   text("statTasks", formatInt(taskCount));
 
-  const recent = [...state.harvest]
-    .sort((a, b) => dateVal(b.harvest_date) - dateVal(a.harvest_date))
+  const pendingRows = [...state.tasks]
+    .filter((task) => normalizeId(task.status).toLowerCase() === "pending")
+    .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
     .slice(0, 6)
-    .map((h) => {
-      const land = findLand(h.land_id);
-      return `<tr><td>${esc(formatDate(h.harvest_date))}</td><td>${esc(land?.land_name || "Unknown")}</td><td>${esc(formatNum(Number(h.quantity_kg || 0)))} kg</td><td>${esc(formatCurrency(Number(h.total_revenue || 0)))}</td></tr>`;
+    .map((task) => {
+      const land = findLand(task.land_id);
+      const dueAt = getTaskDateTime(task);
+      const typeKey = canonicalExpenseType(task.expense_type || "");
+      const typeLabel = label(typeKey || task.expense_type || "fertilizer");
+      const categoryLabel = normalizeId(task.category || task.fertilizer_type) || "-";
+      const countdown = formatTaskCountdown(dueAt);
+      const countdownClass = taskCountdownClass(dueAt);
+      const mobileExtras = mobileExtraFieldsAttr([
+        { label: "Notes", value: task.notes || "-" }
+      ]);
+      return `<tr${mobileExtras}>
+        <td>${esc(formatDate(task.next_date))}</td>
+        <td>${esc(formatTaskTime(task.task_time))}</td>
+        <td><span class="task-countdown-badge ${esc(countdownClass)}">${esc(countdown)}</span></td>
+        <td>${esc(land?.land_name || "Unknown")}</td>
+        <td>${esc(typeLabel)}</td>
+        <td>${esc(categoryLabel)}</td>
+        <td><span class="status-badge ${statusBadgeClass(task.status)}">${esc(label(task.status))}</span></td>
+      </tr>`;
     });
-  setRows("dashboardHarvestRows", recent, 4, "No harvest records found.");
+  setRows("dashboardPendingTaskRows", pendingRows, 7, "No pending tasks found.");
 }
 
 function renderLands() {
@@ -1494,28 +1531,303 @@ function renderLabor() {
 function renderTasks() {
   const admin = isAdmin();
   const rows = [...state.tasks]
-    .sort((a, b) => dateVal(a.next_date) - dateVal(b.next_date))
+    .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
     .map((t) => {
       const land = findLand(t.land_id);
-      const completeBtn = admin && normalizeId(t.status).toLowerCase() === "pending"
+      const taskStatus = normalizeId(t.status).toLowerCase();
+      const taskTime = normalizeTaskTime(t.task_time);
+      const dueAt = getTaskDateTime(t);
+      const typeKey = canonicalExpenseType(t.expense_type || "");
+      const typeLabel = label(typeKey || t.expense_type || "fertilizer");
+      const categoryLabel = normalizeId(t.category || t.fertilizer_type) || "-";
+      const countdown = taskStatus === "completed" ? "-" : formatTaskCountdown(dueAt);
+      const countdownClass = taskStatus === "completed" ? "countdown-unknown" : taskCountdownClass(dueAt);
+      const countdownCell = taskStatus === "completed"
+        ? `<td><span class="muted">Completed</span></td>`
+        : `<td><span class="task-countdown-badge ${esc(countdownClass)}">${esc(countdown)}</span></td>`;
+      const completeBtn = admin && taskStatus === "pending"
         ? `<button class="inline-btn complete" data-complete="${esc(t.id)}">Complete</button>`
         : "";
       const deleteBtn = admin ? `<button class="inline-btn delete" data-delete="tasks" data-id="${esc(t.id)}">Delete</button>` : "";
       const actionCell = (completeBtn || deleteBtn) ? `${completeBtn} ${deleteBtn}`.trim() : '<span class="muted">View only</span>';
       const mobileExtras = mobileExtraFieldsAttr([
+        { label: "Due At", value: formatDateTime(dueAt) || "-" },
         { label: "Notes", value: t.notes || "-" }
       ]);
       return `<tr${mobileExtras}>
         <td>${esc(formatDate(t.next_date))}</td>
+        <td>${esc(formatTaskTime(taskTime))}</td>
+        ${countdownCell}
         <td>${esc(land?.land_name || "Unknown")}</td>
-        <td>${esc(t.fertilizer_type || "")}</td>
+        <td>${esc(typeLabel)}</td>
+        <td>${esc(categoryLabel)}</td>
         <td><span class="status-badge ${statusBadgeClass(t.status)}">${esc(label(t.status))}</span></td>
-        <td>${actionCell}</td>
+        <td><div class="task-action-buttons">${actionCell}</div></td>
       </tr>`;
     });
-  setRows("taskRows", rows, 5, "No tasks found.");
+  setRows("taskRows", rows, 8, "No tasks found.");
+}
+function initTaskReminderControls() {
+  const toggleBtn = document.getElementById("toggleTaskNotificationsBtn");
+  if (!toggleBtn || toggleBtn.dataset.bound === "1") {
+    updateTaskReminderUi();
+    return;
+  }
+
+  toggleBtn.dataset.bound = "1";
+  toggleBtn.addEventListener("click", async () => {
+    const currentlyEnabled = isTaskRemindersEnabled();
+    if (currentlyEnabled) {
+      setTaskRemindersEnabled(false);
+      updateTaskReminderUi();
+      showAlert("Task notifications turned off.", "info");
+      return;
+    }
+
+    const ok = await ensureTaskNotificationPermission();
+    if (!ok) {
+      updateTaskReminderUi();
+      return;
+    }
+
+    setTaskRemindersEnabled(true);
+    updateTaskReminderUi();
+    await checkAndSendTaskReminders();
+    showAlert("Task notifications turned on.", "success");
+  });
+
+  updateTaskReminderUi();
 }
 
+function updateTaskReminderUi() {
+  const toggleBtn = document.getElementById("toggleTaskNotificationsBtn");
+  if (!toggleBtn) return;
+
+  if (!("Notification" in window)) {
+    toggleBtn.disabled = true;
+    toggleBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Notifications Unavailable';
+    return;
+  }
+
+  if (Notification.permission === "denied") {
+    toggleBtn.disabled = true;
+    toggleBtn.innerHTML = '<i class="fas fa-ban"></i> Notifications Blocked';
+    return;
+  }
+
+  const enabled = isTaskRemindersEnabled();
+  toggleBtn.disabled = false;
+  toggleBtn.innerHTML = enabled
+    ? '<i class="fas fa-bell-slash"></i> Turn Off Notifications'
+    : '<i class="fas fa-bell"></i> Turn On Notifications';
+}
+
+async function ensureTaskNotificationPermission() {
+  if (!("Notification" in window)) {
+    showAlert("Notifications are not supported on this browser.", "warning");
+    return false;
+  }
+
+  if (Notification.permission === "granted") {
+    return true;
+  }
+
+  if (Notification.permission === "denied") {
+    showAlert("Notifications are blocked. Please allow notifications in browser settings.", "warning");
+    return false;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      return true;
+    }
+    showAlert("Notification permission was not granted.", "warning");
+  } catch (error) {
+    showAlert(`Unable to enable notifications: ${error.message}`, "danger");
+  }
+
+  return false;
+}
+
+function isTaskRemindersEnabled() {
+  const raw = localStorage.getItem(TASK_REMINDERS_ENABLED_KEY);
+  return raw === "1";
+}
+
+function setTaskRemindersEnabled(enabled) {
+  try {
+    localStorage.setItem(TASK_REMINDERS_ENABLED_KEY, enabled ? "1" : "0");
+  } catch (error) {
+    console.warn("Unable to update task reminder enabled state:", error);
+  }
+}
+function startTaskReminderEngine() {
+  if (taskReminderIntervalId) return;
+
+  checkAndSendTaskReminders();
+  refreshTaskCountdownViews();
+  taskReminderIntervalId = window.setInterval(() => {
+    checkAndSendTaskReminders();
+    refreshTaskCountdownViews();
+  }, TASK_REMINDER_CHECK_INTERVAL_MS);
+
+  if (!taskReminderVisibilityBound) {
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        checkAndSendTaskReminders();
+        refreshTaskCountdownViews();
+      }
+    });
+    taskReminderVisibilityBound = true;
+  }
+}
+
+function refreshTaskCountdownViews() {
+  renderDashboard();
+  renderTasks();
+}
+
+async function checkAndSendTaskReminders() {
+  if (!isTaskRemindersEnabled()) {
+    return;
+  }
+
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  if (!Array.isArray(state.tasks) || !state.tasks.length) {
+    return;
+  }
+
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  const reminderLog = loadTaskReminderLog();
+  let changed = false;
+
+  for (const task of state.tasks) {
+    if (normalizeId(task.status).toLowerCase() === "completed") continue;
+
+    const dueAt = getTaskDateTime(task);
+    if (!dueAt) continue;
+
+    const dueWindowEnd = new Date(dueAt);
+    dueWindowEnd.setDate(dueWindowEnd.getDate() + 1);
+    if (now > dueWindowEnd) continue;
+
+    for (const daysBefore of TASK_REMINDER_DAYS) {
+      const reminderAt = new Date(dueAt);
+      reminderAt.setDate(reminderAt.getDate() - daysBefore);
+
+      const reminderDayStart = new Date(reminderAt);
+      reminderDayStart.setHours(0, 0, 0, 0);
+
+      if (reminderDayStart.getTime() !== todayStart.getTime()) continue;
+      if (now < reminderAt) continue;
+
+      const token = buildTaskReminderToken(task, daysBefore, dueAt);
+      if (reminderLog[token]) continue;
+
+      const sent = await showTaskReminderNotification(task, daysBefore, dueAt);
+      if (sent) {
+        reminderLog[token] = Date.now();
+        changed = true;
+      }
+    }
+  }
+
+  if (changed) {
+    saveTaskReminderLog(reminderLog);
+  }
+}
+
+async function showTaskReminderNotification(task, daysBefore, dueAt) {
+  const land = findLand(task.land_id);
+  const typeKey = canonicalExpenseType(task.expense_type || "");
+  const typeLabel = label(typeKey || task.expense_type || "task");
+  const categoryLabel = normalizeId(task.category || task.fertilizer_type);
+  const taskName = categoryLabel ? `${typeLabel} - ${categoryLabel}` : typeLabel;
+  const dueText = `${formatDate(dueAt)} at ${formatTaskTime(task.task_time)}`;
+  const whenText = daysBefore === 0
+    ? "Task is due today"
+    : `Task is due in ${daysBefore} day${daysBefore === 1 ? "" : "s"}`;
+
+  const title = daysBefore === 0
+    ? `Task Day: ${taskName}`
+    : `Task Reminder: ${taskName}`;
+
+  const body = `${whenText}\nLand: ${land?.land_name || "Unknown"}\nWhen: ${dueText}`;
+
+  const options = {
+    body,
+    icon: "./Img/icon-192.png",
+    badge: "./Img/icon-192.png",
+    tag: `task-reminder-${normalizeId(task.id) || normalizeId(taskName)}`,
+    renotify: true,
+    data: {
+      url: "./index.html?section=tasks",
+      taskId: normalizeId(task.id)
+    }
+  };
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      if (registration?.showNotification) {
+        await registration.showNotification(title, options);
+        return true;
+      }
+    }
+
+    const fallbackNotification = new Notification(title, options);
+    fallbackNotification.onclick = () => {
+      window.focus();
+      activateSection("tasks");
+    };
+    return true;
+  } catch (error) {
+    console.warn("Task reminder notification failed:", error);
+    return false;
+  }
+}
+
+function buildTaskReminderToken(task, daysBefore, dueAt) {
+  const taskId = normalizeId(task.id) || `${normalizeId(task.land_id)}-${normalizeId(task.expense_type || "task")}-${normalizeId(task.category || task.fertilizer_type)}`;
+  return `${taskId}|${formatDateInput(dueAt)}|${normalizeTaskTime(task.task_time)}|d${daysBefore}`;
+}
+
+function loadTaskReminderLog() {
+  try {
+    const raw = localStorage.getItem(TASK_REMINDER_LOG_KEY);
+    if (!raw) return {};
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+
+    const cutoff = Date.now() - (45 * 24 * 60 * 60 * 1000);
+    Object.keys(parsed).forEach((key) => {
+      if (!Number.isFinite(Number(parsed[key])) || Number(parsed[key]) < cutoff) {
+        delete parsed[key];
+      }
+    });
+
+    return parsed;
+  } catch (error) {
+    console.warn("Unable to read task reminder log:", error);
+    return {};
+  }
+}
+
+function saveTaskReminderLog(log) {
+  try {
+    localStorage.setItem(TASK_REMINDER_LOG_KEY, JSON.stringify(log || {}));
+  } catch (error) {
+    console.warn("Unable to save task reminder log:", error);
+  }
+}
 function renderProfile() {
   const signedIn = Boolean(authState.user);
   const profile = authState.profile || {};
@@ -2272,6 +2584,56 @@ function isRecordLinkedToKnownLand(id) {
   return Boolean(findLand(id));
 }
 function parseDate(v) { if (!v) return null; const d = v?.toDate ? v.toDate() : new Date(v); return Number.isNaN(d.getTime()) ? null : d; }
+function normalizeTaskTime(v) {
+  const raw = normalizeId(v);
+  const match = raw.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return TASK_REMINDER_DEFAULT_TIME;
+  return `${match[1]}:${match[2]}`;
+}
+function getTaskDateTime(task) {
+  const baseDate = parseDate(task?.next_date);
+  if (!baseDate) return null;
+  const [hours, minutes] = normalizeTaskTime(task?.task_time).split(":").map((part) => Number(part));
+  baseDate.setHours(hours, minutes, 0, 0);
+  return baseDate;
+}
+function taskDateTimeVal(task) {
+  const date = getTaskDateTime(task);
+  return date ? date.getTime() : 0;
+}
+function formatTaskTime(v) {
+  const normalized = normalizeTaskTime(v);
+  const [hours, minutes] = normalized.split(":").map((part) => Number(part));
+  const dt = new Date();
+  dt.setHours(hours, minutes, 0, 0);
+  return dt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+}
+function taskCountdownClass(taskDateTime, now = new Date()) {
+  if (!(taskDateTime instanceof Date) || Number.isNaN(taskDateTime.getTime())) return "countdown-unknown";
+  const diffMs = taskDateTime.getTime() - now.getTime();
+  if (diffMs < 0) return "countdown-overdue";
+  if (diffMs <= (24 * 60 * 60 * 1000)) return "countdown-soon";
+  return "countdown-upcoming";
+}
+function formatTaskCountdown(taskDateTime, now = new Date()) {
+  if (!(taskDateTime instanceof Date) || Number.isNaN(taskDateTime.getTime())) return "-";
+
+  const diffMs = taskDateTime.getTime() - now.getTime();
+  const absMinutes = Math.floor(Math.abs(diffMs) / (60 * 1000));
+  const days = Math.floor(absMinutes / (24 * 60));
+  const hours = Math.floor((absMinutes % (24 * 60)) / 60);
+  const minutes = absMinutes % 60;
+
+  if (diffMs >= 0 && absMinutes === 0) return "Due <1m";
+  if (diffMs < 0 && absMinutes === 0) return "Overdue <1m";
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  parts.push(`${minutes}m`);
+
+  return diffMs >= 0 ? `In ${parts.join(" ")}` : `Overdue ${parts.join(" ")}`;
+}
 function dateVal(v) { const d = parseDate(v); return d ? d.getTime() : 0; }
 function formatDate(v) { const d = parseDate(v); return d ? d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"; }
 function formatDateTime(v) { const d = parseDate(v); return d ? d.toLocaleString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""; }

@@ -608,6 +608,34 @@ html[data-theme="dark"] input.form-control[type="date"] {
     color: #e4f5e9;
     color-scheme: dark;
 }
+/* Dark mode form readability: keep one consistent, high-contrast text theme */
+html[data-theme="dark"] .form-container .form-title,
+html[data-theme="dark"] .form-container .form-group label,
+html[data-theme="dark"] .form-container .form-group label i {
+    color: #dff7e8;
+}
+
+html[data-theme="dark"] .form-container .form-control,
+html[data-theme="dark"] .form-container select.form-control,
+html[data-theme="dark"] .form-container textarea.form-control {
+    color: #e9fff1;
+}
+
+html[data-theme="dark"] .form-container .form-control::placeholder {
+    color: #b4d8c2;
+}
+
+html[data-theme="dark"] .form-container .form-control:focus {
+    background: #193427;
+    border-color: #7de3a0;
+    color: #f3fff7;
+    box-shadow: 0 0 0 3px rgba(125, 227, 160, 0.24);
+}
+
+html[data-theme="dark"] .form-container select.form-control option {
+    background: #14241c;
+    color: #e9fff1;
+}
 
 html[data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #3a4b41 0%, #2d3a33 100%);
