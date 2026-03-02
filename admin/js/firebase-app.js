@@ -15,8 +15,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import {
   onAuthStateChanged,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   deleteToken,
@@ -33,6 +35,7 @@ const state = {
   harvest: [],
   expenses: [],
   laborers: [],
+  users: [],
   tasks: []
 };
 
@@ -67,6 +70,7 @@ let taskReminderVisibilityBound = false;
 let appBootLoadingStartTs = Date.now();
 let appBootLoadingDone = false;
 let sectionLoadingTimeoutId = null;
+let pendingSignupProfile = null;
 const taskMessagingState = {
   supportChecked: false,
   supported: false,
@@ -111,6 +115,7 @@ const refs = {
   harvest: collection(db, "harvest"),
   expenses: collection(db, "expenses"),
   laborers: collection(db, "laborers"),
+  users: collection(db, "users"),
   tasks: collection(db, "fertilizer_schedule")
 };
 
@@ -138,6 +143,12 @@ const responsiveTables = new ResponsiveTableCards({
       statusField: "Status",
       actionsField: "Actions",
       primaryFields: ["ID", "Contact", "Join Date", "Assigned Land", "Skills"]
+    },
+    userRows: {
+      titleField: "User",
+      statusField: "Role",
+      actionsField: "Actions",
+      primaryFields: ["Email", "Access", "Assigned Lands", "Last Updated"]
     },
     taskRows: {
       titleField: "Land",
@@ -169,10 +180,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function initAuth() {
   const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+  const authModeButtons = Array.from(document.querySelectorAll("button[data-auth-mode-btn]"));
+  const authModeLinks = Array.from(document.querySelectorAll("button[data-auth-mode]"));
+
+  authModeButtons.forEach((btn) => {
+    if (btn.dataset.authModeBound === "1") return;
+    btn.dataset.authModeBound = "1";
+    btn.addEventListener("click", () => setAuthMode(btn.dataset.authModeBtn));
+  });
+  authModeLinks.forEach((btn) => {
+    if (btn.dataset.authModeBound === "1") return;
+    btn.dataset.authModeBound = "1";
+    btn.addEventListener("click", () => setAuthMode(btn.dataset.authMode));
+  });
+  setAuthMode("login");
+
   if (loginForm) {
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       setLoginError("");
+      setSignupError("");
       const email = value("loginEmail");
       const password = document.getElementById("loginPassword")?.value || "";
 
@@ -185,7 +213,55 @@ function initAuth() {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
         console.error("Login failed:", error);
-        setLoginError("Login failed. Check your email/password.");
+        setLoginError(readableAuthError(error, "Login failed. Check your email/password."));
+      }
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setSignupError("");
+      setLoginError("");
+
+      const displayName = value("signupName");
+      const email = value("signupEmail");
+      const password = document.getElementById("signupPassword")?.value || "";
+
+      if (!displayName || !email || !password) {
+        setSignupError("Please enter user name, email, and password.");
+        return;
+      }
+
+      if (password.length < 6) {
+        setSignupError("Password must be at least 6 characters.");
+        return;
+      }
+
+      try {
+        pendingSignupProfile = {
+          email,
+          display_name: displayName
+        };
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        try {
+          await updateProfile(credential.user, { displayName });
+        } catch (profileError) {
+          console.warn("Auth profile display name update skipped:", profileError);
+        }
+        const profileReady = await ensureUserProfile(credential.user.uid, {
+          email,
+          display_name: displayName
+        });
+        if (!profileReady) {
+          setSignupError("Account created, but profile setup failed. Please login again.");
+        } else {
+          setSignupError("");
+        }
+      } catch (error) {
+        pendingSignupProfile = null;
+        console.error("Signup failed:", error);
+        setSignupError(readableAuthError(error, "Account creation failed. Please try again."));
       }
     });
   }
@@ -196,10 +272,16 @@ function initAuth() {
     if (user) {
       authState.user = user;
       authState.role = await resolveUserRole(user.uid);
+      pendingSignupProfile = null;
       setLoginError("");
+      setSignupError("");
       await syncTaskFcmSubscription();
       initListeners();
-      showAlert(`Signed in as ${authState.role.toUpperCase()}.`, "success");
+      if (hasDataAccess()) {
+        showAlert(`Signed in as ${authState.role.toUpperCase()}.`, "success");
+      } else {
+        showAlert("Wait Until Admin Give permission.", "warning");
+      }
     } else {
       await disableTaskFcmSubscription();
       clearRealtimeListeners();
@@ -207,6 +289,7 @@ function initAuth() {
       authState.user = null;
       authState.role = "user";
       authState.profile = null;
+      pendingSignupProfile = null;
       renderAll();
       if (authState.hasSessionResolved) {
         showAlert("Signed out.", "info");
@@ -224,8 +307,18 @@ async function resolveUserRole(uid) {
     const snap = await getDoc(doc(db, "users", uid));
     if (!snap.exists()) {
       authState.profile = buildDefaultProfile();
-      await ensureUserProfile(uid);
-      showAlert("User role not found. Defaulting to USER access.", "warning");
+      const profileReady = await ensureUserProfile(uid, {
+        email: pendingSignupProfile?.email,
+        display_name: pendingSignupProfile?.display_name
+      });
+      if (!profileReady) {
+        showAlert("Profile setup failed. Please login again or contact admin.", "danger");
+      }
+      if (pendingSignupProfile) {
+        showAlert("Account created. Wait Until Admin Give permission.", "warning");
+      } else {
+        showAlert("User role not found. Defaulting to USER access.", "warning");
+      }
       return "user";
     }
 
@@ -242,38 +335,61 @@ async function resolveUserRole(uid) {
   }
 }
 
-async function ensureUserProfile(uid) {
+async function ensureUserProfile(uid, overrides = {}) {
   const defaults = buildDefaultProfile();
+  const email = normalizeId(overrides.email || defaults.email);
+  const displayName = normalizeId(overrides.display_name || defaults.display_name) || defaultDisplayNameFromEmail(email);
+  const profileRef = doc(db, "users", uid);
+  const payload = {
+    role: "user",
+    access_granted: false,
+    email,
+    display_name: displayName,
+    phone: normalizeId(overrides.phone || defaults.phone),
+    location: normalizeId(overrides.location || defaults.location),
+    bio: normalizeId(overrides.bio || defaults.bio),
+    updated_at: serverTimestamp()
+  };
   try {
-    await setDoc(doc(db, "users", uid), {
-      role: defaults.role,
-      email: defaults.email,
-      display_name: defaults.display_name,
-      phone: defaults.phone,
-      location: defaults.location,
-      bio: defaults.bio,
-      updated_at: serverTimestamp()
-    }, { merge: true });
+    const existing = await getDoc(profileRef);
+    if (existing.exists()) return true;
+    await setDoc(profileRef, payload);
+    return true;
   } catch (error) {
     console.warn("Auto profile create skipped:", error);
+    try {
+      const existingAfterError = await getDoc(profileRef);
+      return existingAfterError.exists();
+    } catch {
+      return false;
+    }
   }
 }
 
 function applyRoleAccess() {
   const signedIn = Boolean(authState.user);
   const admin = isAdmin();
+  const accessPending = signedIn && !hasDataAccess();
 
   document.body.classList.toggle("user-readonly", signedIn && !admin);
+  document.body.classList.toggle("access-pending", accessPending);
 
   const overlay = document.getElementById("authOverlay");
   if (overlay) overlay.classList.toggle("hidden", signedIn);
   if (!signedIn) {
     const loginPassword = document.getElementById("loginPassword");
     if (loginPassword) loginPassword.value = "";
+    const signupPassword = document.getElementById("signupPassword");
+    if (signupPassword) signupPassword.value = "";
+    setAuthMode("login");
   }
 
   const navAuth = document.getElementById("navAuth");
   if (navAuth) navAuth.hidden = !signedIn;
+  document.querySelectorAll(".nav-links a[data-section]").forEach((link) => {
+    const sectionName = normalizeId(link.getAttribute("data-section")).toLowerCase();
+    link.hidden = Boolean(accessPending && sectionName && sectionName !== "dashboard");
+  });
 
   const accessNotice = document.getElementById("accessNotice");
   if (accessNotice) {
@@ -286,11 +402,13 @@ function applyRoleAccess() {
       accessNotice.innerHTML = "";
     } else if (admin) {
       accessNotice.innerHTML = `<div class="alert alert-success"><i class="fas fa-shield-alt"></i><div>Admin mode enabled. You can add, update, and delete records.</div></div>`;
+    } else if (accessPending) {
+      accessNotice.innerHTML = `<div class="alert alert-warning"><i class="fas fa-hourglass-half"></i><div>Wait Until Admin Give permission.</div></div>`;
     } else {
       accessNotice.innerHTML = `<div class="alert alert-info"><i class="fas fa-eye"></i><div>Read-only mode enabled. You can view data, but only admins can make changes.</div></div>`;
     }
 
-    if (signedIn) {
+    if (signedIn && !accessPending) {
       accessNoticeTimeoutId = setTimeout(() => {
         accessNotice.innerHTML = "";
         accessNoticeTimeoutId = null;
@@ -302,11 +420,45 @@ function applyRoleAccess() {
   syncTaskFcmSubscription().catch((error) => {
     console.warn("Task FCM sync failed after role update:", error);
   });
+  if (signedIn && accessPending) {
+    const restrictedSections = ["lands", "harvest", "expenses", "labor", "tasks", "users"];
+    const shouldRedirect = restrictedSections.some((sectionName) => {
+      const sectionEl = document.getElementById(`section-${sectionName}`);
+      return sectionEl?.classList.contains("active");
+    });
+    if (shouldRedirect) {
+      activateSection("dashboard");
+    }
+  } else if (signedIn && !admin) {
+    const usersSection = document.getElementById("section-users");
+    if (usersSection?.classList.contains("active")) {
+      activateSection("dashboard");
+    }
+  }
   renderProfile();
 }
 
 function isAdmin() {
   return normalizeId(authState.role).toLowerCase() === "admin";
+}
+
+function isProfileAccessGranted(profile = authState.profile) {
+  if (!profile || typeof profile !== "object") return false;
+  if (Object.prototype.hasOwnProperty.call(profile, "access_granted")) {
+    return profile.access_granted === true;
+  }
+  // Legacy users created before this field existed remain allowed.
+  return true;
+}
+
+function hasDataAccess() {
+  if (!authState.user) return false;
+  if (isAdmin()) return true;
+  return isProfileAccessGranted(authState.profile);
+}
+
+function isAccessPendingUser() {
+  return Boolean(authState.user) && !isAdmin() && !hasDataAccess();
 }
 
 function requireAdmin(actionLabel = "perform this action") {
@@ -322,6 +474,44 @@ function requireAdmin(actionLabel = "perform this action") {
 function setLoginError(message) {
   const loginError = document.getElementById("loginError");
   if (loginError) loginError.textContent = message;
+}
+
+function setSignupError(message) {
+  const signupError = document.getElementById("signupError");
+  if (signupError) signupError.textContent = message;
+}
+
+function setAuthMode(mode) {
+  const normalizedMode = normalizeId(mode).toLowerCase() === "signup" ? "signup" : "login";
+  const isSignup = normalizedMode === "signup";
+  const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+
+  if (loginForm) {
+    loginForm.hidden = isSignup;
+    loginForm.classList.toggle("is-active", !isSignup);
+  }
+  if (signupForm) {
+    signupForm.hidden = !isSignup;
+    signupForm.classList.toggle("is-active", isSignup);
+  }
+
+  document.querySelectorAll("button[data-auth-mode-btn]").forEach((btn) => {
+    const active = normalizeId(btn.dataset.authModeBtn).toLowerCase() === normalizedMode;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+function readableAuthError(error, fallbackMessage) {
+  const code = normalizeId(error?.code).toLowerCase();
+  if (code === "auth/email-already-in-use") return "This email is already registered. Please login.";
+  if (code === "auth/invalid-email") return "Please enter a valid email address.";
+  if (code === "auth/weak-password") return "Password is too weak. Use at least 6 characters.";
+  if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential") {
+    return "Invalid email or password.";
+  }
+  return fallbackMessage;
 }
 
 function clearRealtimeListeners() {
@@ -341,6 +531,7 @@ function resetState() {
   state.harvest = [];
   state.expenses = [];
   state.laborers = [];
+  state.users = [];
   state.tasks = [];
 }
 
@@ -520,6 +711,12 @@ function initNav() {
 
 function activateSection(section, options = {}) {
   if (!section) return;
+  if (isAccessPendingUser() && section !== "dashboard" && section !== "profile") {
+    if (options?.suppressAccessAlert !== true) {
+      showAlert("Wait Until Admin Give permission.", "warning");
+    }
+    section = "dashboard";
+  }
 
   const withLoader = options?.withLoader === true;
   if (!withLoader) {
@@ -548,7 +745,7 @@ function applyStartupSectionFromUrl() {
   const section = normalizeId(params.get("section")).toLowerCase();
   if (!section) return;
 
-  const validSections = ["dashboard", "lands", "harvest", "expenses", "labor", "tasks", "profile"];
+  const validSections = ["dashboard", "lands", "harvest", "expenses", "labor", "users", "tasks", "profile"];
   if (!validSections.includes(section)) return;
 
   activateSection(section);
@@ -844,6 +1041,19 @@ async function deleteLandWithRelatedRecords(landId, landKey) {
 
 function initListeners() {
   clearRealtimeListeners();
+  if (!authState.user) return;
+  if (!hasDataAccess()) {
+    state.lands = [];
+    state.plants = [];
+    state.harvest = [];
+    state.expenses = [];
+    state.laborers = [];
+    state.users = [];
+    state.tasks = [];
+    renderAll();
+    return;
+  }
+
   authState.listeners.push(subscribeSnapshot(refs.lands, "lands", (d) => {
     const data = d.data();
     const landKey = normalizeId(data.land_id ?? d.id) || normalizeId(d.id);
@@ -853,6 +1063,11 @@ function initListeners() {
   authState.listeners.push(subscribeSnapshot(refs.harvest, "harvest"));
   authState.listeners.push(subscribeSnapshot(refs.expenses, "expenses"));
   authState.listeners.push(subscribeSnapshot(refs.laborers, "laborers"));
+  if (isAdmin()) {
+    authState.listeners.push(subscribeSnapshot(refs.users, "users"));
+  } else {
+    state.users = [];
+  }
   authState.listeners.push(subscribeSnapshot(refs.tasks, "tasks"));
 }
 
@@ -1122,6 +1337,7 @@ function renderAll() {
   renderHarvest();
   renderExpenses();
   renderLabor();
+  renderUsers();
   renderTasks();
   renderProfile();
   checkAndSendTaskReminders();
@@ -1205,6 +1421,17 @@ function refreshExpensePlantCountInput(typeValue = value("expense_type"), catego
 }
 
 function renderDashboard() {
+  if (isAccessPendingUser()) {
+    text("statActiveLands", "-");
+    text("statTotalPlants", "-");
+    text("statRevenue", "-");
+    text("statExpenses", "-");
+    text("statProfit", "-");
+    text("statTasks", "-");
+    setRows("dashboardPendingTaskRows", [], 7, "Wait Until Admin Give permission.");
+    return;
+  }
+
   const activeLands = state.lands.filter((l) => (l.status || "").toLowerCase() === "active").length;
   const totalPlants = state.plants
     .filter((plant) => isRecordLinkedToKnownLand(plant.land_id))
@@ -1616,6 +1843,127 @@ function renderLabor() {
   setRows("laborRows", rows, 8, "No laborers found. Add your first laborer above.");
 }
 
+function renderUsers() {
+  const usersTable = document.getElementById("userRows");
+  if (!usersTable) return;
+
+  const allUsers = [...state.users]
+    .filter((u) => normalizeId(u.id))
+    .sort((a, b) => {
+      const left = normalizeId(a.display_name || a.email).toLowerCase();
+      const right = normalizeId(b.display_name || b.email).toLowerCase();
+      return left.localeCompare(right);
+    });
+
+  const adminCount = allUsers.filter((u) => normalizeId(u.role).toLowerCase() === "admin").length;
+  const assignedCount = allUsers.filter((u) => getUserAssignedLandIds(u).length > 0).length;
+
+  text("userStatTotal", formatInt(allUsers.length));
+  text("userStatAdmins", formatInt(adminCount));
+  text("userStatAssigned", formatInt(assignedCount));
+  text("userStatUnassigned", formatInt(Math.max(0, allUsers.length - assignedCount)));
+
+  const canEdit = isAdmin();
+  const rows = allUsers.map((user, index) => {
+    const uid = normalizeId(user.id);
+    const displayName = normalizeId(user.display_name) || defaultDisplayNameFromEmail(user.email || `user_${index + 1}`);
+    const email = normalizeId(user.email) || "-";
+    const roleValue = normalizeId(user.role).toLowerCase() === "admin" ? "admin" : "user";
+    const isAdminUser = roleValue === "admin";
+    const isCurrentUser = idsMatch(uid, authState.user?.uid);
+    const accessGranted = isAdminUser ? true : isProfileAccessGranted(user);
+    const assignedLandIds = getUserAssignedLandIds(user);
+    const assignedLandNames = assignedLandIds.map((landId) => {
+      const land = findLand(landId);
+      return land?.land_name || `Unknown (${landId})`;
+    });
+    const assignedLandLabel = assignedLandNames.length ? assignedLandNames.join(", ") : "Unassigned";
+    const assignedLandSummary = assignedLandNames.length
+      ? assignedLandNames.map((name) => `<span class="user-land-chip">${esc(name)}</span>`).join("")
+      : '<span class="muted">Unassigned</span>';
+    const lastUpdated = formatDateTime(user.updated_at || user.created_at) || "-";
+
+    const roleControl = !canEdit
+      ? `<span class="status-badge ${statusBadgeClass(roleValue)}">${esc(label(roleValue))}</span>`
+      : (isAdminUser
+        ? `<span class="status-badge normal">Admin</span>`
+        : `<select class="form-control user-manage-select" data-user-role-select="${esc(uid)}">
+          <option value="user"${roleValue === "user" ? " selected" : ""}>User</option>
+          <option value="admin"${roleValue === "admin" ? " selected" : ""}>Admin</option>
+        </select>`);
+
+    const accessControl = !canEdit
+      ? `<span class="status-badge ${accessGranted ? "normal" : "upcoming"}">${esc(accessGranted ? "Approved" : "Pending")}</span>`
+      : (isAdminUser
+        ? `<span class="status-badge normal">Approved</span>`
+        : `<select class="form-control user-manage-select" data-user-access-select="${esc(uid)}">
+          <option value="pending"${!accessGranted ? " selected" : ""}>Pending</option>
+          <option value="approved"${accessGranted ? " selected" : ""}>Approved</option>
+        </select>`);
+
+    const unknownAssignedLandIds = assignedLandIds.filter(
+      (assignedId) => !state.lands.some((land) => idsMatch(assignedId, getLandKey(land), land.id, land.land_id))
+    );
+    const landOptions = state.lands
+      .map((land) => {
+        const key = getLandKey(land);
+        const selected = assignedLandIds.some((landId) => idsMatch(landId, key, land.id, land.land_id)) ? " selected" : "";
+        return `<option value="${esc(key)}"${selected}>${esc(land.land_name || "Unnamed")}</option>`;
+      })
+      .concat(unknownAssignedLandIds.length
+        ? unknownAssignedLandIds.map((landId) => `<option value="${esc(landId)}" selected>Unknown (${esc(landId)})</option>`)
+        : [])
+      .join("");
+
+    const landSelectSize = Math.min(Math.max(state.lands.length + unknownAssignedLandIds.length, 3), 6);
+    const landControl = canEdit
+      ? `<div class="user-land-field">
+          <div class="user-land-summary" data-user-land-summary="${esc(uid)}" aria-live="polite">${assignedLandSummary}</div>
+          <button class="inline-btn user-land-edit-toggle" type="button" data-user-land-edit="${esc(uid)}">Edit Lands</button>
+          <select class="form-control user-manage-select user-manage-multiselect" data-user-land-select="${esc(uid)}" multiple size="${landSelectSize}">${landOptions}</select>
+        </div>`
+      : assignedLandSummary;
+
+    const actionControl = canEdit
+      ? `<div class="user-manage-actions">
+          <button
+            class="inline-btn complete"
+            type="button"
+            data-user-save="${esc(uid)}"
+            data-user-current-role="${esc(roleValue)}"
+            data-user-current-access="${esc(accessGranted ? "approved" : "pending")}"
+          >Save</button>
+          ${(!isAdminUser && !isCurrentUser)
+            ? `<button
+                class="inline-btn delete"
+                type="button"
+                data-user-delete="${esc(uid)}"
+                data-user-role="${esc(roleValue)}"
+                data-user-name="${esc(displayName)}"
+                data-user-email="${esc(email)}"
+              >Delete</button>`
+            : `<span class="muted">${isCurrentUser ? "Current user" : "Admin protected"}</span>`}
+        </div>`
+      : '<span class="muted">View only</span>';
+
+    const mobileExtras = mobileExtraFieldsAttr([
+      { label: "User ID", value: uid || "-" }
+    ]);
+
+    return `<tr${mobileExtras}>
+      <td><strong>${esc(displayName)}</strong></td>
+      <td>${esc(email)}</td>
+      <td>${roleControl}</td>
+      <td>${accessControl}</td>
+      <td>${landControl}</td>
+      <td>${esc(lastUpdated)}</td>
+      <td>${actionControl}</td>
+    </tr>`;
+  });
+
+  setRows("userRows", rows, 7, "No users found. Once users sign in, they will appear here.");
+}
+
 function renderTasks() {
   const admin = isAdmin();
   const rows = [...state.tasks]
@@ -1631,7 +1979,7 @@ function renderTasks() {
       const countdown = taskStatus === "completed" ? "-" : formatTaskCountdown(dueAt);
       const countdownClass = taskStatus === "completed" ? "countdown-unknown" : taskCountdownClass(dueAt);
       const countdownCell = taskStatus === "completed"
-        ? `<td><span class="muted">Completed</span></td>`
+        ? `<td><span class="status-badge completed">Completed</span></td>`
         : `<td><span class="task-countdown-badge ${esc(countdownClass)}">${esc(countdown)}</span></td>`;
       const completeBtn = admin && taskStatus === "pending"
         ? `<button class="inline-btn complete" data-complete="${esc(t.id)}">Complete</button>`
@@ -2262,11 +2610,13 @@ function bindLogoutButtons() {
 }
 
 function buildDefaultProfile() {
-  const email = authState.user?.email || "";
+  const email = normalizeId(authState.user?.email || pendingSignupProfile?.email);
+  const preferredName = normalizeId(pendingSignupProfile?.display_name || authState.user?.displayName);
   return {
     role: "user",
+    access_granted: false,
     email,
-    display_name: defaultDisplayNameFromEmail(email),
+    display_name: preferredName || defaultDisplayNameFromEmail(email),
     phone: "",
     location: "",
     bio: ""
@@ -2295,6 +2645,28 @@ function profileInitials(name) {
 
 function bindRowActionHandlers(root) {
   if (!root) return;
+
+  const updateUserLandSummary = (landSelect) => {
+    if (!(landSelect instanceof HTMLSelectElement)) return;
+    const userId = normalizeId(landSelect.dataset.userLandSelect);
+    if (!userId) return;
+
+    const summary = Array.from(root.querySelectorAll("[data-user-land-summary]"))
+      .find((el) => normalizeId(el.dataset.userLandSummary) === userId);
+    if (!summary) return;
+
+    const selectedNames = Array.from(landSelect.selectedOptions || [])
+      .map((opt) => normalizeId(opt.textContent))
+      .filter(Boolean);
+    if (!selectedNames.length) {
+      summary.innerHTML = '<span class="muted">Unassigned</span>';
+      return;
+    }
+
+    summary.innerHTML = selectedNames
+      .map((name) => `<span class="user-land-chip">${esc(name)}</span>`)
+      .join("");
+  };
 
   root.querySelectorAll("button[data-record-view]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -2339,6 +2711,131 @@ function bindRowActionHandlers(root) {
         showAlert("Task marked complete.", "success");
       } catch (error) {
         showAlert(`Update failed: ${error.message}`, "danger");
+      }
+    });
+  });
+
+  root.querySelectorAll("button[data-user-save]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!requireAdmin("manage users")) return;
+      try {
+        const userId = normalizeId(btn.dataset.userSave);
+        if (!userId) return;
+
+        const roleSelect = Array.from(root.querySelectorAll("select[data-user-role-select]"))
+          .find((el) => normalizeId(el.dataset.userRoleSelect) === userId);
+        const accessSelect = Array.from(root.querySelectorAll("select[data-user-access-select]"))
+          .find((el) => normalizeId(el.dataset.userAccessSelect) === userId);
+        const landSelect = Array.from(root.querySelectorAll("select[data-user-land-select]"))
+          .find((el) => normalizeId(el.dataset.userLandSelect) === userId);
+
+        const currentRole = normalizeId(btn.dataset.userCurrentRole).toLowerCase() === "admin" ? "admin" : "user";
+        const nextRole = roleSelect
+          ? (normalizeId(roleSelect?.value).toLowerCase() === "admin" ? "admin" : "user")
+          : currentRole;
+        const currentAccessGranted = normalizeId(btn.dataset.userCurrentAccess).toLowerCase() === "approved";
+        const nextAccessGranted = accessSelect
+          ? normalizeId(accessSelect?.value).toLowerCase() === "approved"
+          : currentAccessGranted;
+        const nextLandIds = landSelect
+          ? Array.from(landSelect.selectedOptions || [])
+            .map((option) => normalizeId(option.value))
+            .filter(Boolean)
+          : getUserAssignedLandIds(state.users.find((entry) => idsMatch(entry.id, userId)));
+        const uniqueLandIds = Array.from(new Set(nextLandIds));
+        const primaryLandId = uniqueLandIds[0] || null;
+        const isSelf = idsMatch(userId, authState.user?.uid);
+
+        if (currentRole === "admin" && nextRole !== "admin") {
+          showAlert("Admin role is locked and cannot be changed here.", "warning");
+          return;
+        }
+
+        if (isSelf && nextRole !== "admin") {
+          const ok = window.confirm("You are changing your own role to User. You will lose admin access. Continue?");
+          if (!ok) return;
+        }
+
+        await updateDoc(doc(db, "users", userId), {
+          role: nextRole,
+          access_granted: nextAccessGranted,
+          assigned_land_ids: uniqueLandIds,
+          assigned_land_id: primaryLandId,
+          land_id: primaryLandId,
+          updated_at: serverTimestamp()
+        });
+
+        if (isSelf) {
+          authState.role = nextRole;
+          authState.profile = {
+            ...(authState.profile || {}),
+            role: nextRole,
+            access_granted: nextAccessGranted,
+            assigned_land_ids: uniqueLandIds,
+            assigned_land_id: primaryLandId,
+            land_id: primaryLandId
+          };
+          applyRoleAccess();
+          initListeners();
+        }
+
+        showAlert("User settings updated.", "success");
+      } catch (error) {
+        showAlert(`User update failed: ${error.message}`, "danger");
+      }
+    });
+  });
+
+  root.querySelectorAll("button[data-user-land-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const userId = normalizeId(btn.dataset.userLandEdit);
+      if (!userId) return;
+      const landField = btn.closest(".user-land-field");
+      if (!landField) return;
+      const editing = landField.classList.toggle("is-editing");
+      btn.textContent = editing ? "Hide Editor" : "Edit Lands";
+
+      const select = Array.from(root.querySelectorAll("select[data-user-land-select]"))
+        .find((el) => normalizeId(el.dataset.userLandSelect) === userId);
+      if (select) select.focus();
+    });
+  });
+
+  root.querySelectorAll("select[data-user-land-select]").forEach((selectEl) => {
+    selectEl.addEventListener("change", () => {
+      updateUserLandSummary(selectEl);
+    });
+  });
+
+  root.querySelectorAll("button[data-user-delete]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!requireAdmin("delete users")) return;
+      try {
+        const userId = normalizeId(btn.dataset.userDelete);
+        if (!userId) return;
+
+        const roleValue = normalizeId(btn.dataset.userRole).toLowerCase();
+        const userName = normalizeId(btn.dataset.userName) || "this user";
+        const userEmail = normalizeId(btn.dataset.userEmail) || "";
+
+        if (idsMatch(userId, authState.user?.uid)) {
+          showAlert("You cannot delete your own account while logged in.", "warning");
+          return;
+        }
+
+        if (roleValue === "admin") {
+          showAlert("Admin users are protected and cannot be deleted here.", "warning");
+          return;
+        }
+
+        const labelText = userEmail ? `${userName} (${userEmail})` : userName;
+        const ok = window.confirm(`Delete user ${labelText}? This cannot be undone.`);
+        if (!ok) return;
+
+        await deleteDoc(doc(db, "users", userId));
+        showAlert("User deleted.", "success");
+      } catch (error) {
+        showAlert(`User delete failed: ${error.message}`, "danger");
       }
     });
   });
@@ -2916,6 +3413,15 @@ function normalizeId(v) {
   if (v === null || v === undefined) return "";
   return String(v).trim();
 }
+function getUserAssignedLandIds(user) {
+  if (!user || typeof user !== "object") return [];
+  const assignedArray = Array.isArray(user.assigned_land_ids)
+    ? user.assigned_land_ids.map((entry) => normalizeId(entry)).filter(Boolean)
+    : [];
+  if (assignedArray.length) return Array.from(new Set(assignedArray));
+  const fallback = normalizeId(user.assigned_land_id || user.land_id);
+  return fallback ? [fallback] : [];
+}
 function canonicalExpenseType(value) {
   const raw = normalizeId(value).toLowerCase();
   if (!raw) return "";
@@ -3038,7 +3544,9 @@ function getLandColor(seed) {
 function label(v) { return (v || "").replaceAll("_", " ").replace(/\b\w/g, (m) => m.toUpperCase()); }
 function statusBadgeClass(v) {
   const status = normalizeId(v).toLowerCase();
-  return status === "active" || status === "completed" ? "normal" : (status === "pending" || status === "on_leave" ? "upcoming" : "urgent");
+  if (status === "completed") return "completed";
+  if (status === "active") return "normal";
+  return status === "pending" || status === "on_leave" ? "upcoming" : "urgent";
 }
 function esc(v) {
   return String(v ?? "")
