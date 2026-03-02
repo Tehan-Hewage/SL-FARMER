@@ -108,8 +108,21 @@
           <div class="stat-card"><div class="stat-icon" style="background-color:#00897B;"><i class="fas fa-calendar-day"></i></div><div class="stat-info"><h3>Upcoming Tasks (7d)</h3><p class="stat-number" id="statTasks">0</p></div></div>
         </div>
         <div class="table-section">
-          <h2><i class="fas fa-history"></i> Recent Harvests</h2>
-          <table class="data-table"><thead><tr><th>Date</th><th>Land</th><th>Quantity</th><th>Revenue</th></tr></thead><tbody id="dashboardHarvestRows"></tbody></table>
+          <h2><i class="fas fa-list-check"></i> Pending Tasks</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Countdown</th>
+                <th>Land</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardPendingTaskRows"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -364,24 +377,26 @@
           </div>
         </div>
 
-        <div class="quick-actions labor-quick-actions">
-          <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
-          <div class="action-buttons">
-            <button type="button" class="action-btn quick-action-btn admin-only" id="quickAddLaborer"><i class="fas fa-user-plus"></i><span>Add New Laborer</span></button>
-            <button type="button" class="action-btn quick-action-btn" id="quickActiveLaborers"><i class="fas fa-user-check"></i><span>View Active Laborers</span></button>
-            <button type="button" class="action-btn quick-action-btn" id="quickLandLaborers"><i class="fas fa-tractor"></i><span>Laborers in First Land</span></button>
-            <button type="button" class="action-btn quick-action-btn" id="quickMonthJoiners"><i class="fas fa-calendar"></i><span>This Month's Joiners</span></button>
-          </div>
-        </div>
       </div>
     </section>
 
-    <section id="section-tasks" class="app-section">
-      <div class="dashboard-header"><h1><i class="fas fa-calendar-check"></i> Fertilizer Tasks</h1></div>
-      <div class="form-container admin-only"><h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Task</h2><form id="taskForm" class="simple-form"></form></div>
-      <div class="table-section"><h2><i class="fas fa-list-check"></i> Task List</h2><table class="data-table"><thead><tr><th>Date</th><th>Land</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="taskRows"></tbody></table></div>
-    </section>
+        <section id="section-tasks" class="app-section">
+      <div class="dashboard tasks-page">
+        <div class="dashboard-header">
+          <h1><i class="fas fa-calendar-check"></i> Expense Tasks</h1>
+          <div class="task-header-actions">
+            <button type="button" class="btn admin-only" id="toggleTaskFormBtn"><i class="fas fa-plus"></i> Add Task</button>
+            <button type="button" class="btn btn-secondary task-notify-toggle" id="toggleTaskNotificationsBtn">
+              <i class="fas fa-bell"></i> Turn On Notifications
+            </button>
+          </div>
+        </div>
 
+        <div class="form-container collapsible-panel admin-only" id="taskFormPanel"><h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Task</h2><form id="taskForm" class="simple-form"></form></div>
+
+        <div class="table-section"><h2><i class="fas fa-list-check"></i> Task List</h2><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Countdown</th><th>Land</th><th>Type</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="taskRows"></tbody></table></div>
+      </div>
+    </section>
     <section id="section-profile" class="app-section">
       <div class="dashboard profile-page">
         <div class="dashboard-header">

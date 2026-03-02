@@ -695,7 +695,118 @@ html[data-theme="dark"] .record-detail-value {
   color: #e4f5e9;
 }
 
+.task-countdown-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.2rem;
+  padding: 0.32rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.task-countdown-badge.countdown-overdue {
+  background: linear-gradient(135deg, #ffe1e1, #ffcfcf);
+  color: #a61b1b;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+}
+
+.task-countdown-badge.countdown-soon {
+  background: linear-gradient(135deg, #fff4d9, #ffe8bf);
+  color: #9a5500;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+}
+
+.task-countdown-badge.countdown-upcoming {
+  background: linear-gradient(135deg, #e4f7e8, #d4f1dc);
+  color: #1f7d38;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.task-countdown-badge.countdown-unknown {
+  background: #eef2f7;
+  color: #4b5563;
+  border: 1px solid #d5dde7;
+}
+
+html[data-theme="dark"] .task-countdown-badge.countdown-overdue {
+  background: linear-gradient(135deg, rgba(120, 26, 26, 0.6), rgba(90, 20, 20, 0.66));
+  color: #ffd9d9;
+  border-color: rgba(254, 202, 202, 0.38);
+}
+
+html[data-theme="dark"] .task-countdown-badge.countdown-soon {
+  background: linear-gradient(135deg, rgba(120, 72, 16, 0.56), rgba(90, 53, 12, 0.6));
+  color: #ffe8c8;
+  border-color: rgba(253, 186, 116, 0.4);
+}
+
+html[data-theme="dark"] .task-countdown-badge.countdown-upcoming {
+  background: linear-gradient(135deg, rgba(21, 80, 41, 0.56), rgba(17, 64, 33, 0.62));
+  color: #d9ffe8;
+  border-color: rgba(134, 239, 172, 0.36);
+}
+
+html[data-theme="dark"] .task-countdown-badge.countdown-unknown {
+  background: rgba(51, 65, 85, 0.6);
+  color: #d7deeb;
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.task-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.task-header-actions .btn {
+  white-space: nowrap;
+}
+
+.task-notify-toggle {
+  white-space: nowrap;
+}
+
+.task-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
 @media (max-width: 768px) {
+  .tasks-page .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .task-header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .task-header-actions .btn,
+  .task-notify-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .task-action-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .task-action-buttons .inline-btn {
+    width: 100%;
+  }
+
   .simple-form-grid { grid-template-columns: 1fr; }
   .compact-stats {
     gap: 1rem;
