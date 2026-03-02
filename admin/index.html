@@ -27,8 +27,8 @@
       } catch (error) {}
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=20260228-1">
-  <link rel="stylesheet" href="css/firebase-app.css?v=20260228-1">
+  <link rel="stylesheet" href="css/style.css?v=20260302-4">
+  <link rel="stylesheet" href="css/firebase-app.css?v=20260302-6">
 </head>
 <body>
 <div id="appLoadingOverlay" class="app-loading-overlay" aria-hidden="false">
@@ -49,18 +49,38 @@
 </div>
 <div id="authOverlay" class="auth-overlay hidden">
   <div class="auth-card">
+    <a href="../index.html" class="auth-back-btn" aria-label="Back to website">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back</span>
+    </a>
     <div class="auth-brand">
       <img src="Img/logo.png" alt="Pineapple Farm Logo" class="auth-logo">
       <h2>Pineapple Farm MS Login</h2>
       <p>Sign in as <strong>Admin</strong> or <strong>User</strong></p>
     </div>
-    <form id="loginForm" class="auth-form">
+    <div class="auth-mode-switch" role="tablist" aria-label="Authentication mode">
+      <button type="button" class="auth-mode-btn active" data-auth-mode-btn="login">Login</button>
+      <button type="button" class="auth-mode-btn" data-auth-mode-btn="signup">Create Account</button>
+    </div>
+    <form id="loginForm" class="auth-form is-active">
       <label for="loginEmail">Email</label>
       <input id="loginEmail" type="email" class="form-control" placeholder="name@email.com" required>
       <label for="loginPassword">Password</label>
       <input id="loginPassword" type="password" class="form-control" placeholder="Enter password" required>
       <button type="submit" class="btn auth-submit"><i class="fas fa-sign-in-alt"></i> Login</button>
       <p id="loginError" class="auth-error" aria-live="polite"></p>
+      <p class="auth-alt-action">No account? <button type="button" class="auth-link-btn" data-auth-mode="signup">Create account</button></p>
+    </form>
+    <form id="signupForm" class="auth-form" hidden>
+      <label for="signupName">User Name</label>
+      <input id="signupName" type="text" class="form-control" placeholder="Enter your name" required>
+      <label for="signupEmail">Email</label>
+      <input id="signupEmail" type="email" class="form-control" placeholder="name@email.com" required>
+      <label for="signupPassword">Password</label>
+      <input id="signupPassword" type="password" class="form-control" placeholder="At least 6 characters" minlength="6" required>
+      <button type="submit" class="btn auth-submit"><i class="fas fa-user-plus"></i> Create Account</button>
+      <p id="signupError" class="auth-error" aria-live="polite"></p>
+      <p class="auth-alt-action">Have an account? <button type="button" class="auth-link-btn" data-auth-mode="login">Back to login</button></p>
     </form>
   </div>
 </div>
@@ -82,6 +102,7 @@
         <a href="#" data-section="expenses"><i class="fas fa-money-bill-wave"></i> Expenses</a>
         <a href="#" data-section="labor"><i class="fas fa-users"></i> Labor</a>
         <a href="#" data-section="tasks"><i class="fas fa-calendar-check"></i> Tasks</a>
+        <a href="#" data-section="users" class="admin-only"><i class="fas fa-user-shield"></i> Users</a>
       </div>
         <div class="nav-actions">
           <div class="nav-tools">
@@ -397,6 +418,42 @@
       </div>
     </section>
 
+    <section id="section-users" class="app-section admin-only">
+      <div class="dashboard users-page">
+        <div class="dashboard-header">
+          <div>
+            <h1><i class="fas fa-user-shield"></i> Users Management</h1>
+            <p class="subtitle section-subtitle">Manage user roles, access permissions, and land assignments</p>
+          </div>
+        </div>
+
+        <div class="dashboard-stats compact-stats">
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#4CAF50,#2E7D32);"><i class="fas fa-users"></i></div><div class="stat-info"><h3>Total Users</h3><p class="stat-number" id="userStatTotal">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#1565C0,#1E88E5);"><i class="fas fa-user-shield"></i></div><div class="stat-info"><h3>Admins</h3><p class="stat-number" id="userStatAdmins">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#00897B,#26A69A);"><i class="fas fa-map-marked-alt"></i></div><div class="stat-info"><h3>Assigned Lands</h3><p class="stat-number" id="userStatAssigned">0</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:linear-gradient(135deg,#F57C00,#FFB300);"><i class="fas fa-user-clock"></i></div><div class="stat-info"><h3>Unassigned</h3><p class="stat-number" id="userStatUnassigned">0</p></div></div>
+        </div>
+
+        <div class="table-section">
+          <h2><i class="fas fa-user-cog"></i> Users &amp; Land Assignment</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Access</th>
+                <th>Assigned Lands</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
         <section id="section-tasks" class="app-section">
       <div class="dashboard tasks-page">
         <div class="dashboard-header">
@@ -475,7 +532,7 @@
   <footer><div class="footer-content"><p>&copy; <span id="year"></span> Pineapple Farm Management System</p></div></footer>
 </div>
 <script src="js/theme.js?v=20260220-4" defer></script>
-<script type="module" src="js/firebase-app.js?v=20260220-4"></script>
+<script type="module" src="js/firebase-app.js?v=20260302-6"></script>
 <script src="js/pwa.js?v=20260220-4" defer></script>
 </body>
 </html>

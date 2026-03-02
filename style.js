@@ -166,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!profiles.length) return;
 
             let currentFounderIndex = 0;
-            let founderIntervalId = null;
 
             const renderFounder = (index) => {
                 currentFounderIndex = (index + profiles.length) % profiles.length;
@@ -188,20 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             };
 
-            const stopFounderAutoSlide = () => {
-                if (!founderIntervalId) return;
-                clearInterval(founderIntervalId);
-                founderIntervalId = null;
-            };
-
-            const startFounderAutoSlide = () => {
-                stopFounderAutoSlide();
-                if (profiles.length < 2 || prefersReducedMotion) return;
-                founderIntervalId = setInterval(() => {
-                    renderFounder(currentFounderIndex + 1);
-                }, 10000);
-            };
-
             founderDotsEl.innerHTML = '';
             profiles.forEach((profile, index) => {
                 const dot = document.createElement('button');
@@ -211,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 dot.setAttribute('aria-selected', 'false');
                 dot.addEventListener('click', () => {
                     renderFounder(index);
-                    startFounderAutoSlide();
                 });
                 founderDotsEl.appendChild(dot);
             });
@@ -227,22 +211,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             founderPrevBtn?.addEventListener('click', () => {
                 renderFounder(currentFounderIndex - 1);
-                startFounderAutoSlide();
             });
 
             founderNextBtn?.addEventListener('click', () => {
                 renderFounder(currentFounderIndex + 1);
-                startFounderAutoSlide();
             });
 
-            const storyContainer = document.querySelector('#story .story-content');
-            if (storyContainer && profiles.length > 1) {
-                storyContainer.addEventListener('mouseenter', stopFounderAutoSlide);
-                storyContainer.addEventListener('mouseleave', startFounderAutoSlide);
-            }
-
             renderFounder(0);
-            startFounderAutoSlide();
         });
     }
     

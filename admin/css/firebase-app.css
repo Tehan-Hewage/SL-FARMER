@@ -778,6 +778,94 @@ html[data-theme="dark"] .task-countdown-badge.countdown-unknown {
   gap: 0.45rem;
   align-items: center;
 }
+
+.user-manage-select {
+  min-width: 10rem;
+  padding: 0.45rem 0.62rem;
+  border-width: 1px;
+}
+
+.user-manage-multiselect {
+  min-height: 5.8rem;
+  max-height: 8.5rem;
+  overflow-y: auto;
+}
+
+.user-land-field {
+  min-width: 10.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.user-land-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.user-land-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.48rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.2;
+  color: #0f3f2a;
+  background: rgba(52, 211, 153, 0.18);
+  border: 1px solid rgba(20, 83, 45, 0.22);
+}
+
+.user-land-edit-toggle {
+  display: none;
+  width: fit-content;
+}
+
+.data-table .user-land-field .user-land-summary,
+.data-table .user-land-field .user-land-edit-toggle {
+  display: none;
+}
+
+.user-manage-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+html[data-theme="dark"] .user-manage-select {
+  background: #193427;
+  border-color: #4f7d62;
+  color: #edfff3;
+}
+
+html[data-theme="dark"] .user-land-chip {
+  color: #d9ffe8;
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(134, 239, 172, 0.4);
+}
+
+.responsive-row-card__value .user-land-summary {
+  display: flex;
+}
+
+.responsive-row-card__value .user-land-edit-toggle {
+  display: inline-flex;
+}
+
+.responsive-row-card__value .user-land-field .user-manage-multiselect {
+  display: none;
+  min-height: 4.2rem;
+  max-height: 7.4rem;
+}
+
+.responsive-row-card__value .user-land-field.is-editing .user-manage-multiselect {
+  display: block;
+}
+
+.responsive-row-card__value .user-land-field.is-editing .user-land-edit-toggle {
+  background: #14532d;
+}
 @media (max-width: 768px) {
   .tasks-page .dashboard-header {
     flex-direction: column;
@@ -804,6 +892,33 @@ html[data-theme="dark"] .task-countdown-badge.countdown-unknown {
   }
 
   .task-action-buttons .inline-btn {
+    width: 100%;
+  }
+
+  .user-manage-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .user-manage-multiselect {
+    min-height: 5rem;
+    max-height: 7.5rem;
+  }
+
+  .responsive-row-card__value .user-land-field {
+    min-width: 0;
+  }
+
+  .responsive-row-card__value .user-land-edit-toggle {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.72rem;
+  }
+
+  .user-manage-actions {
+    width: 100%;
+  }
+
+  .user-manage-actions .inline-btn {
     width: 100%;
   }
 
