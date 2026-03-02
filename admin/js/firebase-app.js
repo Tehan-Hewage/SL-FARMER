@@ -1946,11 +1946,7 @@ function renderUsers() {
         </div>`
       : '<span class="muted">View only</span>';
 
-    const mobileExtras = mobileExtraFieldsAttr([
-      { label: "User ID", value: uid || "-" }
-    ]);
-
-    return `<tr${mobileExtras}>
+    return `<tr>
       <td><strong>${esc(displayName)}</strong></td>
       <td>${esc(email)}</td>
       <td>${roleControl}</td>
