@@ -1355,10 +1355,12 @@ function renderAll() {
   checkAndSendTaskReminders();
 }
 function fillReferenceSelects() {
+  const visibleLands = getVisibleLands();
+  const visibleLaborers = getVisibleRecordsByLand(state.laborers);
   const landOptions = ['<option value="">Select Land</option>']
-    .concat(state.lands.map((l) => `<option value="${esc(getLandKey(l))}">${esc(l.land_name || "Unnamed")} - ${esc(l.location || "")}</option>`));
+    .concat(visibleLands.map((l) => `<option value="${esc(getLandKey(l))}">${esc(l.land_name || "Unnamed")} - ${esc(l.location || "")}</option>`));
   const landFilterOptions = ['<option value="">All Lands</option>']
-    .concat(state.lands.map((l) => `<option value="${esc(getLandKey(l))}">${esc(l.land_name || "Unnamed")}</option>`));
+    .concat(visibleLands.map((l) => `<option value="${esc(getLandKey(l))}">${esc(l.land_name || "Unnamed")}</option>`));
 
   ["harvest_land_id", "task_land_id"].forEach((id) => {
     const el = document.getElementById(id);
@@ -1388,7 +1390,7 @@ function fillReferenceSelects() {
   if (laborerSelect) {
     const current = normalizeId(laborerSelect.value);
     laborerSelect.innerHTML = ['<option value="">None</option>']
-      .concat(state.laborers.map((l) => `<option value="${esc(l.id)}">${esc(l.laborer_name || "Unknown")}</option>`)).join("");
+      .concat(visibleLaborers.map((l) => `<option value="${esc(l.id)}">${esc(l.laborer_name || "Unknown")}</option>`)).join("");
     preserveSelectValue(laborerSelect, current);
   }
 }
@@ -1444,18 +1446,23 @@ function renderDashboard() {
     return;
   }
 
-  const activeLands = state.lands.filter((l) => (l.status || "").toLowerCase() === "active").length;
-  const totalPlants = state.plants
-    .filter((plant) => isRecordLinkedToKnownLand(plant.land_id))
-    .reduce((sum, p) => sum + Number(p.plant_count || 0), 0);
-  const revenue = state.harvest.reduce((sum, h) => sum + Number(h.total_revenue || 0), 0);
-  const expenses = state.expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const visibleLands = getVisibleLands();
+  const visiblePlants = getVisibleRecordsByLand(state.plants)
+    .filter((plant) => isRecordLinkedToKnownLand(plant.land_id));
+  const visibleHarvest = getVisibleRecordsByLand(state.harvest);
+  const visibleExpenses = getVisibleRecordsByLand(state.expenses);
+  const visibleTasks = getVisibleRecordsByLand(state.tasks);
+
+  const activeLands = visibleLands.filter((l) => (l.status || "").toLowerCase() === "active").length;
+  const totalPlants = visiblePlants.reduce((sum, p) => sum + Number(p.plant_count || 0), 0);
+  const revenue = visibleHarvest.reduce((sum, h) => sum + Number(h.total_revenue || 0), 0);
+  const expenses = visibleExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
   const profit = revenue - expenses;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const in7 = new Date(now);
   in7.setDate(in7.getDate() + 7);
-  const taskCount = state.tasks.filter((t) => {
+  const taskCount = visibleTasks.filter((t) => {
     const d = parseDate(t.next_date);
     return d && d >= now && d <= in7 && normalizeId(t.status).toLowerCase() === "pending";
   }).length;
@@ -1467,7 +1474,7 @@ function renderDashboard() {
   text("statProfit", formatCurrency(profit));
   text("statTasks", formatInt(taskCount));
 
-  const pendingRows = [...state.tasks]
+  const pendingRows = [...visibleTasks]
     .filter((task) => normalizeId(task.status).toLowerCase() === "pending")
     .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
     .slice(0, 6)
@@ -1500,13 +1507,18 @@ function renderLands() {
   if (!grid) return;
   const admin = isAdmin();
 
-  const lands = state.lands.map((land) => {
+  const visibleLands = getVisibleLands();
+  const visiblePlants = getVisibleRecordsByLand(state.plants);
+  const visibleHarvest = getVisibleRecordsByLand(state.harvest);
+  const visibleExpenses = getVisibleRecordsByLand(state.expenses);
+
+  const lands = visibleLands.map((land) => {
     const landKey = getLandKey(land);
-    const landPlants = state.plants.filter((p) => idsMatch(p.land_id, landKey, land.id));
+    const landPlants = visiblePlants.filter((p) => idsMatch(p.land_id, landKey, land.id));
     const latestPlant = landPlants.sort((a, b) => dateVal(b.created_at || b.planting_date) - dateVal(a.created_at || a.planting_date))[0];
     const plants = Number(latestPlant?.plant_count || 0);
-    const revenue = state.harvest.filter((h) => idsMatch(h.land_id, landKey, land.id)).reduce((s, h) => s + Number(h.total_revenue || 0), 0);
-    const expense = state.expenses.filter((e) => idsMatch(e.land_id, landKey, land.id)).reduce((s, e) => s + Number(e.amount || 0), 0);
+    const revenue = visibleHarvest.filter((h) => idsMatch(h.land_id, landKey, land.id)).reduce((s, h) => s + Number(h.total_revenue || 0), 0);
+    const expense = visibleExpenses.filter((e) => idsMatch(e.land_id, landKey, land.id)).reduce((s, e) => s + Number(e.amount || 0), 0);
     const profit = revenue - expense;
     const costPerPlant = plants > 0 ? expense / plants : 0;
     const size = land.size_hectares ? `${formatNum(Number(land.size_hectares))} Hectares` : (land.size_perches ? `${formatNum(Number(land.size_perches))} Perches` : "-");
@@ -1660,8 +1672,9 @@ function renderLands() {
 
 function renderHarvest() {
   const admin = isAdmin();
-  const sorted = [...state.harvest].sort((a, b) => dateVal(b.harvest_date) - dateVal(a.harvest_date));
-  const totalPlants = state.plants
+  const visibleHarvest = getVisibleRecordsByLand(state.harvest);
+  const sorted = [...visibleHarvest].sort((a, b) => dateVal(b.harvest_date) - dateVal(a.harvest_date));
+  const totalPlants = getVisibleRecordsByLand(state.plants)
     .filter((plant) => isRecordLinkedToKnownLand(plant.land_id))
     .reduce((sum, p) => sum + Number(p.plant_count || 0), 0);
   const totalRevenue = sorted.reduce((sum, h) => sum + Number(h.total_revenue || 0), 0);
@@ -1717,7 +1730,8 @@ function renderHarvest() {
 function renderExpenses() {
   const admin = isAdmin();
   const selectedType = canonicalExpenseType(filters.expenses.type);
-  const filtered = state.expenses
+  const visibleExpenses = getVisibleRecordsByLand(state.expenses);
+  const filtered = visibleExpenses
     .filter((e) => {
       const expenseDate = parseDate(e.expense_date);
       const dateKey = expenseDate ? formatDateInput(expenseDate) : "";
@@ -1747,7 +1761,7 @@ function renderExpenses() {
     typeTotals[type] = (typeTotals[type] || 0) + Number(e.amount || 0);
   });
   const topType = Object.keys(typeTotals).sort((a, b) => typeTotals[b] - typeTotals[a])[0] || "";
-  const scopeLand = state.lands.find((l) => idsMatch(filters.expenses.land, getLandKey(l), l.id, l.land_id));
+  const scopeLand = getVisibleLands().find((l) => idsMatch(filters.expenses.land, getLandKey(l), l.id, l.land_id));
 
   text("expenseStatTotal", formatCurrency(totalAmount));
   text("expenseStatMonth", formatCurrency(monthAmount));
@@ -1787,17 +1801,18 @@ function renderExpenses() {
 
 function renderLabor() {
   const admin = isAdmin();
-  const total = state.laborers.length;
-  const active = state.laborers.filter((l) => normalizeId(l.status).toLowerCase() === "active").length;
-  const onLeave = state.laborers.filter((l) => normalizeId(l.status).toLowerCase() === "on_leave").length;
-  const inactive = state.laborers.filter((l) => normalizeId(l.status).toLowerCase() === "inactive").length;
+  const visibleLaborers = getVisibleRecordsByLand(state.laborers);
+  const total = visibleLaborers.length;
+  const active = visibleLaborers.filter((l) => normalizeId(l.status).toLowerCase() === "active").length;
+  const onLeave = visibleLaborers.filter((l) => normalizeId(l.status).toLowerCase() === "on_leave").length;
+  const inactive = visibleLaborers.filter((l) => normalizeId(l.status).toLowerCase() === "inactive").length;
 
   text("laborStatTotal", formatInt(total));
   text("laborStatActive", formatInt(active));
   text("laborStatLeave", formatInt(onLeave));
   text("laborStatInactive", formatInt(inactive));
 
-  const filtered = state.laborers
+  const filtered = visibleLaborers
     .filter((l) => {
       const land = findLand(l.land_id);
       const haystack = `${normalizeId(l.laborer_name)} ${normalizeId(l.contact)} ${normalizeId(l.skills)} ${normalizeId(land?.land_name)}`.toLowerCase();
@@ -1975,7 +1990,8 @@ function renderUsers() {
 
 function renderTasks() {
   const admin = isAdmin();
-  const rows = [...state.tasks]
+  const visibleTasks = getVisibleRecordsByLand(state.tasks);
+  const rows = [...visibleTasks]
     .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
     .map((t) => {
       const land = findLand(t.land_id);
@@ -2424,6 +2440,7 @@ async function checkAndSendTaskReminders() {
 
   for (const task of state.tasks) {
     if (normalizeId(task.status).toLowerCase() === "completed") continue;
+    if (!isLandVisibleToCurrentUser(task.land_id, { allowBlankForAdmin: true })) continue;
 
     const dueAt = getTaskDateTime(task);
     if (!dueAt) continue;
@@ -3059,7 +3076,18 @@ function getRecordByType(type, id) {
     laborers: state.laborers
   };
   const list = listByType[type] || [];
-  return list.find((entry) => normalizeId(entry.id) === normalizeId(id)) || null;
+  const record = list.find((entry) => normalizeId(entry.id) === normalizeId(id)) || null;
+  if (!record) return null;
+
+  if (type === "lands") {
+    return isLandVisibleToCurrentUser(getLandKey(record), { allowBlankForAdmin: false }) ? record : null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(record, "land_id")) {
+    return isLandVisibleToCurrentUser(record.land_id, { allowBlankForAdmin: false }) ? record : null;
+  }
+
+  return record;
 }
 
 function getCollectionNameByRecordType(type) {
@@ -3438,6 +3466,44 @@ function getUserAssignedLandIds(user) {
   const fallback = normalizeId(user.assigned_land_id || user.land_id);
   return fallback ? [fallback] : [];
 }
+function getCurrentUserAssignedLandIds() {
+  return getUserAssignedLandIds(authState.profile);
+}
+function getVisibleLands() {
+  const allLands = Array.isArray(state.lands) ? state.lands : [];
+  if (isAdmin()) return allLands;
+
+  const assignedLandIds = getCurrentUserAssignedLandIds();
+  if (!assignedLandIds.length) return [];
+
+  return allLands.filter((land) => assignedLandIds.some((assignedId) => idsMatch(assignedId, getLandKey(land), land.id, land.land_id)));
+}
+function isLandVisibleToCurrentUser(landId, options = {}) {
+  if (isAdmin()) {
+    const allowBlankForAdmin = options.allowBlankForAdmin !== false;
+    return allowBlankForAdmin || Boolean(normalizeId(landId));
+  }
+
+  const normalizedLandId = normalizeId(landId);
+  if (!normalizedLandId) return false;
+
+  const assignedLandIds = getCurrentUserAssignedLandIds();
+  if (!assignedLandIds.length) return false;
+
+  if (assignedLandIds.some((assignedId) => idsMatch(normalizedLandId, assignedId))) {
+    return true;
+  }
+
+  const matchedLand = state.lands.find((land) => idsMatch(normalizedLandId, getLandKey(land), land.id, land.land_id));
+  if (!matchedLand) return false;
+
+  return assignedLandIds.some((assignedId) => idsMatch(assignedId, getLandKey(matchedLand), matchedLand.id, matchedLand.land_id));
+}
+function getVisibleRecordsByLand(records, landField = "land_id") {
+  if (!Array.isArray(records)) return [];
+  if (isAdmin()) return records;
+  return records.filter((record) => isLandVisibleToCurrentUser(record?.[landField], { allowBlankForAdmin: false }));
+}
 function canonicalExpenseType(value) {
   const raw = normalizeId(value).toLowerCase();
   if (!raw) return "";
@@ -3480,7 +3546,7 @@ function idsMatch(value, ...candidates) {
   return candidates.some((candidate) => needle === normalizeId(candidate));
 }
 function findLand(id) {
-  return state.lands.find((l) => idsMatch(id, getLandKey(l), l.id, l.land_id)) || null;
+  return getVisibleLands().find((l) => idsMatch(id, getLandKey(l), l.id, l.land_id)) || null;
 }
 function isRecordLinkedToKnownLand(id) {
   if (!normalizeId(id)) return false;
