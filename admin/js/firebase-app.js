@@ -1038,6 +1038,37 @@ async function deleteRecordsByLand(collectionName, landCandidates) {
   return deleted;
 }
 
+async function removeDeletedLandAssignments(landCandidates) {
+  const normalizedCandidates = Array.from(new Set((landCandidates || []).map((entry) => normalizeId(entry)).filter(Boolean)));
+  if (!normalizedCandidates.length) return 0;
+
+  const usersSnap = await getDocs(refs.users);
+  let updatedUsers = 0;
+
+  for (const userDoc of usersSnap.docs) {
+    const userData = userDoc.data() || {};
+    const assignedLandIds = getUserAssignedLandIds(userData);
+    if (!assignedLandIds.length) continue;
+
+    const keptLandIds = assignedLandIds.filter(
+      (assignedId) => !normalizedCandidates.some((candidate) => idsMatch(assignedId, candidate))
+    );
+
+    if (keptLandIds.length === assignedLandIds.length) continue;
+
+    const primaryLandId = keptLandIds[0] || null;
+    await updateDoc(userDoc.ref, {
+      assigned_land_ids: keptLandIds,
+      assigned_land_id: primaryLandId,
+      land_id: primaryLandId,
+      updated_at: serverTimestamp()
+    });
+    updatedUsers += 1;
+  }
+
+  return updatedUsers;
+}
+
 async function deleteLandWithRelatedRecords(landId, landKey) {
   const candidates = Array.from(new Set([normalizeId(landId), normalizeId(landKey)].filter(Boolean)));
   const collections = ["plants", "harvest", "expenses", "laborers", "fertilizer_schedule"];
@@ -1047,6 +1078,7 @@ async function deleteLandWithRelatedRecords(landId, landKey) {
     relatedDeleted += await deleteRecordsByLand(collectionName, candidates);
   }
 
+  await removeDeletedLandAssignments(candidates);
   await deleteDoc(doc(db, "lands", landId));
   return relatedDeleted;
 }
@@ -1901,10 +1933,12 @@ function renderUsers() {
     const isCurrentUser = idsMatch(uid, authState.user?.uid);
     const accessGranted = isPrivilegedUser ? true : isProfileAccessGranted(user);
     const assignedLandIds = getUserAssignedLandIds(user);
-    const assignedLandNames = assignedLandIds.map((landId) => {
-      const land = findLand(landId);
-      return land?.land_name || `Unknown (${landId})`;
-    });
+    const assignedLandNames = assignedLandIds
+      .map((landId) => {
+        const land = state.lands.find((entry) => idsMatch(landId, getLandKey(entry), entry.id, entry.land_id));
+        return normalizeId(land?.land_name);
+      })
+      .filter(Boolean);
     const assignedLandLabel = assignedLandNames.length ? assignedLandNames.join(", ") : "Unassigned";
     const assignedLandSummary = assignedLandNames.length
       ? assignedLandNames.map((name) => `<span class="user-land-chip">${esc(name)}</span>`).join("")
@@ -1930,21 +1964,15 @@ function renderUsers() {
           <option value="approved"${accessGranted ? " selected" : ""}>Approved</option>
         </select>`);
 
-    const unknownAssignedLandIds = assignedLandIds.filter(
-      (assignedId) => !state.lands.some((land) => idsMatch(assignedId, getLandKey(land), land.id, land.land_id))
-    );
     const landOptions = state.lands
       .map((land) => {
         const key = getLandKey(land);
         const selected = assignedLandIds.some((landId) => idsMatch(landId, key, land.id, land.land_id)) ? " selected" : "";
         return `<option value="${esc(key)}"${selected}>${esc(land.land_name || "Unnamed")}</option>`;
       })
-      .concat(unknownAssignedLandIds.length
-        ? unknownAssignedLandIds.map((landId) => `<option value="${esc(landId)}" selected>Unknown (${esc(landId)})</option>`)
-        : [])
       .join("");
 
-    const landSelectSize = Math.min(Math.max(state.lands.length + unknownAssignedLandIds.length, 3), 6);
+    const landSelectSize = Math.min(Math.max(state.lands.length, 3), 6);
     const landControl = canEdit
       ? `<div class="user-land-field">
           <div class="user-land-summary" data-user-land-summary="${esc(uid)}" aria-live="polite">${assignedLandSummary}</div>
@@ -3459,12 +3487,23 @@ function normalizeId(v) {
 }
 function getUserAssignedLandIds(user) {
   if (!user || typeof user !== "object") return [];
+
   const assignedArray = Array.isArray(user.assigned_land_ids)
     ? user.assigned_land_ids.map((entry) => normalizeId(entry)).filter(Boolean)
     : [];
-  if (assignedArray.length) return Array.from(new Set(assignedArray));
-  const fallback = normalizeId(user.assigned_land_id || user.land_id);
-  return fallback ? [fallback] : [];
+
+  let rawAssigned = [];
+  if (assignedArray.length) {
+    rawAssigned = Array.from(new Set(assignedArray));
+  } else {
+    const fallback = normalizeId(user.assigned_land_id || user.land_id);
+    if (fallback) rawAssigned = [fallback];
+  }
+
+  if (!rawAssigned.length) return [];
+  if (!Array.isArray(state.lands) || !state.lands.length) return rawAssigned;
+
+  return rawAssigned.filter((assignedId) => state.lands.some((land) => idsMatch(assignedId, getLandKey(land), land.id, land.land_id)));
 }
 function getCurrentUserAssignedLandIds() {
   return getUserAssignedLandIds(authState.profile);
