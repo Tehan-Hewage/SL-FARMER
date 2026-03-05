@@ -590,7 +590,7 @@ function renderForms() {
   document.getElementById("expenseForm").innerHTML = `
     <div class="simple-form-grid">
       <div class="form-group"><label>Land</label><select id="expense_land_id" class="form-control"></select></div>
-      <div class="form-group"><label>Laborer</label><select id="expense_laborer_id" class="form-control"></select></div>
+      <div class="form-group" id="expense_laborer_wrap" hidden><label>Laborer</label><select id="expense_laborer_id" class="form-control"></select></div>
       <div class="form-group"><label>Type *</label><select id="expense_type" class="form-control" required><option value="">Select</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="fertilizer">Fertilizer</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="irrigation">Irrigation</option><option value="land_preparation">Land Preparation</option><option value="extra">Extra</option></select></div>
       <div class="form-group"><label>Category *</label><select id="expense_category" class="form-control" required></select></div>
       <div class="form-group" id="expense_plant_count_wrap" hidden><label>Plant Count *</label><input id="expense_plant_count" class="form-control" type="number" min="1" step="1"></div>
@@ -1258,6 +1258,7 @@ function initSubmitHandlers() {
     try {
       const expenseType = canonicalExpenseType(value("expense_type")) || normalizeId(value("expense_type"));
       const expenseCategory = value("expense_category");
+      const selectedLaborerId = expenseType === "labor" ? value("expense_laborer_id") : "";
       const requiresPlantCount = shouldTrackPlantCount(expenseType, expenseCategory);
       const plantCount = numOrNull("expense_plant_count");
       if (requiresPlantCount && (!plantCount || plantCount < 1)) {
@@ -1267,7 +1268,7 @@ function initSubmitHandlers() {
 
       await addDoc(refs.expenses, {
         land_id: value("expense_land_id") || null,
-        laborer_id: value("expense_laborer_id") || null,
+        laborer_id: selectedLaborerId || null,
         expense_type: value("expense_type"),
         category: expenseCategory,
         plant_count: requiresPlantCount ? Number(plantCount) : null,
@@ -1435,6 +1436,7 @@ function refreshExpenseCategoryOptions() {
   categoryEl.innerHTML = ['<option value="">Select Category</option>']
     .concat(cats.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`)).join("");
   refreshExpensePlantCountInput(type, categoryEl.value);
+  refreshExpenseLaborerInput(type);
 }
 
 function refreshTaskCategoryOptions() {
@@ -1464,6 +1466,16 @@ function refreshExpensePlantCountInput(typeValue = value("expense_type"), catego
   input.required = shouldShow;
   input.disabled = !shouldShow;
   if (!shouldShow) input.value = "";
+}
+
+function refreshExpenseLaborerInput(typeValue = value("expense_type")) {
+  const wrap = document.getElementById("expense_laborer_wrap");
+  const select = document.getElementById("expense_laborer_id");
+  if (!wrap || !select) return;
+  const shouldShow = canonicalExpenseType(typeValue) === "labor";
+  wrap.hidden = !shouldShow;
+  select.disabled = !shouldShow;
+  if (!shouldShow) select.value = "";
 }
 
 function renderDashboard() {
@@ -1510,7 +1522,7 @@ function renderDashboard() {
 
   text("statActiveLands", formatInt(activeLands));
   text("statTotalPlants", formatInt(totalPlants));
-  text("statTotalHectares", `${formatNum(totalHectares)} ha`);
+  text("statTotalHectares", formatNum(totalHectares));
   text("statRevenue", formatCurrency(revenue));
   text("statExpenses", formatCurrency(expenses));
   text("statProfit", formatCurrency(profit));
@@ -3170,9 +3182,11 @@ function bindRecordModalEvents(recordType, record) {
     const expenseCategorySelect = body.querySelector("#modalExpenseCategory");
     refreshExpenseModalCategoryOptions(expenseTypeSelect.value, normalizeId(record.category));
     refreshExpenseModalPlantCountInput(expenseTypeSelect.value, expenseCategorySelect?.value || normalizeId(record.category));
+    refreshExpenseModalLaborerInput(expenseTypeSelect.value);
     expenseTypeSelect.addEventListener("change", () => {
       refreshExpenseModalCategoryOptions(expenseTypeSelect.value, "");
       refreshExpenseModalPlantCountInput(expenseTypeSelect.value, expenseCategorySelect?.value || "");
+      refreshExpenseModalLaborerInput(expenseTypeSelect.value);
     });
     expenseCategorySelect?.addEventListener("change", () => {
       refreshExpenseModalPlantCountInput(expenseTypeSelect.value, expenseCategorySelect.value);
@@ -3390,7 +3404,7 @@ function buildRecordEditMarkup(type, record) {
     <form id="recordEditForm" class="simple-form">
       <div class="record-modal-grid">
         <div class="form-group"><label>Land</label><select name="land_id" class="form-control">${landOptions}</select></div>
-        <div class="form-group"><label>Laborer</label><select name="laborer_id" class="form-control">${laborerOptions}</select></div>
+        <div class="form-group" id="modalExpenseLaborerWrap" ${currentType === "labor" ? "" : "hidden"}><label>Laborer</label><select id="modalExpenseLaborer" name="laborer_id" class="form-control">${laborerOptions}</select></div>
         <div class="form-group"><label>Type</label><select id="modalExpenseType" name="expense_type" class="form-control">${typeOptions}</select></div>
         <div class="form-group"><label>Category</label><select id="modalExpenseCategory" name="category" class="form-control"></select></div>
         <div class="form-group" id="modalExpensePlantCountWrap" ${shouldTrackPlantCount(currentType, record.category) ? "" : "hidden"}><label>Plant Count</label><input id="modalExpensePlantCount" name="plant_count" class="form-control" type="number" min="1" step="1" value="${esc(modalPlantCount > 0 ? String(modalPlantCount) : "")}"></div>
@@ -3433,6 +3447,16 @@ function refreshExpenseModalPlantCountInput(typeValue, categoryValue) {
   input.required = shouldShow;
   input.disabled = !shouldShow;
   if (!shouldShow) input.value = "";
+}
+
+function refreshExpenseModalLaborerInput(typeValue) {
+  const wrap = document.getElementById("modalExpenseLaborerWrap");
+  const select = document.getElementById("modalExpenseLaborer");
+  if (!wrap || !select) return;
+  const shouldShow = canonicalExpenseType(typeValue) === "labor";
+  wrap.hidden = !shouldShow;
+  select.disabled = !shouldShow;
+  if (!shouldShow) select.value = "";
 }
 
 async function saveRecordModalChanges(type, id, formEl) {
@@ -3488,6 +3512,7 @@ async function saveRecordModalChanges(type, id, formEl) {
 
   const updatedExpenseType = canonicalExpenseType(formData.get("expense_type")) || normalizeId(formData.get("expense_type"));
   const updatedCategory = normalizeId(formData.get("category"));
+  const updatedLaborerId = updatedExpenseType === "labor" ? normalizeId(formData.get("laborer_id")) : "";
   const requiresPlantCount = shouldTrackPlantCount(updatedExpenseType, updatedCategory);
   const updatedPlantCount = Number(formData.get("plant_count") || 0);
   if (requiresPlantCount && !(updatedPlantCount > 0)) {
@@ -3496,7 +3521,7 @@ async function saveRecordModalChanges(type, id, formEl) {
 
   await updateDoc(doc(db, "expenses", id), {
     land_id: normalizeId(formData.get("land_id")) || null,
-    laborer_id: normalizeId(formData.get("laborer_id")) || null,
+    laborer_id: updatedLaborerId || null,
     expense_type: normalizeId(formData.get("expense_type")),
     category: updatedCategory,
     plant_count: requiresPlantCount ? updatedPlantCount : null,
