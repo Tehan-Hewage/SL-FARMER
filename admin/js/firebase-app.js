@@ -1470,6 +1470,7 @@ function renderDashboard() {
   if (isAccessPendingUser()) {
     text("statActiveLands", "-");
     text("statTotalPlants", "-");
+    text("statTotalHectares", "-");
     text("statRevenue", "-");
     text("statExpenses", "-");
     text("statProfit", "-");
@@ -1487,6 +1488,14 @@ function renderDashboard() {
 
   const activeLands = visibleLands.filter((l) => (l.status || "").toLowerCase() === "active").length;
   const totalPlants = visiblePlants.reduce((sum, p) => sum + Number(p.plant_count || 0), 0);
+  const PERCH_TO_HECTARE = 0.002529285264;
+  const totalHectares = visibleLands.reduce((sum, land) => {
+    const hectares = Number(land.size_hectares);
+    if (Number.isFinite(hectares) && hectares > 0) return sum + hectares;
+    const perches = Number(land.size_perches);
+    if (Number.isFinite(perches) && perches > 0) return sum + (perches * PERCH_TO_HECTARE);
+    return sum;
+  }, 0);
   const revenue = visibleHarvest.reduce((sum, h) => sum + Number(h.total_revenue || 0), 0);
   const expenses = visibleExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
   const profit = revenue - expenses;
@@ -1501,6 +1510,7 @@ function renderDashboard() {
 
   text("statActiveLands", formatInt(activeLands));
   text("statTotalPlants", formatInt(totalPlants));
+  text("statTotalHectares", `${formatNum(totalHectares)} ha`);
   text("statRevenue", formatCurrency(revenue));
   text("statExpenses", formatCurrency(expenses));
   text("statProfit", formatCurrency(profit));
@@ -1941,7 +1951,7 @@ function renderUsers() {
       .filter(Boolean);
     const assignedLandLabel = assignedLandNames.length ? assignedLandNames.join(", ") : "Unassigned";
     const assignedLandSummary = assignedLandNames.length
-      ? assignedLandNames.map((name) => `<span class="user-land-chip">${esc(name)}</span>`).join("")
+      ? assignedLandNames.map((name) => `<span class="user-land-chip"><i class="fas fa-check"></i>${esc(name)}</span>`).join("")
       : '<span class="muted">Unassigned</span>';
     const lastUpdated = formatDateTime(user.updated_at || user.created_at) || "-";
 
@@ -1972,14 +1982,30 @@ function renderUsers() {
       })
       .join("");
 
+    const landChecklist = state.lands
+      .map((land) => {
+        const key = getLandKey(land);
+        const checked = assignedLandIds.some((landId) => idsMatch(landId, key, land.id, land.land_id)) ? " checked" : "";
+        return `<label class="user-land-check-option">
+          <input class="user-land-check-input" type="checkbox" data-user-land-checkbox="${esc(uid)}" value="${esc(key)}"${checked}>
+          <span class="user-land-checkmark"><i class="fas fa-check"></i></span>
+          <span class="user-land-check-label">${esc(land.land_name || "Unnamed")}</span>
+        </label>`;
+      })
+      .join("") || '<div class="muted">No lands available.</div>';
+
     const landSelectSize = Math.min(Math.max(state.lands.length, 3), 6);
-    const landControl = canEdit
-      ? `<div class="user-land-field">
-          <div class="user-land-summary" data-user-land-summary="${esc(uid)}" aria-live="polite">${assignedLandSummary}</div>
-          <button class="inline-btn user-land-edit-toggle" type="button" data-user-land-edit="${esc(uid)}">Edit Lands</button>
-          <select class="form-control user-manage-select user-manage-multiselect" data-user-land-select="${esc(uid)}" multiple size="${landSelectSize}">${landOptions}</select>
-        </div>`
-      : assignedLandSummary;
+    const allLandsBadge = '<span class="status-badge normal">All Lands</span>';
+    const landControl = !canEdit
+      ? (isPrivilegedUser ? allLandsBadge : assignedLandSummary)
+      : (isPrivilegedUser
+        ? allLandsBadge
+        : `<div class="user-land-field">
+            <div class="user-land-summary" data-user-land-summary="${esc(uid)}" aria-live="polite">${assignedLandSummary}</div>
+            <button class="inline-btn user-land-edit-toggle" type="button" data-user-land-edit="${esc(uid)}">Edit Lands</button>
+            <div class="user-land-checklist" data-user-land-checklist="${esc(uid)}">${landChecklist}</div>
+            <select class="form-control user-manage-select user-manage-multiselect" data-user-land-select="${esc(uid)}" multiple size="${landSelectSize}">${landOptions}</select>
+          </div>`);
 
     const actionControl = canEdit
       ? `<div class="user-manage-actions">
@@ -2719,8 +2745,48 @@ function bindRowActionHandlers(root) {
     }
 
     summary.innerHTML = selectedNames
-      .map((name) => `<span class="user-land-chip">${esc(name)}</span>`)
+      .map((name) => `<span class="user-land-chip"><i class="fas fa-check"></i>${esc(name)}</span>`)
       .join("");
+  };
+
+  const syncChecklistFromSelect = (landSelect) => {
+    if (!(landSelect instanceof HTMLSelectElement)) return;
+    const userId = normalizeId(landSelect.dataset.userLandSelect);
+    if (!userId) return;
+
+    const selectedValues = Array.from(landSelect.selectedOptions || [])
+      .map((option) => normalizeId(option.value))
+      .filter(Boolean);
+
+    Array.from(root.querySelectorAll("input[data-user-land-checkbox]")).forEach((checkboxEl) => {
+      if (!(checkboxEl instanceof HTMLInputElement)) return;
+      if (normalizeId(checkboxEl.dataset.userLandCheckbox) !== userId) return;
+      const checkboxValue = normalizeId(checkboxEl.value);
+      checkboxEl.checked = selectedValues.some((selectedValue) => idsMatch(checkboxValue, selectedValue));
+    });
+  };
+
+  const syncUserLandSelectFromChecklist = (checkboxEl) => {
+    if (!(checkboxEl instanceof HTMLInputElement)) return;
+    const userId = normalizeId(checkboxEl.dataset.userLandCheckbox);
+    if (!userId) return;
+
+    const landSelect = Array.from(root.querySelectorAll("select[data-user-land-select]"))
+      .find((el) => normalizeId(el.dataset.userLandSelect) === userId);
+    if (!(landSelect instanceof HTMLSelectElement)) return;
+
+    const checkedValues = Array.from(root.querySelectorAll("input[data-user-land-checkbox]"))
+      .filter((inputEl) => inputEl instanceof HTMLInputElement)
+      .filter((inputEl) => normalizeId(inputEl.dataset.userLandCheckbox) === userId)
+      .filter((inputEl) => inputEl.checked)
+      .map((inputEl) => normalizeId(inputEl.value))
+      .filter(Boolean);
+
+    Array.from(landSelect.options).forEach((option) => {
+      option.selected = checkedValues.some((value) => idsMatch(value, option.value));
+    });
+
+    updateUserLandSummary(landSelect);
   };
 
   root.querySelectorAll("button[data-record-view]").forEach((btn) => {
@@ -2792,11 +2858,15 @@ function bindRowActionHandlers(root) {
         const nextAccessGranted = accessSelect
           ? normalizeId(accessSelect?.value).toLowerCase() === "approved"
           : currentAccessGranted;
-        const nextLandIds = landSelect
-          ? Array.from(landSelect.selectedOptions || [])
-            .map((option) => normalizeId(option.value))
-            .filter(Boolean)
-          : getUserAssignedLandIds(state.users.find((entry) => idsMatch(entry.id, userId)));
+        const currentHasFullAccess = currentRole === "admin" || currentRole === "manager";
+        const nextHasFullAccess = nextRole === "admin" || nextRole === "manager";
+        const nextLandIds = nextHasFullAccess
+          ? []
+          : (landSelect
+            ? Array.from(landSelect.selectedOptions || [])
+              .map((option) => normalizeId(option.value))
+              .filter(Boolean)
+            : getUserAssignedLandIds(state.users.find((entry) => idsMatch(entry.id, userId))));
         const uniqueLandIds = Array.from(new Set(nextLandIds));
         const primaryLandId = uniqueLandIds[0] || null;
         const isSelf = idsMatch(userId, authState.user?.uid);
@@ -2806,8 +2876,6 @@ function bindRowActionHandlers(root) {
           return;
         }
 
-        const currentHasFullAccess = currentRole === "admin" || currentRole === "manager";
-        const nextHasFullAccess = nextRole === "admin" || nextRole === "manager";
         if (isSelf && currentHasFullAccess && !nextHasFullAccess) {
           const ok = window.confirm("You are changing your own role to User. You will lose admin/manager access. Continue?");
           if (!ok) return;
@@ -2852,6 +2920,13 @@ function bindRowActionHandlers(root) {
       const editing = landField.classList.toggle("is-editing");
       btn.textContent = editing ? "Hide Editor" : "Edit Lands";
 
+      const checklistInput = Array.from(root.querySelectorAll("input[data-user-land-checkbox]"))
+        .find((el) => normalizeId(el.dataset.userLandCheckbox) === userId);
+      if (checklistInput instanceof HTMLInputElement) {
+        checklistInput.focus();
+        return;
+      }
+
       const select = Array.from(root.querySelectorAll("select[data-user-land-select]"))
         .find((el) => normalizeId(el.dataset.userLandSelect) === userId);
       if (select) select.focus();
@@ -2859,8 +2934,17 @@ function bindRowActionHandlers(root) {
   });
 
   root.querySelectorAll("select[data-user-land-select]").forEach((selectEl) => {
+    syncChecklistFromSelect(selectEl);
+    updateUserLandSummary(selectEl);
     selectEl.addEventListener("change", () => {
+      syncChecklistFromSelect(selectEl);
       updateUserLandSummary(selectEl);
+    });
+  });
+
+  root.querySelectorAll("input[data-user-land-checkbox]").forEach((checkboxEl) => {
+    checkboxEl.addEventListener("change", () => {
+      syncUserLandSelectFromChecklist(checkboxEl);
     });
   });
 
