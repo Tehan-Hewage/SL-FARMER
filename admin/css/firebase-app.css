@@ -786,6 +786,7 @@ html[data-theme="dark"] .task-countdown-badge.countdown-unknown {
 }
 
 .user-manage-multiselect {
+  display: none;
   min-height: 5.8rem;
   max-height: 8.5rem;
   overflow-y: auto;
@@ -817,14 +818,104 @@ html[data-theme="dark"] .task-countdown-badge.countdown-unknown {
   border: 1px solid rgba(20, 83, 45, 0.22);
 }
 
-.user-land-edit-toggle {
+.user-land-chip i {
+  font-size: 0.68rem;
+  margin-right: 0.28rem;
+}
+
+.user-land-checklist {
   display: none;
+  flex-direction: column;
+  gap: 0.45rem;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 0.75rem;
+  background: rgba(15, 118, 110, 0.05);
+  padding: 0.55rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.user-land-check-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  background: rgba(255, 255, 255, 0.65);
+  padding: 0.48rem 0.56rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+}
+
+.user-land-check-option:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.user-land-check-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.user-land-checkmark {
+  width: 1.08rem;
+  height: 1.08rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(15, 118, 110, 0.45);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-land-checkmark i {
+  font-size: 0.66rem;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.user-land-check-input:checked + .user-land-checkmark {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
+.user-land-check-input:checked + .user-land-checkmark i {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.user-land-check-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.user-land-field.is-editing .user-land-checklist {
+  display: flex;
+}
+
+.user-land-edit-toggle {
+  display: inline-flex;
   width: fit-content;
 }
 
-.data-table .user-land-field .user-land-summary,
+.user-land-field.is-editing .user-land-edit-toggle {
+  background: #14532d;
+  color: #ffffff;
+}
+
+.data-table .user-land-field .user-land-summary {
+  display: flex;
+}
+
 .data-table .user-land-field .user-land-edit-toggle {
-  display: none;
+  display: inline-flex;
 }
 
 .user-manage-actions {
@@ -845,6 +936,34 @@ html[data-theme="dark"] .user-land-chip {
   border-color: rgba(134, 239, 172, 0.4);
 }
 
+html[data-theme="dark"] .user-land-checklist {
+  background: rgba(13, 38, 33, 0.9);
+  border-color: rgba(134, 239, 172, 0.3);
+}
+
+html[data-theme="dark"] .user-land-check-option {
+  background: rgba(18, 54, 46, 0.9);
+  border-color: rgba(134, 239, 172, 0.26);
+}
+
+html[data-theme="dark"] .user-land-check-option:hover {
+  border-color: rgba(134, 239, 172, 0.5);
+}
+
+html[data-theme="dark"] .user-land-checkmark {
+  background: #0f172a;
+  border-color: rgba(134, 239, 172, 0.45);
+}
+
+html[data-theme="dark"] .user-land-check-input:checked + .user-land-checkmark {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+html[data-theme="dark"] .user-land-check-label {
+  color: #e6fff1;
+}
+
 .responsive-row-card__value .user-land-summary {
   display: flex;
 }
@@ -853,14 +972,12 @@ html[data-theme="dark"] .user-land-chip {
   display: inline-flex;
 }
 
-.responsive-row-card__value .user-land-field .user-manage-multiselect {
-  display: none;
-  min-height: 4.2rem;
-  max-height: 7.4rem;
+.responsive-row-card__value .user-land-field .user-land-checklist {
+  max-height: 9.4rem;
 }
 
-.responsive-row-card__value .user-land-field.is-editing .user-manage-multiselect {
-  display: block;
+.responsive-row-card__value .user-land-field.is-editing .user-land-checklist {
+  display: flex;
 }
 
 .responsive-row-card__value .user-land-field.is-editing .user-land-edit-toggle {

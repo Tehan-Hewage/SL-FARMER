@@ -1036,6 +1036,15 @@ html[data-theme="dark"] .dashboard-stats .stat-icon {
     word-break: normal;
 }
 
+@media (min-width: 769px) {
+    #statExpenses,
+    #statProfit {
+        font-size: clamp(0.88rem, 1.2vw, 1.12rem);
+        white-space: nowrap;
+        overflow-wrap: normal;
+        word-break: keep-all;
+    }
+}
 /* ===== QUICK ACTIONS ===== */
 .quick-actions {
     background: white;
