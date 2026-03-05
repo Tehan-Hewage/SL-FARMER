@@ -97,7 +97,7 @@ const filters = {
 };
 
 const expenseCategories = {
-  plants: ["Loading", "Unloading", "Tip", "Pineapple Plants"],
+  plants: ["Loading Plants", "Unloading Plants", "Tip", "Pineapple Plants", "Separating Plants"],
   labor: ["Pineapple Planting", "Tip", "Daily Wages", "Hotel Rent", "Transport"],
   fertilizer: ["Urea", "Liquid Fertilizer", "Pineapple Fertilizer"],
   chemicals: ["Pesticides", "Herbicides", "Fungicides", "Growth Regulators", "Diarone", "Propenapose", "Other"],
