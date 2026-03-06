@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
         new Slideshow(container, !prefersReducedMotion, interval);
     });
 
-    // Founder profiles slider (Owner 2 first, then Owner 1)
+    // Founder profiles slider (Owner 1 first, then Owner 2)
     const ownerSlideshowImage = document.querySelector('[data-owner-slideshow]');
     const founderNameEl = document.getElementById('founderName');
     const founderRoleEl = document.getElementById('founderRole');
@@ -127,19 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (canInitFounderSlider) {
         const founderProfiles = [
             {
-                key: 'owner-2',
-                name: 'Upul Premakumara',
-                role: 'Founder - SL Farmer',
-                image: 'images/Owner1.png',
-                alt: 'Upul Premakumara - Founder & SL Farmer',
-                bio: [
-                    'Upul Premakumara is a hands-on farm leader focused on practical growth, crop health, and disciplined field operations. His day-to-day management helps keep SL Farmer productive through every season.',
-                    'With a strong commitment to sustainable methods, Upul supports efficient planting, expense control, and quality-first harvesting standards across the farm.',
-                    'His leadership strengthens SL Farmer\'s mission to deliver naturally grown produce while building long-term value for the local farming community.'
-                ],
-                achievements: ['10+ Years Farming Experience', 'Farm Operations Leader']
-            },
-            {
                 key: 'owner-1',
                 name: 'Jayasanka Peiris',
                 role: 'Founder - SL Farmer',
@@ -151,6 +138,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Guided by purpose, driven by heritage, and committed to purity, Jayasanka continues to lead SL Farmer toward a future where sustainability and excellence grow side by side.'
                 ],
                 achievements: ['2+ Years Farming Experience', 'Local Community Leader']
+            },
+            {
+                key: 'owner-2',
+                name: 'Upul Premakumara',
+                role: 'Founder - SL Farmer',
+                image: 'images/Owner1.png',
+                alt: 'Upul Premakumara - Founder & SL Farmer',
+                bio: [
+                    'Upul Premakumara is a hands-on farm leader focused on practical growth, crop health, and disciplined field operations. His day-to-day management helps keep SL Farmer productive through every season.',
+                    'With a strong commitment to sustainable methods, Upul supports efficient planting, expense control, and quality-first harvesting standards across the farm.',
+                    'His leadership strengthens SL Farmer\'s mission to deliver naturally grown produce while building long-term value for the local farming community.'
+                ],
+                achievements: ['10+ Years Farming Experience', 'Farm Operations Leader']
             }
         ];
 
