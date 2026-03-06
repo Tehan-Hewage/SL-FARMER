@@ -589,7 +589,7 @@ function renderForms() {
     <div class="simple-form-grid">
       <div class="form-group"><label>Land</label><select id="expense_land_id" class="form-control"></select></div>
       <div class="form-group" id="expense_laborer_wrap" hidden><label>Laborer</label><select id="expense_laborer_id" class="form-control"></select></div>
-      <div class="form-group"><label>Type *</label><select id="expense_type" class="form-control" required><option value="">Select</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="fertilizer">Fertilizer</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="irrigation">Irrigation</option><option value="land_preparation">Land Preparation</option><option value="extra">Extra</option></select></div>
+      <div class="form-group"><label>Type *</label><select id="expense_type" class="form-control" required><option value="">Select</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="fertilizer">Fertilizer</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="extra">Extra</option></select></div>
       <div class="form-group"><label>Category *</label><select id="expense_category" class="form-control" required></select></div>
       <div class="form-group" id="expense_plant_count_wrap" hidden><label>Plant Count *</label><input id="expense_plant_count" class="form-control" type="number" min="1" step="1"></div>
       <div class="form-group"><label>Amount *</label><input id="expense_amount" class="form-control" type="number" step="0.01" min="0.01" required></div>
@@ -615,7 +615,7 @@ function renderForms() {
   document.getElementById("taskForm").innerHTML = `
     <div class="simple-form-grid">
       <div class="form-group"><label>Land *</label><select id="task_land_id" class="form-control" required></select></div>
-      <div class="form-group"><label>Type *</label><select id="task_type" class="form-control" required><option value="fertilizer">Fertilizer</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="irrigation">Irrigation</option><option value="land_preparation">Land Preparation</option><option value="extra">Extra</option></select></div>
+      <div class="form-group"><label>Type *</label><select id="task_type" class="form-control" required><option value="fertilizer">Fertilizer</option><option value="plants">Plants</option><option value="labor">Labor</option><option value="chemicals">Chemicals</option><option value="tools_equipment">Tools & Equipment</option><option value="machines">Machines</option><option value="transport">Transport</option><option value="extra">Extra</option></select></div>
       <div class="form-group"><label>Category *</label><select id="task_category" class="form-control" required></select></div>
       <div class="form-group"><label>Next Date *</label><input id="task_next_date" class="form-control" type="date" value="${today}" required></div>
       <div class="form-group"><label>Time *</label><input id="task_time" class="form-control" type="time" value="${TASK_REMINDER_DEFAULT_TIME}" required></div>
@@ -3384,7 +3384,7 @@ function buildRecordEditMarkup(type, record) {
   }
 
   const currentType = canonicalExpenseType(record.expense_type) || "extra";
-  const typeOptions = ["plants", "labor", "fertilizer", "chemicals", "tools_equipment", "machines", "transport", "irrigation", "land_preparation", "extra"]
+  const typeOptions = ["plants", "labor", "fertilizer", "chemicals", "tools_equipment", "machines", "transport", "extra"]
     .map((typeValue) => `<option value="${esc(typeValue)}" ${typeValue === currentType ? "selected" : ""}>${esc(label(typeValue))}</option>`)
     .join("");
   const landOptions = ['<option value="">None</option>']
