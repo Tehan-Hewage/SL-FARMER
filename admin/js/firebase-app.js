@@ -98,7 +98,7 @@ const filters = {
 
 const expenseCategories = {
   plants: ["Loading Plants", "Unloading Plants", "Tip", "Pineapple Plants", "Separating Plants"],
-  labor: ["Pineapple Planting", "Tip", "Daily Wages", "Hotel Rent", "Transport"],
+  labor: ["Pineapple Planting", "Tip", "Daily Wages", "Hotel Rent", "Transport" , "Spraying chemicals"],
   fertilizer: ["Urea", "Liquid Fertilizer", "Pineapple Fertilizer"],
   chemicals: [ "Diarone", "Propenapose", "Other"],
   tools_equipment: ["Purchase", "Repair", "Maintenance", "Rental", "Fuel", "Other"],
