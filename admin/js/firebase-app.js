@@ -100,7 +100,7 @@ const expenseCategories = {
   plants: ["Loading Plants", "Unloading Plants", "Tip", "Pineapple Plants", "Separating Plants"],
   labor: ["Pineapple Planting", "Tip", "Daily Wages", "Hotel Rent", "Transport"],
   fertilizer: ["Urea", "Liquid Fertilizer", "Pineapple Fertilizer"],
-  chemicals: ["Pesticides", "Herbicides", "Fungicides", "Growth Regulators", "Diarone", "Propenapose", "Other"],
+  chemicals: [ "Diarone", "Propenapose", "Other"],
   tools_equipment: ["Purchase", "Repair", "Maintenance", "Rental", "Fuel", "Other"],
   machines: ["Excavator", "JCB"],
   transport: ["Vehicle Fuel", "Vehicle Maintenance", "Driver Wages", "Transport Rental", "Other"],
