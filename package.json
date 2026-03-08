@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "description": "SL Farmer web and admin reminder functions",
+  "scripts": {
+    "build:assistant-knowledge": "node tools/generate-site-assistant-knowledge.mjs"
+  },
   "engines": {
     "node": ">=20"
   },
