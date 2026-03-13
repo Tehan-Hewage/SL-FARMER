@@ -79,6 +79,9 @@ const taskMessagingState = {
 };
 
 const filters = {
+  dashboard: {
+    lands: []
+  },
   expenses: {
     land: "",
     type: "",
@@ -543,6 +546,7 @@ function resetState() {
   state.laborers = [];
   state.users = [];
   state.tasks = [];
+  filters.dashboard.lands = [];
 }
 
 function renderForms() {
@@ -806,6 +810,56 @@ function initFilterHandlers() {
     const eventName = el.tagName === "INPUT" ? "input" : "change";
     el.addEventListener(eventName, cb);
   };
+
+  const dashboardLandFilterOptions = document.getElementById("dashboardLandFilterOptions");
+  if (dashboardLandFilterOptions) {
+    dashboardLandFilterOptions.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+      if (normalizeId(target.dataset.dashboardLandFilter).toLowerCase() !== "true") return;
+
+      const selectedKeys = Array.from(dashboardLandFilterOptions.querySelectorAll('input[data-dashboard-land-filter="true"]:checked'))
+        .map((input) => normalizeId(input.value))
+        .filter(Boolean);
+
+      setDashboardFilterLandKeys(selectedKeys);
+      renderDashboardLandFilterOptions();
+      renderDashboard();
+    });
+  }
+
+  const dashboardLandFilterToggle = document.getElementById("dashboardLandFilterToggle");
+  if (dashboardLandFilterToggle) {
+    dashboardLandFilterToggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      const panel = document.getElementById("dashboardLandFilterPanel");
+      const isOpen = panel?.classList.contains("is-open");
+      setDashboardLandFilterPanelOpen(!isOpen);
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const panel = document.getElementById("dashboardLandFilterPanel");
+    const toggleBtn = document.getElementById("dashboardLandFilterToggle");
+    const target = event.target;
+    if (!panel || !toggleBtn || !(target instanceof Node)) return;
+    if (panel.hidden) return;
+    if (panel.contains(target) || toggleBtn.contains(target)) return;
+    setDashboardLandFilterPanelOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setDashboardLandFilterPanelOpen(false);
+  });
+
+  const dashboardLandFilterReset = document.getElementById("dashboardLandFilterReset");
+  if (dashboardLandFilterReset) {
+    dashboardLandFilterReset.addEventListener("click", () => {
+      setDashboardFilterLandKeys([]);
+      renderDashboardLandFilterOptions();
+      renderDashboard();
+    });
+  }
 
   wireChange("expenseFilterLand", () => {
     filters.expenses.land = value("expenseFilterLand");
@@ -1416,6 +1470,7 @@ function fillReferenceSelects() {
     el.innerHTML = landFilterOptions.join("");
     preserveSelectValue(el, current);
   });
+  renderDashboardLandFilterOptions(visibleLands);
 
   const laborerSelect = document.getElementById("expense_laborer_id");
   if (laborerSelect) {
@@ -1424,6 +1479,87 @@ function fillReferenceSelects() {
       .concat(visibleLaborers.map((l) => `<option value="${esc(l.id)}">${esc(l.laborer_name || "Unknown")}</option>`)).join("");
     preserveSelectValue(laborerSelect, current);
   }
+}
+
+function setDashboardLandFilterPanelOpen(nextOpen) {
+  const panel = document.getElementById("dashboardLandFilterPanel");
+  const toggleBtn = document.getElementById("dashboardLandFilterToggle");
+  if (!panel || !toggleBtn) return;
+
+  const canOpen = panel.dataset.hasOptions !== "false";
+  const isOpen = Boolean(nextOpen) && canOpen;
+
+  panel.classList.toggle("is-open", isOpen);
+  panel.hidden = !isOpen;
+  toggleBtn.classList.toggle("is-open", isOpen);
+  toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
+function syncDashboardLandFilterPanelState(hasOptions) {
+  const panel = document.getElementById("dashboardLandFilterPanel");
+  const toggleBtn = document.getElementById("dashboardLandFilterToggle");
+  if (!panel || !toggleBtn) return;
+
+  panel.dataset.hasOptions = hasOptions ? "true" : "false";
+  toggleBtn.disabled = !hasOptions;
+  if (!hasOptions) {
+    setDashboardLandFilterPanelOpen(false);
+    return;
+  }
+
+  setDashboardLandFilterPanelOpen(panel.classList.contains("is-open"));
+}
+
+function renderDashboardLandFilterOptions(visibleLands = getVisibleLands()) {
+  const optionsEl = document.getElementById("dashboardLandFilterOptions");
+  const summaryEl = document.getElementById("dashboardLandFilterSummary");
+  const resetBtn = document.getElementById("dashboardLandFilterReset");
+  const toggleBtn = document.getElementById("dashboardLandFilterToggle");
+  if (!optionsEl) return;
+
+  const selectedKeys = getDashboardFilterLandKeys();
+  setDashboardFilterLandKeys(selectedKeys);
+
+  optionsEl.innerHTML = visibleLands.length
+    ? visibleLands.map((land) => {
+      const landKey = getLandKey(land);
+      const checked = selectedKeys.some((selectedKey) => idsMatch(selectedKey, landKey)) ? " checked" : "";
+      return `<label class="dashboard-land-option">
+        <input class="dashboard-land-option-input" type="checkbox" data-dashboard-land-filter="true" value="${esc(landKey)}"${checked}>
+        <span class="dashboard-land-option-check"><i class="fas fa-check"></i></span>
+        <span class="dashboard-land-option-body">
+          <span class="dashboard-land-option-title">${esc(land.land_name || "Unnamed")}</span>
+          <span class="dashboard-land-option-meta">${esc(land.location || "No location added")}</span>
+        </span>
+      </label>`;
+    }).join("")
+    : '<div class="muted">No lands available.</div>';
+
+  const scopeLabel = isAdmin() ? "available lands" : "assigned lands";
+  if (summaryEl) {
+    if (!visibleLands.length) {
+      summaryEl.textContent = isAccessPendingUser()
+        ? "Dashboard filters will be available after admin approval."
+        : `No ${scopeLabel} available for this account.`;
+    } else if (!selectedKeys.length) {
+      summaryEl.textContent = `Showing all ${formatInt(visibleLands.length)} ${scopeLabel}.`;
+    } else {
+      summaryEl.textContent = `Showing ${formatInt(selectedKeys.length)} of ${formatInt(visibleLands.length)} ${scopeLabel}.`;
+    }
+  }
+
+  if (toggleBtn) {
+    const toggleLabel = !visibleLands.length
+      ? `Open land filter options. No ${scopeLabel} available.`
+      : (!selectedKeys.length
+        ? `Open land filter options. Showing all ${formatInt(visibleLands.length)} ${scopeLabel}.`
+        : `Open land filter options. ${formatInt(selectedKeys.length)} lands selected.`);
+    toggleBtn.setAttribute("aria-label", toggleLabel);
+    toggleBtn.title = toggleLabel;
+  }
+
+  syncDashboardLandFilterPanelState(visibleLands.length > 0);
+  if (resetBtn) resetBtn.disabled = !selectedKeys.length;
 }
 
 function refreshExpenseCategoryOptions() {
@@ -1489,12 +1625,12 @@ function renderDashboard() {
     return;
   }
 
-  const visibleLands = getVisibleLands();
-  const visiblePlants = getVisibleRecordsByLand(state.plants)
+  const visibleLands = getDashboardFilteredLands();
+  const visiblePlants = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.plants))
     .filter((plant) => isRecordLinkedToKnownLand(plant.land_id));
-  const visibleHarvest = getVisibleRecordsByLand(state.harvest);
-  const visibleExpenses = getVisibleRecordsByLand(state.expenses);
-  const visibleTasks = getVisibleRecordsByLand(state.tasks);
+  const visibleHarvest = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.harvest));
+  const visibleExpenses = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.expenses));
+  const visibleTasks = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.tasks));
 
   const activeLands = visibleLands.filter((l) => (l.status || "").toLowerCase() === "active").length;
   const totalPlants = visiblePlants.reduce((sum, p) => sum + Number(p.plant_count || 0), 0);
@@ -3623,6 +3759,40 @@ function getVisibleLands() {
   if (!assignedLandIds.length) return [];
 
   return allLands.filter((land) => assignedLandIds.some((assignedId) => idsMatch(assignedId, getLandKey(land), land.id, land.land_id)));
+}
+function getResolvedLandKey(landId) {
+  const normalizedLandId = normalizeId(landId);
+  if (!normalizedLandId) return "";
+
+  const matchedLand = state.lands.find((land) => idsMatch(normalizedLandId, getLandKey(land), land.id, land.land_id));
+  return matchedLand ? getLandKey(matchedLand) : normalizedLandId;
+}
+function getDashboardFilterLandKeys() {
+  const visibleLandKeys = getVisibleLands().map((land) => getLandKey(land)).filter(Boolean);
+  const selectedKeys = Array.isArray(filters.dashboard.lands)
+    ? filters.dashboard.lands.map((entry) => normalizeId(entry)).filter(Boolean)
+    : [];
+
+  if (!selectedKeys.length) return [];
+  return Array.from(new Set(selectedKeys.filter((selectedKey) => visibleLandKeys.some((visibleKey) => idsMatch(selectedKey, visibleKey)))));
+}
+function setDashboardFilterLandKeys(nextKeys) {
+  const sanitizedKeys = Array.isArray(nextKeys)
+    ? nextKeys.map((entry) => normalizeId(entry)).filter(Boolean)
+    : [];
+  filters.dashboard.lands = Array.from(new Set(sanitizedKeys));
+}
+function getDashboardFilteredLands() {
+  const visibleLands = getVisibleLands();
+  const selectedKeys = getDashboardFilterLandKeys();
+  if (!selectedKeys.length) return visibleLands;
+  return visibleLands.filter((land) => selectedKeys.some((selectedKey) => idsMatch(selectedKey, getLandKey(land))));
+}
+function getDashboardFilteredRecordsByLand(records, landField = "land_id") {
+  if (!Array.isArray(records)) return [];
+  const selectedKeys = getDashboardFilterLandKeys();
+  if (!selectedKeys.length) return records;
+  return records.filter((record) => selectedKeys.some((selectedKey) => idsMatch(selectedKey, getResolvedLandKey(record?.[landField]))));
 }
 function isLandVisibleToCurrentUser(landId, options = {}) {
   if (isAdmin()) {

@@ -135,8 +135,25 @@
 
     <section id="section-dashboard" class="app-section active">
       <div class="dashboard">
-        <h1><i class="fas fa-seedling"></i> Farm Dashboard</h1>
-        <p class="subtitle">Live metrics from Firestore</p>
+        <div class="dashboard-title-row">
+          <div class="dashboard-title-meta">
+            <h1><i class="fas fa-seedling"></i> Farm Dashboard</h1>
+            <p class="subtitle">Live metrics from Firestore</p>
+          </div>
+          <div class="dashboard-filter-dropdown dashboard-filter-dropdown--title">
+            <button type="button" class="dashboard-filter-toggle dashboard-filter-icon-btn" id="dashboardLandFilterToggle" aria-expanded="false" aria-controls="dashboardLandFilterPanel" aria-label="Open land filter options" title="Open land filter options">
+              <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+            <div class="dashboard-land-filter-panel" id="dashboardLandFilterPanel" hidden>
+              <div class="dashboard-land-filter-panel-head">
+                <p class="dashboard-filter-summary" id="dashboardLandFilterSummary">Showing all available lands.</p>
+                <button type="button" class="btn btn-secondary dashboard-filter-reset" id="dashboardLandFilterReset"><i class="fas fa-redo"></i> Reset Filter</button>
+              </div>
+              <div class="dashboard-land-checklist" id="dashboardLandFilterOptions" role="group" aria-label="Dashboard land filters"></div>
+              <small class="dashboard-land-filter-help">Choose one or more lands to focus the dashboard. Users only see lands assigned by admin.</small>
+            </div>
+          </div>
+        </div>
         <div class="dashboard-stats">
           <div class="stat-card"><div class="stat-icon" style="background-color:#4CAF50;"><i class="fas fa-tractor"></i></div><div class="stat-info"><h3>Active Lands</h3><p class="stat-number" id="statActiveLands">0</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#00ACC1;"><i class="fas fa-ruler-combined"></i></div><div class="stat-info"><h3>Total Hectares</h3><p class="stat-number" id="statTotalHectares">0</p></div></div>
