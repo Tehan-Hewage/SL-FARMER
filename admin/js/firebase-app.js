@@ -78,6 +78,80 @@ const taskMessagingState = {
   foregroundBound: false
 };
 
+const AUTOMATED_LAND_TASK_SOURCE = "pineapple_growth_cycle";
+const AUTOMATED_LAND_TASK_TEMPLATE = [
+  {
+    key: "dairon_round_1",
+    order: 1,
+    title: "1st Diuron",
+    expense_type: "chemicals",
+    category: "1st Diuron Application",
+    offset: { months: 1, days: 15 },
+    description: "Apply Diuron one and a half months after planting."
+  },
+  {
+    key: "fertilizer_round_1",
+    order: 2,
+    title: "1st Fertilizer",
+    expense_type: "fertilizer",
+    category: "1st Fertilizer Round",
+    offset: { months: 3 },
+    description: "Apply the first round of fertilizer around the plant after three months."
+  },
+  {
+    key: "fertilizer_round_2",
+    order: 3,
+    title: "2nd Fertilizer",
+    expense_type: "fertilizer",
+    category: "2nd Fertilizer Round",
+    offset: { months: 6 },
+    description: "Apply the second round of fertilizer around the plant after six months."
+  },
+  {
+    key: "dairon_round_2",
+    order: 4,
+    title: "2nd Diuron",
+    expense_type: "chemicals",
+    category: "2nd Diuron Application",
+    offset: { months: 7 },
+    description: "Apply the second Diuron treatment around the plant after seven months."
+  },
+  {
+    key: "fertilizer_round_3",
+    order: 5,
+    title: "3rd Fertilizer",
+    expense_type: "fertilizer",
+    category: "3rd Fertilizer Round",
+    offset: { months: 8 },
+    description: "Apply the third round of fertilizer around the plant after eight months."
+  },
+  {
+    key: "hormone_application",
+    order: 6,
+    title: "Hormones",
+    expense_type: "chemicals",
+    category: "Hormone Application",
+    offset: { months: 9 },
+    description: "Apply hormones after nine months."
+  },
+  {
+    key: "fruit_harvest",
+    order: 7,
+    title: "Harvest",
+    expense_type: "extra",
+    category: "Fruit Harvest",
+    offset: { months: 13 },
+    description: "Harvest the fruits in the thirteenth month."
+  }
+];
+
+const snapshotState = {
+  lands: false,
+  tasks: false
+};
+
+let automatedLandTaskSyncPromise = null;
+let automatedLandTaskSyncQueued = false;
 const filters = {
   dashboard: {
     lands: []
@@ -123,12 +197,7 @@ const refs = {
 const responsiveTables = new ResponsiveTableCards({
   breakpoint: 768,
   tableConfigs: {
-    dashboardPendingTaskRows: {
-      titleField: "Land",
-      statusField: "Status",
-      primaryFields: ["Date", "Time", "Countdown", "Type", "Category"]
-    },
-    harvestRows: {
+harvestRows: {
       titleField: "Land",
       actionsField: "Actions",
       primaryFields: ["Date", "Total KG", "Grades (A/B/C)", "Revenue", "Avg Price/KG", "Buyer"]
@@ -547,6 +616,9 @@ function resetState() {
   state.users = [];
   state.tasks = [];
   filters.dashboard.lands = [];
+  snapshotState.lands = false;
+  snapshotState.tasks = false;
+  automatedLandTaskSyncQueued = false;
 }
 
 function renderForms() {
@@ -1172,7 +1244,13 @@ function subscribeSnapshot(collectionRef, stateKey, mapper = (d) => ({ id: d.id,
     collectionRef,
     (snapshot) => {
       state[stateKey] = snapshot.docs.map(mapper);
+      if (stateKey === "lands" || stateKey === "tasks") {
+        snapshotState[stateKey] = true;
+      }
       renderAll();
+      if (stateKey === "lands" || stateKey === "tasks") {
+        queueAutomatedLandTaskSync();
+      }
     },
     (error) => {
       console.error(`Firestore listener failed for ${stateKey}:`, error);
@@ -1621,7 +1699,7 @@ function renderDashboard() {
     text("statExpenses", "-");
     text("statProfit", "-");
     text("statTasks", "-");
-    setRows("dashboardPendingTaskRows", [], 7, "Wait Until Admin Give permission.");
+    renderDashboardTaskProgress([], []);
     return;
   }
 
@@ -1662,32 +1740,7 @@ function renderDashboard() {
   text("statProfit", formatCurrency(profit));
   text("statTasks", formatInt(taskCount));
 
-  const pendingRows = [...visibleTasks]
-    .filter((task) => normalizeId(task.status).toLowerCase() === "pending")
-    .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
-    .slice(0, 6)
-    .map((task) => {
-      const land = findLand(task.land_id);
-      const dueAt = getTaskDateTime(task);
-      const typeKey = canonicalExpenseType(task.expense_type || "");
-      const typeLabel = label(typeKey || task.expense_type || "fertilizer");
-      const categoryLabel = normalizeId(task.category || task.fertilizer_type) || "-";
-      const countdown = formatTaskCountdown(dueAt);
-      const countdownClass = taskCountdownClass(dueAt);
-      const mobileExtras = mobileExtraFieldsAttr([
-        { label: "Notes", value: task.notes || "-" }
-      ]);
-      return `<tr${mobileExtras}>
-        <td>${esc(formatDate(task.next_date))}</td>
-        <td>${esc(formatTaskTime(task.task_time))}</td>
-        <td><span class="task-countdown-badge ${esc(countdownClass)}">${esc(countdown)}</span></td>
-        <td>${esc(land?.land_name || "Unknown")}</td>
-        <td>${esc(typeLabel)}</td>
-        <td>${esc(categoryLabel)}</td>
-        <td><span class="status-badge ${statusBadgeClass(task.status)}">${esc(label(task.status))}</span></td>
-      </tr>`;
-    });
-  setRows("dashboardPendingTaskRows", pendingRows, 7, "No pending tasks found.");
+  renderDashboardTaskProgress(visibleTasks, visibleLands);
 }
 
 function renderLands() {
@@ -1765,8 +1818,12 @@ function renderLands() {
     const statusClass = status === "active" ? "active" : "inactive";
 
     return `
-      <div class="land-card">
-        <div class="land-card-header" style="background: ${esc(getLandColor(land.id))};">
+      <div class="land-card glowing-edge-card" data-land-glow-card>
+        <div class="glowing-edge-card__mesh-border" aria-hidden="true"></div>
+        <div class="glowing-edge-card__mesh-bg" aria-hidden="true"></div>
+        <div class="glowing-edge-card__glow" aria-hidden="true"><div class="glowing-edge-card__glow-core"></div></div>
+        <div class="land-card-shell">
+          <div class="land-card-header" style="background: ${esc(getLandColor(land.id))};">
           <h3>${esc(land.land_name || "Unnamed Land")}</h3>
           <span class="land-status ${statusClass}">${esc(label(status))}</span>
         </div>
@@ -1798,9 +1855,12 @@ function renderLands() {
           </div>`
     : '<span class="muted">View only</span>'}
         </div>
+        </div>
       </div>
     `;
   }).join("");
+
+  bindGlowingLandCards(grid);
 
   grid.querySelectorAll("button[data-land-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1858,6 +1918,79 @@ function renderLands() {
   });
 }
 
+function bindGlowingLandCards(root = document) {
+  const cards = root.querySelectorAll("[data-land-glow-card]");
+  cards.forEach((card) => {
+    if (!(card instanceof HTMLElement) || card.dataset.glowBound === "true") return;
+    card.dataset.glowBound = "true";
+    resetLandGlowCard(card);
+
+    card.addEventListener("pointerenter", () => {
+      card.classList.add("is-glow-active");
+    });
+
+    card.addEventListener("pointermove", (event) => {
+      if (!(event instanceof PointerEvent)) return;
+      const rect = card.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const px = landGlowClamp((100 / rect.width) * x);
+      const py = landGlowClamp((100 / rect.height) * y);
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const angle = landGlowAngleFromPointer(dx, dy);
+      const edge = landGlowEdgeCloseness(rect, x, y);
+
+      card.classList.add("is-glow-active");
+      card.style.setProperty("--land-pointer-x", `${landGlowRound(px)}%`);
+      card.style.setProperty("--land-pointer-y", `${landGlowRound(py)}%`);
+      card.style.setProperty("--land-pointer-deg", `${landGlowRound(angle)}deg`);
+      card.style.setProperty("--land-pointer-d", `${landGlowRound(edge * 100)}`);
+    });
+
+    card.addEventListener("pointerleave", () => {
+      resetLandGlowCard(card);
+    });
+  });
+}
+
+function resetLandGlowCard(card) {
+  if (!(card instanceof HTMLElement)) return;
+  card.classList.remove("is-glow-active");
+  card.style.setProperty("--land-pointer-x", "50%");
+  card.style.setProperty("--land-pointer-y", "50%");
+  card.style.setProperty("--land-pointer-deg", "45deg");
+  card.style.setProperty("--land-pointer-d", "0");
+}
+
+function landGlowRound(value, precision = 3) {
+  return Number(value.toFixed(precision));
+}
+
+function landGlowClamp(value, min = 0, max = 100) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function landGlowAngleFromPointer(dx, dy) {
+  if (dx === 0 && dy === 0) return 45;
+  let angle = (Math.atan2(dy, dx) * (180 / Math.PI)) + 90;
+  if (angle < 0) angle += 360;
+  return angle;
+}
+
+function landGlowEdgeCloseness(rect, x, y) {
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  const dx = x - centerX;
+  const dy = y - centerY;
+  let edgeX = Infinity;
+  let edgeY = Infinity;
+  if (dx !== 0) edgeX = centerX / Math.abs(dx);
+  if (dy !== 0) edgeY = centerY / Math.abs(dy);
+  return landGlowClamp(1 / Math.min(edgeX, edgeY), 0, 1);
+}
 function renderHarvest() {
   const admin = isAdmin();
   const visibleHarvest = getVisibleRecordsByLand(state.harvest);
@@ -2188,9 +2321,297 @@ function renderUsers() {
   setRows("userRows", rows, 7, "No users found. Once users sign in, they will appear here.");
 }
 
+function canSyncAutomatedLandTasks() {
+  return Boolean(authState.user)
+    && hasDataAccess()
+    && isAdmin()
+    && snapshotState.lands
+    && snapshotState.tasks;
+}
+
+function queueAutomatedLandTaskSync() {
+  if (!canSyncAutomatedLandTasks()) return;
+  if (automatedLandTaskSyncPromise) {
+    automatedLandTaskSyncQueued = true;
+    return;
+  }
+
+  automatedLandTaskSyncPromise = syncAutomatedLandTasks()
+    .catch((error) => {
+      console.warn("Unable to sync automated land tasks:", error);
+    })
+    .finally(() => {
+      automatedLandTaskSyncPromise = null;
+      if (automatedLandTaskSyncQueued) {
+        automatedLandTaskSyncQueued = false;
+        queueAutomatedLandTaskSync();
+      }
+    });
+}
+
+async function syncAutomatedLandTasks() {
+  if (!canSyncAutomatedLandTasks()) return;
+
+  const activeLands = Array.isArray(state.lands)
+    ? state.lands.filter((land) => getLandKey(land) && parseDate(land.planting_date))
+    : [];
+  const existingAutomatedTasks = Array.isArray(state.tasks) ? state.tasks.filter(isAutomatedLandTask) : [];
+  const expectedKeys = new Set();
+  const operations = [];
+
+  for (const land of activeLands) {
+    const scheduleEntries = buildAutomatedLandScheduleEntries(land, existingAutomatedTasks);
+    for (const entry of scheduleEntries) {
+      const expectedKey = `${normalizeId(entry.landKey)}|${normalizeId(entry.template.key)}`;
+      expectedKeys.add(expectedKey);
+
+      if (entry.task) {
+        const updates = {};
+        const nextDate = entry.dueDateInput;
+        const existingDate = toDateInputValue(entry.task.next_date);
+        const existingStatus = normalizeId(entry.task.status).toLowerCase();
+        const expectedNotes = buildAutomatedLandTaskNote(entry.template);
+
+        if (!idsMatch(entry.task.land_id, entry.landKey, land.id, land.land_id)) updates.land_id = entry.landKey;
+        if (normalizeId(entry.task.expense_type) !== entry.template.expense_type) updates.expense_type = entry.template.expense_type;
+        if (normalizeId(entry.task.category) !== entry.template.category) updates.category = entry.template.category;
+        if (normalizeId(entry.task.fertilizer_type) !== entry.template.category) updates.fertilizer_type = entry.template.category;
+        if (existingDate !== nextDate) {
+          updates.next_date = nextDate;
+          if (existingStatus === "completed") updates.status = "pending";
+        }
+        if (!normalizeId(entry.task.task_time)) updates.task_time = TASK_REMINDER_DEFAULT_TIME;
+        if (normalizeId(entry.task.notes) !== expectedNotes) updates.notes = expectedNotes;
+        if (normalizeId(entry.task.automation_source) !== AUTOMATED_LAND_TASK_SOURCE) updates.automation_source = AUTOMATED_LAND_TASK_SOURCE;
+        if (normalizeId(entry.task.automation_stage_key) !== entry.template.key) updates.automation_stage_key = entry.template.key;
+        if (Number(entry.task.automation_stage_order || 0) !== entry.template.order) updates.automation_stage_order = entry.template.order;
+        if (normalizeId(entry.task.automation_land_key) !== entry.landKey) updates.automation_land_key = entry.landKey;
+        if (entry.task.is_automated !== true) updates.is_automated = true;
+
+        if (Object.keys(updates).length) {
+          updates.updated_at = serverTimestamp();
+          operations.push(() => updateDoc(doc(db, "fertilizer_schedule", entry.task.id), updates));
+        }
+        continue;
+      }
+
+      operations.push(() => addDoc(refs.tasks, {
+        land_id: entry.landKey,
+        expense_type: entry.template.expense_type,
+        category: entry.template.category,
+        fertilizer_type: entry.template.category,
+        next_date: entry.dueDateInput,
+        task_time: TASK_REMINDER_DEFAULT_TIME,
+        status: "pending",
+        notes: buildAutomatedLandTaskNote(entry.template),
+        is_automated: true,
+        automation_source: AUTOMATED_LAND_TASK_SOURCE,
+        automation_stage_key: entry.template.key,
+        automation_stage_order: entry.template.order,
+        automation_land_key: entry.landKey,
+        created_at: serverTimestamp()
+      }));
+    }
+  }
+
+  for (const task of existingAutomatedTasks) {
+    const taskLandKey = normalizeId(task.automation_land_key || getResolvedLandKey(task.land_id));
+    const stageKey = normalizeId(task.automation_stage_key);
+    if (!taskLandKey || !stageKey) continue;
+    const expectedKey = `${taskLandKey}|${stageKey}`;
+    if (expectedKeys.has(expectedKey)) continue;
+    operations.push(() => deleteDoc(doc(db, "fertilizer_schedule", task.id)));
+  }
+
+  for (const operation of operations) {
+    await operation();
+  }
+}
+
+function isAutomatedLandTask(task) {
+  return normalizeId(task?.automation_source) === AUTOMATED_LAND_TASK_SOURCE
+    || task?.is_automated === true;
+}
+
+function buildAutomatedLandTaskNote(template) {
+  return `Automated from planting date. ${template.description}`;
+}
+
+function addMonthsClamped(dateValue, monthsToAdd) {
+  const baseDate = parseDate(dateValue);
+  if (!baseDate) return null;
+
+  const result = new Date(baseDate);
+  const targetDay = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + Number(monthsToAdd || 0));
+  const maxDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(targetDay, maxDay));
+  return result;
+}
+
+function applyAutomatedTaskOffset(dateValue, offset = {}) {
+  const shiftedDate = addMonthsClamped(dateValue, Number(offset.months || 0));
+  if (!shiftedDate) return null;
+  shiftedDate.setDate(shiftedDate.getDate() + Number(offset.days || 0));
+  shiftedDate.setHours(0, 0, 0, 0);
+  return shiftedDate;
+}
+
+function buildAutomatedLandScheduleEntries(land, taskRecords = state.tasks) {
+  const plantingDate = parseDate(land?.planting_date);
+  const landKey = getLandKey(land);
+  if (!plantingDate || !landKey) return [];
+
+  const automatedTasks = Array.isArray(taskRecords)
+    ? taskRecords.filter((task) => isAutomatedLandTask(task)
+      && (idsMatch(normalizeId(task.automation_land_key), landKey)
+        || idsMatch(getResolvedLandKey(task.land_id), landKey, land.id, land.land_id)))
+    : [];
+
+  return AUTOMATED_LAND_TASK_TEMPLATE.map((template) => {
+    const dueDate = applyAutomatedTaskOffset(plantingDate, template.offset);
+    const task = automatedTasks.find((entry) => normalizeId(entry.automation_stage_key) === template.key) || null;
+    return {
+      landKey,
+      plantingDate,
+      template,
+      dueDate,
+      dueDateInput: dueDate ? formatDateInput(dueDate) : "",
+      task
+    };
+  });
+}
+
+function getAutomatedLandCyclePercent(land, scheduleEntries, now = new Date()) {
+  const plantingDate = parseDate(land?.planting_date);
+  const finalDueDate = parseDate(scheduleEntries[scheduleEntries.length - 1]?.dueDate);
+  if (!plantingDate || !finalDueDate) return 0;
+
+  const totalMs = finalDueDate.getTime() - plantingDate.getTime();
+  if (totalMs <= 0) return 0;
+
+  const elapsedMs = now.getTime() - plantingDate.getTime();
+  return Math.max(0, Math.min(100, (elapsedMs / totalMs) * 100));
+}
+
+function getAutomatedTaskStageState(entry, now = new Date()) {
+  const taskStatus = normalizeId(entry?.task?.status).toLowerCase();
+  if (taskStatus === "completed") return "completed";
+
+  const dueDate = parseDate(entry?.dueDate);
+  if (!dueDate) return "upcoming";
+
+  const dueStart = new Date(dueDate);
+  dueStart.setHours(0, 0, 0, 0);
+  const dueEnd = new Date(dueDate);
+  dueEnd.setHours(23, 59, 59, 999);
+
+  if (now.getTime() > dueEnd.getTime()) return "overdue";
+  if (now.getTime() >= dueStart.getTime()) return "current";
+  return "upcoming";
+}
+
+function renderTaskProgressGrid(gridId, lands, visibleTasks) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+
+  if (isAccessPendingUser()) {
+    grid.innerHTML = '<div class="task-progress-empty">Wait Until Admin Give permission.</div>';
+    return;
+  }
+
+  const progressLands = Array.isArray(lands)
+    ? lands.filter((land) => parseDate(land.planting_date))
+    : [];
+  if (!progressLands.length) {
+    grid.innerHTML = '<div class="task-progress-empty">No lands with planting dates available yet.</div>';
+    return;
+  }
+
+  const taskRecords = Array.isArray(visibleTasks) ? visibleTasks : [];
+  const now = new Date();
+  const cards = progressLands.map((land) => {
+    const scheduleEntries = buildAutomatedLandScheduleEntries(land, taskRecords);
+    if (!scheduleEntries.length) return "";
+
+    const totalStages = scheduleEntries.length;
+    const completedCount = scheduleEntries.filter((entry) => normalizeId(entry.task?.status).toLowerCase() === "completed").length;
+    const reachedCount = scheduleEntries.filter((entry) => {
+      const dueDate = parseDate(entry.dueDate);
+      if (!dueDate) return false;
+      const dueEnd = new Date(dueDate);
+      dueEnd.setHours(23, 59, 59, 999);
+      return now.getTime() >= dueEnd.getTime();
+    }).length;
+    const overdueCount = scheduleEntries.filter((entry) => getAutomatedTaskStageState(entry, now) === "overdue").length;
+    const progressPercent = getAutomatedLandCyclePercent(land, scheduleEntries, now);
+    const nextOpenStage = scheduleEntries.find((entry) => normalizeId(entry.task?.status).toLowerCase() !== "completed") || null;
+
+    let nextLabel = "All automated stages completed.";
+    if (nextOpenStage) {
+      const nextState = getAutomatedTaskStageState(nextOpenStage, now);
+      if (nextState === "overdue") {
+        nextLabel = `${nextOpenStage.template.title} is overdue since ${formatDate(nextOpenStage.dueDate)}.`;
+      } else if (nextState === "current") {
+        nextLabel = `${nextOpenStage.template.title} is due today.`;
+      } else {
+        nextLabel = `Next: ${nextOpenStage.template.title} on ${formatDate(nextOpenStage.dueDate)}.`;
+      }
+    }
+
+    const stageMarkup = scheduleEntries.map((entry) => {
+      const stageState = getAutomatedTaskStageState(entry, now);
+      const stageLabel = stageState === "completed"
+        ? "Completed"
+        : stageState === "overdue"
+          ? "Overdue"
+          : stageState === "current"
+            ? "Today"
+            : "Upcoming";
+      return `<div class="task-stage-pill task-stage-pill--${esc(stageState)}">
+        <span class="task-stage-pill__title">${esc(`${entry.template.order}. ${entry.template.title}`)}</span>
+        <span class="task-stage-pill__meta">${esc(stageLabel)} | ${esc(formatDate(entry.dueDate))}</span>
+      </div>`;
+    }).join("");
+
+    return `<article class="task-progress-card">
+      <div class="task-progress-card__head">
+        <div>
+          <h3>${esc(land.land_name || "Unnamed Land")}</h3>
+          <p>${esc(land.location || "No location added")} | Planted ${esc(formatDate(land.planting_date))}</p>
+        </div>
+        <div class="task-progress-card__badge">${esc(`${Math.round(progressPercent)}%`)}</div>
+      </div>
+      <div class="task-progress-track" aria-hidden="true">
+        <span class="task-progress-track__fill" style="width:${progressPercent.toFixed(1)}%"></span>
+      </div>
+      <div class="task-progress-card__meta">
+        <span>${esc(`${completedCount}/${totalStages} tasks completed`)}</span>
+        <span>${esc(`${reachedCount}/${totalStages} stages reached`)}</span>
+        <span>${esc(overdueCount ? `${overdueCount} overdue` : "On schedule")}</span>
+      </div>
+      <p class="task-progress-card__next">${esc(nextLabel)}</p>
+      <div class="task-stage-list">${stageMarkup}</div>
+    </article>`;
+  }).filter(Boolean);
+
+  grid.innerHTML = cards.length
+    ? cards.join("")
+    : '<div class="task-progress-empty">No automated schedule available yet.</div>';
+}
+
+function renderDashboardTaskProgress(visibleTasks = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.tasks)), lands = getDashboardFilteredLands()) {
+  renderTaskProgressGrid("dashboardTaskProgressGrid", lands, visibleTasks);
+}
+
+function renderTaskProgressBoard(visibleTasks = getVisibleRecordsByLand(state.tasks), lands = getVisibleLands()) {
+  renderTaskProgressGrid("taskProgressGrid", lands, visibleTasks);
+}
 function renderTasks() {
   const admin = isAdmin();
   const visibleTasks = getVisibleRecordsByLand(state.tasks);
+  renderTaskProgressBoard(visibleTasks);
   const rows = [...visibleTasks]
     .sort((a, b) => taskDateTimeVal(a) - taskDateTimeVal(b))
     .map((t) => {
