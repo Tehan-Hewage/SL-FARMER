@@ -163,22 +163,14 @@
           <div class="stat-card"><div class="stat-icon" style="background-color:#7B1FA2;"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Net Profit</h3><p class="stat-number" id="statProfit">Rs. 0.00</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#00897B;"><i class="fas fa-calendar-day"></i></div><div class="stat-info"><h3>Upcoming Tasks (7d)</h3><p class="stat-number" id="statTasks">0</p></div></div>
         </div>
-        <div class="table-section">
-          <h2><i class="fas fa-list-check"></i> Pending Tasks</h2>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Countdown</th>
-                <th>Land</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="dashboardPendingTaskRows"></tbody>
-          </table>
+        <div class="task-progress-section">
+          <div class="task-progress-section__head">
+            <div>
+              <h2><i class="fas fa-chart-line"></i> Land Task Progress</h2>
+              <p>These tasks are auto-created from each land planting date and update through the crop cycle.</p>
+            </div>
+          </div>
+          <div class="task-progress-grid" id="dashboardTaskProgressGrid"></div>
         </div>
       </div>
     </section>
@@ -483,6 +475,16 @@
         </div>
 
         <div class="form-container collapsible-panel admin-only" id="taskFormPanel"><h2 class="form-title"><i class="fas fa-plus-circle"></i> Add Task</h2><form id="taskForm" class="simple-form"></form></div>
+
+        <div class="task-progress-section">
+          <div class="task-progress-section__head">
+            <div>
+              <h2><i class="fas fa-chart-line"></i> Land Task Progress</h2>
+              <p>These tasks are auto-created from each land planting date and update through the crop cycle.</p>
+            </div>
+          </div>
+          <div class="task-progress-grid" id="taskProgressGrid"></div>
+        </div>
 
         <div class="table-section"><h2><i class="fas fa-list-check"></i> Task List</h2><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Countdown</th><th>Land</th><th>Type</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="taskRows"></tbody></table></div>
       </div>
