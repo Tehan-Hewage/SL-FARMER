@@ -102,6 +102,7 @@
         <a href="#" data-section="expenses"><i class="fas fa-money-bill-wave"></i> Expenses</a>
         <a href="#" data-section="labor"><i class="fas fa-users"></i> Labor</a>
         <a href="#" data-section="tasks"><i class="fas fa-calendar-check"></i> Tasks</a>
+        <a href="#" data-section="investments" class="admin-only"><i class="fas fa-piggy-bank"></i> Funds</a>
         <a href="#" data-section="users" class="admin-only"><i class="fas fa-user-shield"></i> Users</a>
       </div>
         <div class="nav-actions">
@@ -140,17 +141,19 @@
             <h1><i class="fas fa-seedling"></i> Farm Dashboard</h1>
             <p class="subtitle">Live metrics from Firestore</p>
           </div>
-          <div class="dashboard-filter-dropdown dashboard-filter-dropdown--title">
-            <button type="button" class="dashboard-filter-toggle dashboard-filter-icon-btn" id="dashboardLandFilterToggle" aria-expanded="false" aria-controls="dashboardLandFilterPanel" aria-label="Open land filter options" title="Open land filter options">
-              <i class="fas fa-bars" aria-hidden="true"></i>
-            </button>
-            <div class="dashboard-land-filter-panel" id="dashboardLandFilterPanel" hidden>
-              <div class="dashboard-land-filter-panel-head">
-                <p class="dashboard-filter-summary" id="dashboardLandFilterSummary">Showing all available lands.</p>
-                <button type="button" class="btn btn-secondary dashboard-filter-reset" id="dashboardLandFilterReset"><i class="fas fa-redo"></i> Reset Filter</button>
+          <div class="dashboard-title-actions">
+            <div class="dashboard-filter-dropdown dashboard-filter-dropdown--title">
+              <button type="button" class="dashboard-filter-toggle dashboard-filter-icon-btn" id="dashboardLandFilterToggle" aria-expanded="false" aria-controls="dashboardLandFilterPanel" aria-label="Open land filter options" title="Open land filter options">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+              </button>
+              <div class="dashboard-land-filter-panel" id="dashboardLandFilterPanel" hidden>
+                <div class="dashboard-land-filter-panel-head">
+                  <p class="dashboard-filter-summary" id="dashboardLandFilterSummary">Showing all available lands.</p>
+                  <button type="button" class="btn btn-secondary dashboard-filter-reset" id="dashboardLandFilterReset"><i class="fas fa-redo"></i> Reset Filter</button>
+                </div>
+                <div class="dashboard-land-checklist" id="dashboardLandFilterOptions" role="group" aria-label="Dashboard land filters"></div>
+                <small class="dashboard-land-filter-help">Choose one or more lands to focus the dashboard. Users only see lands assigned by admin.</small>
               </div>
-              <div class="dashboard-land-checklist" id="dashboardLandFilterOptions" role="group" aria-label="Dashboard land filters"></div>
-              <small class="dashboard-land-filter-help">Choose one or more lands to focus the dashboard. Users only see lands assigned by admin.</small>
             </div>
           </div>
         </div>
@@ -160,10 +163,11 @@
           <div class="stat-card"><div class="stat-icon" style="background-color:#2196F3;"><i class="fas fa-seedling"></i></div><div class="stat-info"><h3>Total Plants</h3><p class="stat-number" id="statTotalPlants">0</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#FF9800;"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h3>Total Revenue</h3><p class="stat-number" id="statRevenue">Rs. 0.00</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#E53935;"><i class="fas fa-file-invoice-dollar"></i></div><div class="stat-info"><h3>Total Expenses</h3><p class="stat-number" id="statExpenses">Rs. 0.00</p></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background-color:#0F766E;"><i class="fas fa-piggy-bank"></i></div><div class="stat-info"><h3>Funds</h3><p class="stat-number" id="statFunds">Rs. 0.00</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#7B1FA2;"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Net Profit</h3><p class="stat-number" id="statProfit">Rs. 0.00</p></div></div>
           <div class="stat-card"><div class="stat-icon" style="background-color:#00897B;"><i class="fas fa-calendar-day"></i></div><div class="stat-info"><h3>Upcoming Tasks (7d)</h3><p class="stat-number" id="statTasks">0</p></div></div>
         </div>
-        <div class="task-progress-section">
+        <div class="task-progress-section">  
           <div class="task-progress-section__head">
             <div>
               <h2><i class="fas fa-chart-line"></i> Land Task Progress</h2>
@@ -328,6 +332,106 @@
             </thead>
             <tbody id="expenseRows"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-investments" class="app-section admin-only">
+      <div class="dashboard investment-page">
+        <div class="dashboard-header">
+          <div>
+            <h1><i class="fas fa-piggy-bank"></i> Funds</h1>
+            <p class="subtitle section-subtitle">Add the funds amount and connect it to one or more lands.</p>
+          </div>
+        </div>
+
+        <div class="investment-section-shell">
+          <button type="button" class="investment-toggle-card" id="toggleInvestmentSectionBtn" aria-expanded="false" aria-controls="investmentPanelSection">
+            <span class="investment-toggle-card__copy">
+              <span class="investment-toggle-card__eyebrow">Funds</span>
+              <strong class="investment-toggle-card__title">Client Funds</strong>
+              <small class="investment-toggle-card__meta" id="investmentCardMeta">Full expenses will be deducted automatically.</small>
+            </span>
+            <span class="investment-toggle-card__stats">
+              <span class="investment-toggle-card__amount" id="investmentCardAmount">Rs. 0.00</span>
+              <span class="investment-toggle-card__balance" id="investmentCardBalance">Fund Rs. 0.00</span>
+            </span>
+            <span class="investment-toggle-card__icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+          </button>
+
+          <div class="investment-subcontainer" id="investmentPanelSection" hidden>
+            <div class="investment-panel__summary investment-panel__summary--section">
+              <article class="investment-summary-card">
+                <span class="investment-summary-card__label">Selected Land Expenses</span>
+                <strong class="investment-summary-card__value" id="investmentExpenseAmount">Rs. 0.00</strong>
+              </article>
+              <article class="investment-summary-card">
+                <span class="investment-summary-card__label">Funds Amount</span>
+                <strong class="investment-summary-card__value" id="investmentSavedAmount">Rs. 0.00</strong>
+              </article>
+              <article class="investment-summary-card">
+                <span class="investment-summary-card__label">Fund</span>
+                <strong class="investment-summary-card__value" id="investmentResultAmount">Rs. 0.00</strong>
+                <span id="investmentBalanceState" class="investment-balance-state">Balanced</span>
+              </article>
+            </div>
+
+            <div class="investment-panel__body investment-panel__body--section">
+              <div class="investment-form-box investment-form-box--section">
+                <form id="investmentForm" class="simple-form" autocomplete="off">
+                  <div class="simple-form-grid investment-form-grid">
+                    <div class="form-group">
+                      <label>Investor Name *</label>
+                      <input id="investment_investor_name" class="form-control" type="text" placeholder="Client Name" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                      <label>Funds Date *</label>
+                      <input id="investment_date" class="form-control" type="date" autocomplete="off" required>
+                    </div>
+                    <div class="form-group full">
+                      <label>Funds Amount (Rs.) *</label>
+                      <input id="investment_amount" class="form-control" type="number" min="0" step="0.01" placeholder="250000.00" autocomplete="off" required>
+                    </div>
+                    <div class="form-group full">
+                      <div class="investment-land-picker__head">
+                        <div>
+                          <label>Select Lands *</label>
+                          <small id="investmentLandSummary">All lands selected</small>
+                        </div>
+                        <div class="investment-land-picker__actions">
+                          <button type="button" class="btn btn-secondary investment-land-picker__btn" id="investmentSelectAllBtn">All</button>
+                          <button type="button" class="btn btn-secondary investment-land-picker__btn" id="investmentClearBtn">Clear</button>
+                        </div>
+                      </div>
+                      <div class="dashboard-land-checklist dashboard-land-checklist--investment" id="investmentLandOptions" role="group" aria-label="Funds lands"></div>
+                      <div class="investment-expense-breakdown" id="investmentExpenseBreakdown"></div>
+                    </div>
+                  </div>
+                  <div class="form-actions-row investment-form-actions">
+                    <button type="button" class="btn btn-secondary" id="investmentFormSecondaryBtn" hidden><i class="fas fa-times"></i> Cancel</button>
+                    <button type="submit" class="btn" id="investmentSubmitBtn"><i class="fas fa-save"></i> Save Funds</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="investment-entry-box investment-entry-box--section">
+                <div class="investment-entry-box__head">
+                  <div>
+                    <h3><i class="fas fa-clock-rotate-left"></i> Funds History</h3>
+                    <p class="investment-form-box__lead">Previous saved fund details and amounts.</p>
+                  </div>
+                </div>
+                <div class="table-section investment-history-table">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Investor</th><th>Date</th><th>Lands</th><th>Amount</th><th>Saved</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="investmentHistoryRows"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -554,3 +658,6 @@
 <script src="js/pwa.js?v=20260220-4" defer></script>
 </body>
 </html>
+
+
+
