@@ -288,7 +288,7 @@ function initExpenseCategorySelectors() {
         'fertilizer': ['Urea', 'TSP', 'MOP', 'Organic', 'Liquid Fertilizer', 'Other'],
         'chemicals': ['Pesticides', 'Herbicides', 'Fungicides', 'Growth Regulators', 'Other'],
         'tools_equipment': ['Purchase', 'Repair', 'Maintenance', 'Rental', 'Fuel', 'Other'],
-        'transport': ['Vehicle Fuel', 'Vehicle Maintenance', 'Driver Wages', 'Transport Rental', 'Other'],
+        'transport': ['Vehicle Fuel', 'Vehicle Maintenance', 'Driver Wages', 'Transport Rental', 'Pick Me', 'Other'],
         'irrigation': ['Water Pump', 'Pipes & Hoses', 'Electricity', 'Water Charges', 'Maintenance', 'Other'],
         'land_preparation': ['Plowing', 'Leveling', 'Fencing', 'Drainage', 'Soil Testing', 'Other'],
         'extra': ['Administrative', 'Miscellaneous', 'Unexpected Costs', 'Other']

@@ -36,6 +36,7 @@ const state = {
   expenses: [],
   laborers: [],
   users: [],
+  investments: [],
   tasks: []
 };
 
@@ -49,7 +50,9 @@ const authState = {
 let accessNoticeTimeoutId = null;
 const uiState = {
   editingLandId: "",
-  recordModal: null
+  recordModal: null,
+  investmentFormMode: "create",
+  investmentHistoryEntryId: ""
 };
 const TASK_REMINDER_DAYS = [3, 2, 1, 0];
 const TASK_COUNTDOWN_SOON_THRESHOLD_DAYS = 3;
@@ -64,6 +67,7 @@ const TASK_FCM_SW_PATH = "/firebase-messaging-sw.js?v=20260302-1";
 const TASK_FCM_SW_SCOPE = "/";
 const APP_BOOT_MIN_LOADING_MS = 900;
 const SECTION_SWITCH_LOADING_MS = 260;
+const INVESTMENT_RECORD_ID = "dashboard_investment";
 
 let taskReminderIntervalId = null;
 let taskReminderVisibilityBound = false;
@@ -71,6 +75,8 @@ let appBootLoadingStartTs = Date.now();
 let appBootLoadingDone = false;
 let sectionLoadingTimeoutId = null;
 let pendingSignupProfile = null;
+let investmentCleanupInFlight = false;
+let investmentDraftDirty = false;
 const taskMessagingState = {
   supportChecked: false,
   supported: false,
@@ -180,7 +186,7 @@ const expenseCategories = {
   chemicals: [ "Diarone", "Propenapose", "Other"],
   tools_equipment: ["Purchase", "Repair", "Rental", "Fuel", "Other"],
   machines: ["Excavator", "JCB"],
-  transport: ["Vehicle Fuel", "Transport Rental", "Other"],
+  transport: ["Vehicle Fuel", "Transport Rental", "Pick Me", "Other"],
   extra: ["Administrative", "Miscellaneous", "Unexpected Costs", "Other"]
 };
 
@@ -191,6 +197,7 @@ const refs = {
   expenses: collection(db, "expenses"),
   laborers: collection(db, "laborers"),
   users: collection(db, "users"),
+  investments: collection(db, "investments"),
   tasks: collection(db, "fertilizer_schedule")
 };
 
@@ -489,7 +496,7 @@ function applyRoleAccess() {
     console.warn("Task FCM sync failed after role update:", error);
   });
   if (signedIn && accessPending) {
-    const restrictedSections = ["lands", "harvest", "expenses", "labor", "tasks", "users"];
+    const restrictedSections = ["lands", "harvest", "expenses", "investments", "labor", "tasks", "users"];
     const shouldRedirect = restrictedSections.some((sectionName) => {
       const sectionEl = document.getElementById(`section-${sectionName}`);
       return sectionEl?.classList.contains("active");
@@ -498,8 +505,12 @@ function applyRoleAccess() {
       activateSection("dashboard");
     }
   } else if (signedIn && !admin) {
-    const usersSection = document.getElementById("section-users");
-    if (usersSection?.classList.contains("active")) {
+    const restrictedSections = ["users", "investments"];
+    const shouldRedirect = restrictedSections.some((sectionName) => {
+      const sectionEl = document.getElementById(`section-${sectionName}`);
+      return sectionEl?.classList.contains("active");
+    });
+    if (shouldRedirect) {
       activateSection("dashboard");
     }
   }
@@ -614,6 +625,7 @@ function resetState() {
   state.expenses = [];
   state.laborers = [];
   state.users = [];
+  state.investments = [];
   state.tasks = [];
   filters.dashboard.lands = [];
   snapshotState.lands = false;
@@ -847,6 +859,7 @@ function initUiControls() {
   bindToggle("toggleExpenseFormBtn", "expenseFormPanel", "Add New Expense", "Close Expense Form");
   bindToggle("toggleLaborFormBtn", "laborFormPanel", "Add New Laborer", "Close Labor Form");
   bindToggle("toggleTaskFormBtn", "taskFormPanel", "Add Task", "Close Task Form");
+  initInvestmentPanelControls();
 }
 
 function bindToggle(buttonId, panelId, closedText, openText) {
@@ -873,6 +886,549 @@ function iconFromText(text) {
   if (text.includes("Close")) return '<i class="fas fa-times"></i> ';
   if (text.includes("Laborer")) return '<i class="fas fa-user-plus"></i> ';
   return '<i class="fas fa-plus"></i> ';
+}
+
+function initInvestmentPanelControls() {
+  const toggleBtn = document.getElementById("toggleInvestmentSectionBtn");
+  const landOptions = document.getElementById("investmentLandOptions");
+  const amountInput = document.getElementById("investment_amount");
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const selectAllBtn = document.getElementById("investmentSelectAllBtn");
+  const clearBtn = document.getElementById("investmentClearBtn");
+  const secondaryBtn = document.getElementById("investmentFormSecondaryBtn");
+
+  if (toggleBtn && toggleBtn.dataset.bound !== "1") {
+    toggleBtn.dataset.bound = "1";
+    toggleBtn.addEventListener("click", () => {
+      const panel = document.getElementById("investmentPanelSection");
+      const nextOpen = !(panel && !panel.hidden);
+      setInvestmentSectionOpen(nextOpen);
+    });
+  }
+
+  if (landOptions && landOptions.dataset.bound !== "1") {
+    landOptions.dataset.bound = "1";
+    landOptions.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+      if (normalizeId(target.dataset.investmentLand).toLowerCase() !== "true") return;
+      setInvestmentDraftDirty(true);
+      updateInvestmentSummaryPreview();
+    });
+  }
+
+  if (amountInput && amountInput.dataset.bound !== "1") {
+    amountInput.dataset.bound = "1";
+    amountInput.addEventListener("input", () => {
+      setInvestmentDraftDirty(true);
+      updateInvestmentSummaryPreview();
+    });
+  }
+
+  if (investorNameInput && investorNameInput.dataset.bound !== "1") {
+    investorNameInput.dataset.bound = "1";
+    investorNameInput.addEventListener("input", () => {
+      setInvestmentDraftDirty(true);
+      updateInvestmentSummaryPreview();
+    });
+  }
+
+  if (dateInput && dateInput.dataset.bound !== "1") {
+    dateInput.dataset.bound = "1";
+    dateInput.addEventListener("input", () => {
+      setInvestmentDraftDirty(true);
+      updateInvestmentSummaryPreview();
+    });
+  }
+
+  if (selectAllBtn && selectAllBtn.dataset.bound !== "1") {
+    selectAllBtn.dataset.bound = "1";
+    selectAllBtn.addEventListener("click", () => {
+      setInvestmentDraftDirty(true);
+      setInvestmentLandSelectionState(true);
+    });
+  }
+
+  if (clearBtn && clearBtn.dataset.bound !== "1") {
+    clearBtn.dataset.bound = "1";
+    clearBtn.addEventListener("click", () => {
+      setInvestmentDraftDirty(true);
+      setInvestmentLandSelectionState(false);
+    });
+  }
+
+  if (secondaryBtn && secondaryBtn.dataset.bound !== "1") {
+    secondaryBtn.dataset.bound = "1";
+    secondaryBtn.addEventListener("click", () => {
+      resetInvestmentDraftForm();
+      renderInvestmentSection();
+    });
+  }
+}
+
+function setInvestmentSectionOpen(nextOpen) {
+  const panel = document.getElementById("investmentPanelSection");
+  const toggleBtn = document.getElementById("toggleInvestmentSectionBtn");
+  if (!panel || !toggleBtn) return;
+
+  const isOpen = Boolean(nextOpen);
+  panel.hidden = !isOpen;
+  panel.classList.toggle("is-open", isOpen);
+  toggleBtn.classList.toggle("is-open", isOpen);
+  toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
+function getInvestmentRecord() {
+  return (Array.isArray(state.investments) ? state.investments : [])
+    .find((entry) => idsMatch(entry.id, INVESTMENT_RECORD_ID)) || null;
+}
+
+function cleanupLegacyInvestmentRecords() {
+  if (investmentCleanupInFlight || !authState.user || !isAdmin()) return;
+
+  const legacyEntries = (Array.isArray(state.investments) ? state.investments : [])
+    .filter((entry) => !idsMatch(entry.id, INVESTMENT_RECORD_ID));
+
+  if (!legacyEntries.length) return;
+
+  investmentCleanupInFlight = true;
+  Promise.all(legacyEntries.map((entry) => deleteDoc(doc(db, "investments", entry.id))))
+    .catch((error) => {
+      console.error("Error clearing legacy investments:", error);
+    })
+    .finally(() => {
+      investmentCleanupInFlight = false;
+    });
+}
+
+function setInvestmentDraftDirty(nextDirty = true) {
+  investmentDraftDirty = Boolean(nextDirty);
+}
+
+function setInvestmentFormMode(mode = "create", entryId = "") {
+  const normalizedMode = mode === "view" ? "view" : mode === "edit" ? "edit" : "create";
+  uiState.investmentFormMode = normalizedMode;
+  uiState.investmentHistoryEntryId = normalizeId(entryId);
+
+  const submitBtn = document.getElementById("investmentSubmitBtn");
+  const secondaryBtn = document.getElementById("investmentFormSecondaryBtn");
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const amountInput = document.getElementById("investment_amount");
+  const selectAllBtn = document.getElementById("investmentSelectAllBtn");
+  const clearBtn = document.getElementById("investmentClearBtn");
+  const lockFields = normalizedMode === "view";
+
+  if (submitBtn) {
+    submitBtn.hidden = lockFields;
+    submitBtn.innerHTML = normalizedMode === "edit"
+      ? '<i class="fas fa-save"></i> Update Funds'
+      : '<i class="fas fa-save"></i> Save Funds'
+  }
+
+  if (secondaryBtn) {
+    secondaryBtn.hidden = normalizedMode === "create";
+    secondaryBtn.innerHTML = normalizedMode === "view"
+      ? '<i class="fas fa-arrow-left"></i> Close Preview'
+      : '<i class="fas fa-times"></i> Cancel Edit'
+  }
+
+  if (investorNameInput) investorNameInput.readOnly = lockFields;
+  if (amountInput) amountInput.readOnly = lockFields;
+  if (dateInput) dateInput.disabled = lockFields;
+  if (selectAllBtn) selectAllBtn.disabled = lockFields;
+  if (clearBtn) clearBtn.disabled = lockFields;
+  Array.from(document.querySelectorAll('#investmentLandOptions input[data-investment-land="true"]')).forEach((input) => {
+    input.disabled = lockFields;
+  });
+}
+
+function resetInvestmentDraftForm() {
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const amountInput = document.getElementById("investment_amount");
+
+  if (investorNameInput) investorNameInput.value = "";
+  if (dateInput) dateInput.value = "";
+  if (amountInput) amountInput.value = "";
+
+  setInvestmentDraftDirty(false);
+  setInvestmentFormMode("create");
+  renderInvestmentLandOptions(getInvestmentRecord(), []);
+  updateInvestmentSummaryPreview();
+}
+
+function getStoredInvestmentLandKeys(record = getInvestmentRecord()) {
+  return Array.isArray(record?.land_ids)
+    ? record.land_ids.map((entry) => normalizeId(entry)).filter(Boolean)
+    : [];
+}
+
+function getInvestmentLandKeys(record = getInvestmentRecord()) {
+  const visibleLandKeys = getVisibleLands().map((land) => getLandKey(land)).filter(Boolean);
+  if (!visibleLandKeys.length) return [];
+
+  const savedKeys = getStoredInvestmentLandKeys(record);
+  const matchedKeys = Array.from(new Set(
+    savedKeys.filter((savedKey) => visibleLandKeys.some((visibleKey) => idsMatch(savedKey, visibleKey)))
+  ));
+
+  return matchedKeys.length ? matchedKeys : visibleLandKeys;
+}
+
+function getSelectedInvestmentLandKeysFromDom() {
+  const optionsWrap = document.getElementById("investmentLandOptions");
+  if (!optionsWrap) return null;
+
+  return Array.from(optionsWrap.querySelectorAll('input[data-investment-land="true"]:checked'))
+    .map((input) => normalizeId(input.value))
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index);
+}
+
+function setInvestmentLandSelectionState(nextChecked) {
+  const inputs = Array.from(document.querySelectorAll('#investmentLandOptions input[data-investment-land="true"]'));
+  if (!inputs.length) return;
+  inputs.forEach((input) => {
+    input.checked = Boolean(nextChecked);
+  });
+  updateInvestmentSummaryPreview();
+}
+
+function formatInvestmentLandSummary(selectedKeys, visibleLands = getVisibleLands()) {
+  if (!visibleLands.length) return "No lands available";
+
+  const selectedLands = visibleLands.filter((land) => selectedKeys.some((selectedKey) => idsMatch(selectedKey, getLandKey(land))));
+  if (!selectedLands.length) return "No lands selected";
+  if (selectedLands.length === visibleLands.length) return `All ${visibleLands.length} lands selected`;
+  if (selectedLands.length === 1) return selectedLands[0].land_name || "1 land selected";
+  if (selectedLands.length === 2) return `${selectedLands[0].land_name || "Land 1"} + ${selectedLands[1].land_name || "Land 2"}`;
+  return `${selectedLands.length} lands selected`;
+}
+
+function renderInvestmentLandOptions(record = getInvestmentRecord(), selectedKeysOverride = null) {
+  const optionsWrap = document.getElementById("investmentLandOptions");
+  if (!optionsWrap) return;
+
+  const visibleLands = getVisibleLands();
+  const selectedKeys = Array.isArray(selectedKeysOverride)
+    ? selectedKeysOverride.map((entry) => normalizeId(entry)).filter(Boolean)
+    : (investmentDraftDirty ? (getSelectedInvestmentLandKeysFromDom() || []) : []);
+
+  if (!visibleLands.length) {
+    optionsWrap.innerHTML = '<div class="empty-inline-note">No lands available for funds selection.</div>';
+    return;
+  }
+
+  optionsWrap.innerHTML = visibleLands.map((land) => {
+    const landKey = getLandKey(land);
+    const checked = selectedKeys.some((selectedKey) => idsMatch(selectedKey, landKey)) ? "checked" : "";
+    return `
+      <label class="dashboard-land-option dashboard-land-option--investment">
+        <input class="dashboard-land-option-input" type="checkbox" value="${esc(landKey)}" data-investment-land="true" ${checked}>
+        <span class="dashboard-land-option-check"><i class="fas fa-check"></i></span>
+        <span class="dashboard-land-option-copy">
+          <span class="dashboard-land-option-title">${esc(land.land_name || "Unnamed")}</span>
+          <span class="dashboard-land-option-meta">${esc(land.location || "No location added")}</span>
+        </span>
+      </label>`;
+  }).join("");
+}
+
+function getInvestmentExpenseAmount(selectedKeys = []) {
+  const landKeys = Array.isArray(selectedKeys)
+    ? selectedKeys.map((entry) => normalizeId(entry)).filter(Boolean)
+    : [];
+
+  if (!landKeys.length) return 0;
+
+  return getVisibleRecordsByLand(state.expenses).reduce((sum, entry) => {
+    const resolvedLandKey = getResolvedLandKey(entry?.land_id);
+    return landKeys.some((landKey) => idsMatch(landKey, resolvedLandKey))
+      ? sum + Number(entry.amount || 0)
+      : sum;
+  }, 0);
+}
+
+function getInvestmentExpenseBreakdown(selectedKeys = [], visibleLands = getVisibleLands()) {
+  const landKeys = Array.isArray(selectedKeys)
+    ? Array.from(new Set(selectedKeys.map((entry) => normalizeId(entry)).filter(Boolean)))
+    : [];
+
+  return landKeys.map((landKey) => {
+    const matchedLand = visibleLands.find((land) => idsMatch(landKey, getLandKey(land)));
+    return {
+      landKey,
+      landName: matchedLand?.land_name || "Unnamed Land",
+      amount: getInvestmentExpenseAmount([landKey])
+    };
+  });
+}
+
+function renderInvestmentExpenseBreakdown(selectedKeys = [], visibleLands = getVisibleLands()) {
+  const wrap = document.getElementById("investmentExpenseBreakdown");
+  if (!wrap) return;
+
+  const entries = getInvestmentExpenseBreakdown(selectedKeys, visibleLands);
+  if (!entries.length) {
+    wrap.innerHTML = '<div class="investment-expense-breakdown__empty">Select one or more lands to view expenses.</div>';
+    return;
+  }
+
+  const total = entries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  wrap.innerHTML = '<div class="investment-expense-breakdown__title">Selected Land Expenses</div>'
+    + entries.map((entry) => '<div class="investment-expense-breakdown__row"><span>' + esc(entry.landName) + '</span><strong>' + esc(formatCurrency(entry.amount)) + '</strong></div>').join("")
+    + '<div class="investment-expense-breakdown__row investment-expense-breakdown__row--total"><span>Total</span><strong>' + esc(formatCurrency(total)) + '</strong></div>';
+}
+
+function getInvestmentFullExpenseAmount() {
+  return getVisibleRecordsByLand(state.expenses).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+}
+
+function getAllocatedInvestmentAmountForLandKeys(selectedKeys = [], record = getInvestmentRecord()) {
+  const landKeys = Array.isArray(selectedKeys)
+    ? Array.from(new Set(selectedKeys.map((entry) => normalizeId(entry)).filter(Boolean)))
+    : [];
+
+  if (!landKeys.length) return 0;
+
+  const savedKeys = getStoredInvestmentLandKeys(record);
+  if (!savedKeys.length) return 0;
+
+  const totalAmount = Number(record?.amount || 0);
+  if (!Number.isFinite(totalAmount) || totalAmount <= 0) return 0;
+
+  const matchedCount = landKeys.filter((landKey) => savedKeys.some((savedKey) => idsMatch(landKey, savedKey))).length;
+  if (!matchedCount) return 0;
+
+  return totalAmount * (matchedCount / savedKeys.length);
+}
+
+function getInvestmentHistoryEntries(record = getInvestmentRecord()) {
+  return Array.isArray(record?.history)
+    ? record.history.filter((entry) => entry && typeof entry === "object")
+    : [];
+}
+
+function getInvestmentHistoryEntryById(entryId, record = getInvestmentRecord()) {
+  return getInvestmentHistoryEntries(record).find((entry) => idsMatch(entry.id, entryId)) || null;
+}
+
+async function persistInvestmentHistoryState(nextHistory = []) {
+  const sanitizedHistory = Array.isArray(nextHistory)
+    ? nextHistory.filter((entry) => entry && typeof entry === "object")
+    : [];
+  const primaryEntry = sanitizedHistory[0] || null;
+
+  await setDoc(doc(db, "investments", INVESTMENT_RECORD_ID), {
+    investor_name: primaryEntry?.investor_name || "",
+    investment_date: primaryEntry?.investment_date || "",
+    amount: Number(primaryEntry?.amount || 0),
+    land_ids: Array.isArray(primaryEntry?.land_ids) ? primaryEntry.land_ids : [],
+    history: sanitizedHistory,
+    updated_by: authState.user?.uid || null,
+    updated_at: serverTimestamp()
+  }, { merge: true });
+
+  state.investments = [{
+    ...(getInvestmentRecord() || {}),
+    id: INVESTMENT_RECORD_ID,
+    investor_name: primaryEntry?.investor_name || "",
+    investment_date: primaryEntry?.investment_date || "",
+    amount: Number(primaryEntry?.amount || 0),
+    land_ids: Array.isArray(primaryEntry?.land_ids) ? primaryEntry.land_ids : [],
+    history: sanitizedHistory,
+    updated_by: authState.user?.uid || null
+  }];
+}
+
+function fillInvestmentFormFromHistoryEntry(entry, mode = "view") {
+  if (!entry) return;
+
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const amountInput = document.getElementById("investment_amount");
+  const landKeys = Array.isArray(entry.land_ids)
+    ? entry.land_ids.map((landId) => normalizeId(landId)).filter(Boolean)
+    : [];
+
+  setInvestmentDraftDirty(true);
+  if (investorNameInput) investorNameInput.value = entry.investor_name || "";
+  if (dateInput) dateInput.value = entry.investment_date || "";
+  if (amountInput) amountInput.value = Number.isFinite(Number(entry.amount)) ? String(Number(entry.amount || 0)) : "";
+
+  renderInvestmentLandOptions(getInvestmentRecord(), landKeys);
+  setInvestmentFormMode(mode, entry.id);
+  setInvestmentSectionOpen(true);
+  updateInvestmentSummaryPreview();
+}
+
+function bindInvestmentHistoryActionRoot(root) {
+  if (!root) return;
+
+  root.querySelectorAll('button[data-funds-view]').forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const entry = getInvestmentHistoryEntryById(btn.dataset.fundsView);
+      if (!entry) return;
+      fillInvestmentFormFromHistoryEntry(entry, "view");
+    });
+  });
+
+  root.querySelectorAll('button[data-funds-edit]').forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!requireAdmin("edit funds")) return;
+      const entry = getInvestmentHistoryEntryById(btn.dataset.fundsEdit);
+      if (!entry) return;
+      fillInvestmentFormFromHistoryEntry(entry, "edit");
+    });
+  });
+
+  root.querySelectorAll('button[data-funds-delete]').forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!requireAdmin("delete funds")) return;
+      const entryId = normalizeId(btn.dataset.fundsDelete);
+      if (!entryId) return;
+      if (!window.confirm("Do you want to delete this funds entry?")) return;
+      try {
+        const currentRecord = getInvestmentRecord();
+        const nextHistory = getInvestmentHistoryEntries(currentRecord)
+          .filter((entry) => !idsMatch(entry.id, entryId));
+        await persistInvestmentHistoryState(nextHistory);
+        if (idsMatch(uiState.investmentHistoryEntryId, entryId)) {
+          resetInvestmentDraftForm();
+        }
+        renderInvestmentSection();
+        renderDashboard();
+        showAlert("Funds entry deleted successfully.", "success");
+      } catch (error) {
+        showAlert(`Error deleting funds entry: ${error.message}`, "danger");
+      }
+    });
+  });
+}
+
+function bindInvestmentHistoryActionHandlers() {
+  const tbody = document.getElementById("investmentHistoryRows");
+  bindInvestmentHistoryActionRoot(tbody);
+  const cardsContainer = responsiveTables.getCardsContainer("investmentHistoryRows");
+  if (cardsContainer) bindInvestmentHistoryActionRoot(cardsContainer);
+}
+
+function renderInvestmentHistory(record = getInvestmentRecord()) {
+  const entries = getInvestmentHistoryEntries(record)
+    .slice()
+    .sort((a, b) => dateVal(b.saved_at || b.investment_date) - dateVal(a.saved_at || a.investment_date));
+
+  const rows = entries.map((entry) => {
+    const title = entry.investor_name || "Unnamed Investor";
+    const savedAt = entry.saved_at ? formatDateTime(entry.saved_at) : "-";
+    const investmentDate = entry.investment_date ? formatDate(entry.investment_date) : "-";
+    const landSummary = entry.land_summary || "No land details";
+    const mobileExtras = mobileExtraFieldsAttr([
+      { label: "Lands", value: landSummary },
+      { label: "Saved", value: savedAt }
+    ]);
+
+    return `<tr${mobileExtras}>
+      <td><strong>${esc(title)}</strong></td>
+      <td>${esc(investmentDate)}</td>
+      <td>${esc(landSummary)}</td>
+      <td><strong>${esc(formatCurrency(Number(entry.amount || 0)))}</strong></td>
+      <td>${esc(savedAt)}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn-icon" type="button" data-funds-view="${esc(entry.id)}" title="View Funds Entry"><i class="fas fa-eye"></i></button>
+          <button class="btn-icon" type="button" data-funds-edit="${esc(entry.id)}" title="Edit Funds Entry"><i class="fas fa-edit"></i></button>
+          <button class="btn-icon btn-danger" type="button" data-funds-delete="${esc(entry.id)}" title="Delete Funds Entry"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  setRows("investmentHistoryRows", rows, 6, "No funds history yet.");
+  bindInvestmentHistoryActionHandlers();
+}
+
+function updateInvestmentSummaryPreview() {
+  const record = getInvestmentRecord();
+  const visibleLands = getVisibleLands();
+  const domLandKeys = getSelectedInvestmentLandKeysFromDom();
+  const storedLandKeys = getStoredInvestmentLandKeys(record);
+  const useDraftValues = investmentDraftDirty;
+  const selectedKeys = useDraftValues
+    ? (domLandKeys || [])
+    : (storedLandKeys.length ? getInvestmentLandKeys(record) : []);
+  const amountInput = document.getElementById("investment_amount");
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const parsedAmount = amountInput ? Number(amountInput.value || 0) : Number.NaN;
+  const investmentAmount = useDraftValues
+    ? (Number.isFinite(parsedAmount) && parsedAmount >= 0 ? parsedAmount : 0)
+    : (Number.isFinite(Number(record?.amount)) ? Number(record.amount || 0) : 0);
+  const investorName = normalizeId(useDraftValues ? investorNameInput?.value : (record?.investor_name || ""));
+  const investmentDate = normalizeId(useDraftValues ? dateInput?.value : (record?.investment_date || ""));
+  const selectedExpenseAmount = getInvestmentExpenseAmount(selectedKeys);
+  const fundAmount = selectedExpenseAmount - investmentAmount;
+  const summaryLabel = formatInvestmentLandSummary(selectedKeys, visibleLands);
+  const metaText = investorName
+    ? [investorName, investmentDate ? formatDate(investmentDate) : ""].filter(Boolean).join(" | ")
+    : (investmentDate ? "Funds Date: " + formatDate(investmentDate) : "Add investor name and funds date");
+
+  text("investmentLandSummary", summaryLabel);
+  text("investmentExpenseAmount", formatCurrency(selectedExpenseAmount));
+  text("investmentSavedAmount", formatCurrency(investmentAmount));
+  text("investmentResultAmount", formatCurrency(fundAmount));
+  text("investmentCardAmount", formatCurrency(investmentAmount));
+  text("investmentCardMeta", metaText);
+  text("investmentCardBalance", "Fund " + formatCurrency(fundAmount));
+  renderInvestmentExpenseBreakdown(selectedKeys, visibleLands);
+
+  const balanceState = document.getElementById("investmentBalanceState");
+  if (balanceState) {
+    let message = "Balanced";
+    let stateClass = "is-positive";
+
+    if (!selectedKeys.length) {
+      message = "Select one or more lands";
+      stateClass = "";
+    } else if (investmentAmount <= 0) {
+      message = "Add funds amount";
+      stateClass = "";
+    } else if (fundAmount > 0) {
+      message = "More funds needed";
+      stateClass = "is-negative";
+    } else if (fundAmount < 0) {
+      message = "Funds cover expenses";
+      stateClass = "is-positive";
+    }
+
+    balanceState.textContent = message;
+    balanceState.className = ("investment-balance-state " + stateClass).trim();
+  }
+}
+
+function renderInvestmentSection() {
+  const amountInput = document.getElementById("investment_amount");
+  const investorNameInput = document.getElementById("investment_investor_name");
+  const dateInput = document.getElementById("investment_date");
+  const draftSelectedKeys = investmentDraftDirty ? (getSelectedInvestmentLandKeysFromDom() || []) : [];
+  if (!amountInput) return;
+
+  cleanupLegacyInvestmentRecords();
+
+  if (!investmentDraftDirty) {
+    if (amountInput) amountInput.value = "";
+    if (investorNameInput) investorNameInput.value = "";
+    if (dateInput) dateInput.value = "";
+    setInvestmentFormMode("create");
+  }
+
+  const record = getInvestmentRecord();
+  renderInvestmentLandOptions(record, draftSelectedKeys);
+  renderInvestmentHistory(record);
+  setInvestmentFormMode(uiState.investmentFormMode, uiState.investmentHistoryEntryId);
+  updateInvestmentSummaryPreview();
 }
 
 function initFilterHandlers() {
@@ -911,19 +1467,21 @@ function initFilterHandlers() {
   }
 
   document.addEventListener("click", (event) => {
-    const panel = document.getElementById("dashboardLandFilterPanel");
-    const toggleBtn = document.getElementById("dashboardLandFilterToggle");
     const target = event.target;
-    if (!panel || !toggleBtn || !(target instanceof Node)) return;
-    if (panel.hidden) return;
-    if (panel.contains(target) || toggleBtn.contains(target)) return;
-    setDashboardLandFilterPanelOpen(false);
+    if (!(target instanceof Node)) return;
+
+    const landPanel = document.getElementById("dashboardLandFilterPanel");
+    const landToggleBtn = document.getElementById("dashboardLandFilterToggle");
+    if (landPanel && landToggleBtn && !landPanel.hidden && !landPanel.contains(target) && !landToggleBtn.contains(target)) {
+      setDashboardLandFilterPanelOpen(false);
+    }
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setDashboardLandFilterPanelOpen(false);
+    if (event.key === "Escape") {
+      setDashboardLandFilterPanelOpen(false);
+    }
   });
-
   const dashboardLandFilterReset = document.getElementById("dashboardLandFilterReset");
   if (dashboardLandFilterReset) {
     dashboardLandFilterReset.addEventListener("click", () => {
@@ -1217,6 +1775,7 @@ function initListeners() {
     state.expenses = [];
     state.laborers = [];
     state.users = [];
+    state.investments = [];
     state.tasks = [];
     renderAll();
     return;
@@ -1233,8 +1792,10 @@ function initListeners() {
   authState.listeners.push(subscribeSnapshot(refs.laborers, "laborers"));
   if (isAdmin()) {
     authState.listeners.push(subscribeSnapshot(refs.users, "users"));
+    authState.listeners.push(subscribeSnapshot(refs.investments, "investments"));
   } else {
     state.users = [];
+    state.investments = [];
   }
   authState.listeners.push(subscribeSnapshot(refs.tasks, "tasks"));
 }
@@ -1419,6 +1980,70 @@ function initSubmitHandlers() {
     }
   });
 
+  const investmentForm = document.getElementById("investmentForm");
+  if (investmentForm) {
+    investmentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!requireAdmin("update funds")) return;
+      try {
+        const investorName = value("investment_investor_name");
+        const investmentDate = value("investment_date");
+        const amount = num("investment_amount");
+        if (!investorName) {
+          showAlert("Investor name is required.", "warning");
+          return;
+        }
+        if (!investmentDate) {
+          showAlert("Funds date is required.", "warning");
+          return;
+        }
+        if (!Number.isFinite(amount) || amount < 0) {
+          showAlert("Funds amount cannot be negative.", "warning");
+          return;
+        }
+
+        const landKeys = getSelectedInvestmentLandKeysFromDom() || [];
+        if (!landKeys.length) {
+          showAlert("Select at least one land for the funds.", "warning");
+          return;
+        }
+
+        const currentRecord = getInvestmentRecord();
+        const editingEntryId = uiState.investmentFormMode === "edit"
+          ? normalizeId(uiState.investmentHistoryEntryId)
+          : "";
+        const nextEntry = {
+          id: editingEntryId || ("investment_" + Date.now()),
+          investor_name: investorName,
+          investment_date: investmentDate,
+          amount,
+          land_ids: landKeys,
+          land_summary: formatInvestmentLandSummary(landKeys, getVisibleLands()),
+          saved_at: new Date().toISOString(),
+          updated_by: authState.user?.uid || null
+        };
+        const nextHistory = [
+          nextEntry,
+          ...getInvestmentHistoryEntries(currentRecord).filter((entry) => !idsMatch(entry.id, editingEntryId))
+        ].slice(0, 25);
+
+        await persistInvestmentHistoryState(nextHistory);
+
+        const legacyEntries = (Array.isArray(state.investments) ? state.investments : [])
+          .filter((entry) => !idsMatch(entry.id, INVESTMENT_RECORD_ID));
+        if (legacyEntries.length) {
+          await Promise.all(legacyEntries.map((entry) => deleteDoc(doc(db, "investments", entry.id))));
+        }
+
+        resetInvestmentDraftForm();
+        renderInvestmentSection();
+        renderDashboard();
+        showAlert(editingEntryId ? "Funds updated successfully." : "Funds saved successfully.", "success");
+      } catch (error) {
+        showAlert(`Error saving funds: ${error.message}`, "danger");
+      }
+    });
+  }
   document.getElementById("laborForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!requireAdmin("add laborers")) return;
@@ -1508,6 +2133,7 @@ function initSubmitHandlers() {
 function renderAll() {
   fillReferenceSelects();
   renderDashboard();
+  renderInvestmentSection();
   renderLands();
   renderHarvest();
   renderExpenses();
@@ -1697,6 +2323,7 @@ function renderDashboard() {
     text("statTotalHectares", "-");
     text("statRevenue", "-");
     text("statExpenses", "-");
+    text("statFunds", "-");
     text("statProfit", "-");
     text("statTasks", "-");
     renderDashboardTaskProgress([], []);
@@ -1704,6 +2331,7 @@ function renderDashboard() {
   }
 
   const visibleLands = getDashboardFilteredLands();
+  const visibleLandKeys = visibleLands.map((land) => getLandKey(land)).filter(Boolean);
   const visiblePlants = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.plants))
     .filter((plant) => isRecordLinkedToKnownLand(plant.land_id));
   const visibleHarvest = getDashboardFilteredRecordsByLand(getVisibleRecordsByLand(state.harvest));
@@ -1722,6 +2350,7 @@ function renderDashboard() {
   }, 0);
   const revenue = visibleHarvest.reduce((sum, h) => sum + Number(h.total_revenue || 0), 0);
   const expenses = visibleExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const funds = expenses - getAllocatedInvestmentAmountForLandKeys(visibleLandKeys);
   const profit = revenue - expenses;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -1737,6 +2366,7 @@ function renderDashboard() {
   text("statTotalHectares", formatNum(totalHectares));
   text("statRevenue", formatCurrency(revenue));
   text("statExpenses", formatCurrency(expenses));
+  text("statFunds", formatCurrency(funds));
   text("statProfit", formatCurrency(profit));
   text("statTasks", formatInt(taskCount));
 
