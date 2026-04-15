@@ -166,6 +166,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!profiles.length) return;
 
             let currentFounderIndex = 0;
+            let founderAutoplayId = null;
+            const canAutoplayFounders = profiles.length > 1 && !prefersReducedMotion;
+
+            const stopFounderAutoplay = () => {
+                if (founderAutoplayId) {
+                    window.clearInterval(founderAutoplayId);
+                    founderAutoplayId = null;
+                }
+            };
+
+            const startFounderAutoplay = () => {
+                if (!canAutoplayFounders) return;
+                stopFounderAutoplay();
+                founderAutoplayId = window.setInterval(() => {
+                    renderFounder(currentFounderIndex + 1);
+                }, 5000);
+            };
 
             const renderFounder = (index) => {
                 currentFounderIndex = (index + profiles.length) % profiles.length;
@@ -196,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dot.setAttribute('aria-selected', 'false');
                 dot.addEventListener('click', () => {
                     renderFounder(index);
+                    startFounderAutoplay();
                 });
                 founderDotsEl.appendChild(dot);
             });
@@ -211,13 +229,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             founderPrevBtn?.addEventListener('click', () => {
                 renderFounder(currentFounderIndex - 1);
+                startFounderAutoplay();
             });
 
             founderNextBtn?.addEventListener('click', () => {
                 renderFounder(currentFounderIndex + 1);
+                startFounderAutoplay();
             });
 
             renderFounder(0);
+            startFounderAutoplay();
         });
     }
     
